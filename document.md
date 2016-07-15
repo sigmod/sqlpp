@@ -3,32 +3,32 @@
 ## <a id="toc">Table of Contents</a> ##
 
 * [1. Introduction](#Introduction)
-* [2. Query](#Query)
-  * [Expression](#Expression)  
-    * [Primary expression](#Primary_expression)
-      * [Literal](#Literal)
-      * [Variable reference](#Variable_reference)
-      * [Parenthesized expression](#Parenthesized_expression)
-      * [Function call expression](#Function_call_expression)
-      * [Constructor](#Constructor)
-    * [Path expression](#Path_expression)
-      * [Field access expression](#Field_access_expression)
-      * [Index access expression](#Index_access_expression)
-    * [Operator expression](#Operator_expression)
-      * [Arithmetic operator](#Arithmetic_operator)
-      * [Collection operator](#Collection_operator)
-      * [Comparison Operator](#Comparison_operator)
-      * [Logical Operator](#Logical_Operator)
-    * [Conditional expression](#Conditional_expression)
-    * [Quantified expression](#Quantified_expression)
-      * [Existential quatification](#Existential_quantification)
-      * [Universal quantification](#Universal_quantification)
-  * [Select statement](#Select_statement)
+* [2. Queries](#Queries)
+  * [Expressions](#Expressions)  
+    * [Primary expression](#Primary_expressions)
+      * [Literals](#Literals)
+      * [Variable references](#Variable_references)
+      * [Parenthesized expressions](#Parenthesized_expressions)
+      * [Function call expressions](#Function_call_expressions)
+      * [Constructors](#Constructors)
+    * [Path expressions](#Path_expression)
+      * [Field access expressions](#Field_access_expressions)
+      * [Index access expressions](#Index_access_expressions)
+    * [Operator expressions](#Operator_expressions)
+      * [Arithmetic operators](#Arithmetic_operators)
+      * [Collection operators](#Collection_operators)
+      * [Comparison Operators](#Comparison_operators)
+      * [Logical Operators](#Logical_Operators)
+    * [Conditional expressions](#Conditional_expressions)
+    * [Quantified expressions](#Quantified_expressions)
+      * [Existential quatifications](#Existential_quantifications)
+      * [Universal quantifications](#Universal_quantifications)
+  * [Select statement](#Select_statements)
     * [Syntax](#Syntax)
     * [Select-from-where](#select-from-where)
     * [Unnest](#Unnest)
     * [Join](#Join)
-    * [Group By](#Group_BY)
+    * [Group By](#Group_By)
     * [Order By](#ORDER_BY)
     * [Limit](#Limit)
 * [3. DDL and DML Statements](#DDL_and_DML_Statements)
@@ -39,19 +39,19 @@ This document is intended as a reference guide to the full syntax and semantics 
 
 New AsterixDB users are encouraged to read and work through the (friendlier) guide "AsterixDB 101: An ADM and SQL++ Primer" before attempting to make use of this document. In addition, readers are advised to read and understand the Asterix Data Model (ADM) reference guide since a basic understanding of ADM concepts is a prerequisite to understanding SQL++. In what follows, we detail the features of the SQL++ language in a grammar-guided manner: we list and briefly explain each of the productions in the SQL++ grammar, offering examples for clarity in cases where doing so seems needed or helpful.
 
-## <a id="Query">2. Query</a> <font size="4"
+## <a id="Queries">2. Queries</a>
 
     Query ::= (Expression | SelectStatement) ";"
 
 A SQL++ query can be any legal SQL++ expression or Select statment. A query should always end with a semicolon.
 
-### <a id="Expression">Expression
+### <a id="Expression">Expressions
 
     Expression ::= ( OperatorExpression | ConditionExpression | QuantifiedExpression )
 
 SQL++ is a fully composable expression language. Each SQL++ expression returns zero or more Asterix Data Model (ADM) instances. There are three major kinds of expressions in SQL++. At the topmost level, an SQL++ expression can be an OperatorExpr (similar to a mathematical expression), an IfThenElse (to choose between two alternative values), or a QuantifiedExpression (which yields a boolean value). Each will be detailed as we explore the full SQL++ grammar.
 
-#### <a id="Primary_expression">Primary Expression
+#### <a id="Primary_expressions">Primary Expressions
 
     PrimaryExpr ::= Literal
                   | VariableReference
@@ -61,7 +61,7 @@ SQL++ is a fully composable expression language. Each SQL++ expression returns z
 
 The most basic building block for any SQL++ expression is the PrimaryExpr. This can be a simple literal (constant) value, a reference to a query variable that is in scope, a parenthesized expression, a function call,  a newly constructed list of ADM instances, or a newly constructed ADM record.
 
-##### <a id="Literal">Literal
+##### <a id="Literals">Literals
 
     Literal        ::= StringLiteral
                        | IntegerLiteral
@@ -93,7 +93,7 @@ The following are some simple examples of SQL++ literals. Since SQL++ is an expr
     'a string'
     42
 
-##### <a id="Variable_reference">Variable Reference
+##### <a id="Variable_references">Variable References
 
     VariableRef ::= <VARIABLE>|<QuotedString>
     <VARIABLE>  ::= <LETTER> (<LETTER> | <DIGIT> | "_" | "$")*
@@ -106,7 +106,7 @@ A variable in SQL++ can be bound to any legal ADM value. A variable reference re
     tweet
     id
 
-#### <a id="Parenthesized_expression">Parenthesized expression
+#### <a id="Parenthesized_expressions">Parenthesized expressions
 
     ParenthesizedExpression ::= "(" Expression ")" | Subquery
 
@@ -118,7 +118,7 @@ Since SQL++ is an expression language, the following example expression is actua
 
     ( 1 + 1 )
 
-##### <a id="Function_call_expression">Function Call Expression
+##### <a id="Function_call_expressions">Function call expressions
 
     FunctionCallExpression ::= FunctionOrTypeName "(" ( Expression ( "," Expression )* )? ")"
 
@@ -130,7 +130,7 @@ The following example is a (built-in) function call expression whose value is 8.
 
     "length"('a string')
 
-##### <a id="Constructor">Constructor
+##### <a id="Constructors">Constructors
 
     ListConstructor          ::= ( OrderedListConstructor | UnorderedListConstructor )
     OrderedListConstructor   ::= "[" ( Expression ( "," Expression )* )? "]"
@@ -158,7 +158,7 @@ The following examples illustrate how to construct a new ordered list with 3 ite
 When constructing nested records there needs to be a space between the closing braces to avoid confusion with the `}}` token that ends an unordered list constructor:
 `{ 'a' : { 'b' : 'c' }}` will fail to parse while `{ 'a' : { 'b' : 'c' } }` will work.
 
-#### <a id="Path_expression">Path expression
+#### <a id="Path_expressions">Path expressions
 
     ValueExpr ::= PrimaryExpr ( Field | Index )*
     Field     ::= "." Identifier
@@ -176,7 +176,7 @@ The following examples illustrate field access for a record, index-based element
 
     ({ 'list': [ 'a', 'b', 'c']}).list[2]
 
-#### <a id="Operator_expression">Operator expression
+#### <a id="Operator_expressions">Operator expressions
     
 Operators perform a specific operation on the input values or expressions. AsterixDB SQL++ provides a full set of operators that you can use within its statements. Here are the categories of SQL++ operators:
 
@@ -200,7 +200,7 @@ The following table summarizes the precedence order (from higher to lower) of al
 | AND                                                                         | conjunction |
 | OR                                                                          | disjunction |
 
-###  <a id="Select_statement">Select statement
+###  <a id="Select_statements">Select statements
 
     SelectStatement    ::=	( WithClause )? SelectSetOperation (OrderbyClause )? ( LimitClause )?
     SelectSetOperation ::=	 SelectBlock ( (<UNION> | <INTERSECT> | <EXCEPT>)  ( <ALL>)? ( SelectBlock | Subquery ) )*
