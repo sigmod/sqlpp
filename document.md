@@ -4,10 +4,15 @@
 
 * [1. Introduction](#Introduction)
 * [2. Queries and Expressions](#Queries_and_Expressions)
-	* [Primary Expression](#Primary_Expression)
-    * [Path Expression](#Path_Expression)
-    * [Operator Expression](#Operator_Expression)
-    * [SELECT Statement](#SELECT_Statement)
+  * [Primary Expression](#Primary_Expression)
+    * [Literal](#Literal)
+    * [Variable Reference](#Variable_Reference)
+    * [Parenthesized Expression](#Parenthesized_Expression)
+    * [Function Call Expression](#Function_Call_Expression)
+    * [Constructor](#Constructor)
+  * [Path Expression](#Path_Expression)
+  * [Operator Expression](#Operator_Expression)
+  * [SELECT Statement](#SELECT_Statement)
 * [3. DDL and DML Statements](#DDL_and_DML_Statements)
 
 ## <a id="Introduction">1. Introduction</a><font size="4"> <a href="#toc">[Back to TOC]</a></font>
@@ -151,7 +156,7 @@ The following examples illustrate field access for a record, index-based element
 
     ({ 'list': [ 'a', 'b', 'c']}).list[2]
 
-### Operators
+### <a id="Operator_Expression">Operator Expression
     
 Operators perform a specific operation on the input values or expressions. AsterixDB SQL++ provides a full set of operators that you can use within its statements. Here are the categories of SQL++ operators:
 
