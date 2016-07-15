@@ -29,7 +29,7 @@ SQL++ is a fully composable expression language. Each SQL++ expression returns z
 ### <a id="Primary_Expression">Primary Expression
 
     PrimaryExpr ::= Literal
-                  | VariableRef
+                  | VariableReference
                   | ParenthesizedExpression
                   | FunctionCallExpr
                   | ListConstructor
@@ -153,8 +153,9 @@ The following examples illustrate field access for a record, index-based element
 
 ### Logical Expressions
 
-    OperatorExpr ::= AndExpr ( "or" AndExpr )*
-    AndExpr      ::= RelExpr ( "and" RelExpr )*
+    NotExpr  ::= "NOT"? OrExpr
+    OrExpr   ::= AndExpr ( "or" AndExpr )*
+    AndExpr  ::= RelExpr ( "and" RelExpr )*
 
 As in most languages, boolean expressions can be built up from smaller expressions by combining them with the logical connectives and/or. Legal boolean values in SQL++ are `TRUE`, `FALSE`, and `NULL`. (`NULL`s in SQL++ are treated much like SQL treats its unknown truth value in boolean expressions.)
 
@@ -166,7 +167,7 @@ The following is an example of a conjuctive range predicate in SQL++. It will yi
 
 ### Comparison Expressions
 
-    RelExpr ::= AddExpr ( ( "<" | ">" | "<=" | ">=" | "=" | "!=" | "~=" ) AddExpr )?
+    RelExpr ::= AddExpr ( ( "<" | ">" | "<=" | ">=" | "=" | "!=" | "~=") AddExpr )?
 
 SQL++ has the usual list of suspects, plus one, for comparing pairs of atomic values. The "plus one" is the last operator listed above, which is the "roughly equal" operator provided for similarity queries. (See the separate document on [AsterixDB Similarity Queries](similarity.html) for more details on similarity matching.)
 
@@ -180,7 +181,7 @@ An example comparison expression (which yields the boolean value true) is shown 
 
     AddExpr  ::= MultExpr ( ( "+" | "-" ) MultExpr )*
     MultExpr ::= UnaryExpr ( ( "*" | "/" | "%" | "^"| "idiv" ) UnaryExpr )*
-    UnaryExpr ::= ( ( "+" | "-" ) )? ValueExpr
+    UnaryExpr ::= ( ( "+" | "-" | "NOT"? "EXISTS" ) )? ValueExpr
 
 SQL++ also supports the usual cast of characters for arithmetic expressions. The example below evaluates to 25.
 
