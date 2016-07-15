@@ -190,34 +190,33 @@ The following table summarizes the precedence order (from higher to lower) of al
 | OR                                                                          | disjunction |
 
 ###  <a id="SELECT_Statement">SELECT Statement
-	SelectStatement	    ::=	( WithClause )? SelectSetOperation (OrderbyClause )? ( LimitClause )?
-	SelectSetOperation  ::=	 SelectBlock ( ("UNION" | "INTERSECT" | "EXCEPT" ) ( "ALL" )? ( SelectBlock | Subquery ) )*
-        Subquery	    ::=	"(" SelectStatement ")"
-	SelectBlock	    ::=	( SelectClause ( FromClause ( WithClause )? )? (WhereClause )? ( GroupbyClause ( LetClause )? <BR>
-	                        ( HavingClause )? )? | FromClause ( WithClause )? ( WhereClause )? ( GroupbyClause ( WithClause )? <BR> ( HavingClause )? )? SelectClause )
-	SelectClause	    ::=	"SELECT" ( "ALL" | "DISTINCT" )? ( SelectRegular | SelectElement )
-	SelectRegular	    ::=	Projection ( "," Projection )*
-	SelectElement	    ::=	( "RAW" | "ELEMENT" | "VALUE" ) Expression
-    
-        Projection	    ::=	( Expression ( "AS" )? Identifier | Expression "." "*"  | "*" )
+  SelectStatement    ::=	( WithClause )? SelectSetOperation (OrderbyClause )? ( LimitClause )?
+  SelectSetOperation ::=	 SelectBlock ( ("UNION" | "INTERSECT" | "EXCEPT" ) ( "ALL" )? ( SelectBlock | Subquery ) )*
+  Subquery	     ::=	"(" SelectStatement ")"
+  SelectBlock	     ::=	( SelectClause ( FromClause ( WithClause )? )? (WhereClause )? ( GroupbyClause ( LetClause )?
+                                <br> ( HavingClause )? )? | FromClause ( WithClause )? ( WhereClause )? ( GroupbyClause ( WithClause )? <br> ( HavingClause )? )? SelectClause 
+  SelectClause	     ::=	"SELECT" ( "ALL" | "DISTINCT" )? ( SelectRegular | SelectElement )
+  SelectRegular	     ::=	Projection ( "," Projection )*
+  SelectElement	     ::=	( "RAW" | "ELEMENT" | "VALUE" ) Expression
+  
+  Projection	     ::=	( Expression ( "AS" )? Identifier | Expression "." "*"  | "*" )
+  
+  FromClause	     ::=	"FROM" FromTerm ( "," FromTerm )*
+  FromTerm	     ::=	Expression ( "AS" )? Variable ( "AT" Variable )? ( ( JoinType )? ( JoinClause | UnnestClause ) )*
+  JoinClause	     ::=	"JOIN" Expression ( "AS" )? Variable ( "AT" Variable )? "on" Expression
+  UnnestClause	     ::=	( "UNNEST" | "CORRELATE" | "FLATTEN" ) Expression ( "AS" )? Variable ( "AT" Variable )?
+  JoinType	     ::=	( "INNER" | "LEFT" ( "OUTER" )? )
 	
-        FromClause	    ::=	"FROM" FromTerm ( "," FromTerm )*
-	FromTerm	    ::=	Expression ( "AS" )? Variable ( "AT" Variable )? ( ( JoinType )? ( JoinClause | UnnestClause ) )*
-	JoinClause	    ::=	"JOIN" Expression ( "AS" )? Variable ( "AT" Variable )? "on" Expression
-	UnnestClause	    ::=	( "UNNEST" | "CORRELATE" | "FLATTEN" ) Expression ( "AS" )? Variable ( "AT" Variable )?
-	JoinType	    ::=	( "INNER" | "LEFT" ( "OUTER" )? )
-	
-        WithClause	    ::=	( ( "LET" | "LETTING" ) LetElement ( "," LetElement )* | "WITH" WithElement ( "," WithElement )* )
-	
-        WhereClause	    ::=	"WHERE" Expression
-	
-        OrderbyClause	    ::=	"ORDER" "BY" Expression ( "ASC" | "DESC" )? ( "," Expression ( "ASC" | "DESC" )? )*
-	GroupbyClause	    ::=	"GROUP" "BY" ( Expression ( ( "AS" )? Variable )? ( "," Expression ( ( "AS" )? Variable )? )* )
-	HavingClause	    ::=	"HAVING" Expression
-	LimitClause	    ::=	"LIMIT" Expression ( "OFFSET" Expression )?
-    
-        LetElement	    ::=	Variable "=" Expression
-	WithElement	    ::=	Variable "AS" Expression
+  WithClause	     ::=	( ( "LET" | "LETTING" ) LetElement ( "," LetElement )* | "WITH" WithElement ( "," WithElement )* )
+  
+  WhereClause	     ::=	"WHERE" Expression
+  OrderbyClause	     ::=	"ORDER" "BY" Expression ( "ASC" | "DESC" )? ( "," Expression ( "ASC" | "DESC" )? )*
+  GroupbyClause	     ::=	"GROUP" "BY" ( Expression ( ( "AS" )? Variable )? ( "," Expression ( ( "AS" )? Variable )? )* 
+  HavingClause	     ::=	"HAVING" Expression
+  LimitClause	     ::=	"LIMIT" Expression ( "OFFSET" Expression )?
+  
+  LetElement	     ::=	Variable "=" Expression
+  WithElement	     ::=	Variable "AS" Expression
 
 A SELECT statement always return a collection.  `SELECT ELEMENT expression` returns a collection that consists of evaluation results of the expression,  one per binding tuple. All regular SQL-style SELECT clauses could be expressed by `SELECT ELEMENT`.  For example, `SELECT exprA AS fieldA, exprB AS fieldB` is a syntactic suger of `SELECT ELEMENT { 'fieldA': expr1, 'fieldB': exprB }`. 
 
