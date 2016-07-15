@@ -209,12 +209,13 @@ The following table summarizes the precedence order (from higher to lower) of al
     FromClause	       ::=	<FROM> FromTerm ( "," FromTerm )*
     FromTerm	       ::=	Expression (( <AS> )? Variable)? ( <AT> Variable )? 
                             ( ( JoinType )? ( JoinClause | UnnestClause ) )*
+    
     JoinClause	       ::=	<JOIN> Expression (( <AS> )? Variable)? (<AT> Variable)? <ON> Expression
     UnnestClause       ::=	( <UNNEST> | <CORRELATE> | <FLATTEN> ) Expression ( <AS> )? Variable ( <AT> Variable )?
     JoinType	       ::=	( <INNER> | <LEFT> ( <OUTER> )? )
 	
-    WithClause	       ::=	<WITH> WithElement ( "," WithElement )* )
-    LetClause	       ::=	( ( <LET> | <LETTING> ) LetElement ( "," LetElement )*
+    WithClause	       ::=	<WITH> WithElement ( "," WithElement )*
+    LetClause	       ::=	(<LET> | <LETTING>) LetElement ( "," LetElement )*
     LetElement	       ::=	Variable "=" Expression
     WithElement	       ::=	Variable <AS> Expression
   
