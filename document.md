@@ -33,23 +33,25 @@
     * [Limit](#Limit)
 * [3. DDL and DML Statements](#DDL_and_DML_Statements)
 
-## <a id="Introduction">1. Introduction</a><font size="4"> <a href="#toc">[Back to TOC]</a></font>
+## <a id="Introduction">1. Introduction</a><font size="4">
 
 This document is intended as a reference guide to the full syntax and semantics of the SQL++ Query Language, a language for talking to AsterixDB.
 
 New AsterixDB users are encouraged to read and work through the (friendlier) guide "AsterixDB 101: An ADM and SQL++ Primer" before attempting to make use of this document. In addition, readers are advised to read and understand the Asterix Data Model (ADM) reference guide since a basic understanding of ADM concepts is a prerequisite to understanding SQL++. In what follows, we detail the features of the SQL++ language in a grammar-guided manner: we list and briefly explain each of the productions in the SQL++ grammar, offering examples for clarity in cases where doing so seems needed or helpful.
 
-## <a id="Queries_and_Expressions">2. Queries and Expressions</a> <font size="4"><a href="#toc">[Back to TOC]</a></font>
+## <a id="Query">2. Query</a> <font size="4"
 
-    Query ::= Expression | SelectStatement
+    Query ::= (Expression | SelectStatement) ";"
 
-A SQL++ query can be any legal SQL++ expression or SELECT statment.
+A SQL++ query can be any legal SQL++ expression or Select statment. A query should always end with a semicolon.
+
+### <a id="Expression">Expression
 
     Expression ::= ( OperatorExpression | ConditionExpression | QuantifiedExpression )
 
 SQL++ is a fully composable expression language. Each SQL++ expression returns zero or more Asterix Data Model (ADM) instances. There are three major kinds of expressions in SQL++. At the topmost level, an SQL++ expression can be an OperatorExpr (similar to a mathematical expression), an IfThenElse (to choose between two alternative values), or a QuantifiedExpression (which yields a boolean value). Each will be detailed as we explore the full SQL++ grammar.
 
-### <a id="Primary_Expression">Primary Expression
+#### <a id="Primary_expression">Primary Expression
 
     PrimaryExpr ::= Literal
                   | VariableReference
@@ -59,7 +61,7 @@ SQL++ is a fully composable expression language. Each SQL++ expression returns z
 
 The most basic building block for any SQL++ expression is the PrimaryExpr. This can be a simple literal (constant) value, a reference to a query variable that is in scope, a parenthesized expression, a function call,  a newly constructed list of ADM instances, or a newly constructed ADM record.
 
-#### Literals
+##### <a id="Literal">Literal
 
     Literal        ::= StringLiteral
                        | IntegerLiteral
@@ -86,12 +88,12 @@ Literals (constants) in SQL++ can be strings, integers, floating point values, d
 
 The following are some simple examples of SQL++ literals. Since SQL++ is an expression language, each example is also a complete, legal SQL++ query (!).
 
-##### Examples
+###### Examples
 
     'a string'
     42
 
-#### Variable References
+##### <a id="Variable_reference">Variable Reference
 
     VariableRef ::= <VARIABLE>|<QuotedString>
     <VARIABLE>  ::= <LETTER> (<LETTER> | <DIGIT> | "_" | "$")*
@@ -104,7 +106,7 @@ A variable in SQL++ can be bound to any legal ADM value. A variable reference re
     tweet
     id
 
-#### Parenthesized Expressions
+#### <a id="Parenthesized_expression">Parenthesized expression
 
     ParenthesizedExpression ::= "(" Expression ")" | Subquery
 
@@ -112,11 +114,11 @@ As in most languages, an expression may be parenthesized. In SQL++, a subquery i
 
 Since SQL++ is an expression language, the following example expression is actually also a complete, legal SQL++ query whose result is the value 2. (As such, you can have Big Fun explaining to your boss how AsterixDB and SQL++ can turn your 1000-node shared-nothing Big Data cluster into a $5M calculator in its spare time.)
 
-##### Example
+###### Example
 
     ( 1 + 1 )
 
-#### Function Calls
+##### <a id="Function_call_expression">Function Call Expression
 
     FunctionCallExpression ::= FunctionOrTypeName "(" ( Expression ( "," Expression )* )? ")"
 
@@ -124,11 +126,11 @@ Functions are included in SQL++, like most languages, as a way to package useful
 
 The following example is a (built-in) function call expression whose value is 8.
 
-##### Example
+###### Example
 
     "length"('a string')
 
-#### Constructors
+##### <a id="Constructor">Constructor
 
     ListConstructor          ::= ( OrderedListConstructor | UnorderedListConstructor )
     OrderedListConstructor   ::= "[" ( Expression ( "," Expression )* )? "]"
@@ -140,7 +142,7 @@ A major feature of SQL++ is its ability to construct new ADM data instances. Thi
 
 The following examples illustrate how to construct a new ordered list with 3 items, a new unordered list with 4 items, and a new record with 2 fields, respectively. List elements can be homogeneous (as in the first example), which is the common case, or they may be heterogeneous (as in the second example). The data values and field name values used to construct lists and records in constructors are all simply SQL++ expressions. Thus the list elements, field names, and field values used in constructors can be simple literals (as in these three examples) or they can come from query variable references or even arbitrarily complex SQL++ expressions.
 
-##### Examples
+###### Examples
 
     [ 'a', 'b', 'c' ]
 
@@ -151,12 +153,12 @@ The following examples illustrate how to construct a new ordered list with 3 ite
       'project members': {{ 'vinayakb', 'dtabass', 'chenli' }}
     }
 
-##### Note
+###### Note
 
 When constructing nested records there needs to be a space between the closing braces to avoid confusion with the `}}` token that ends an unordered list constructor:
 `{ 'a' : { 'b' : 'c' }}` will fail to parse while `{ 'a' : { 'b' : 'c' } }` will work.
 
-### <a id="Path_Expression">Path Expression
+#### <a id="Path_expression">Path expression
 
     ValueExpr ::= PrimaryExpr ( Field | Index )*
     Field     ::= "." Identifier
@@ -166,7 +168,7 @@ Components of complex types in ADM are accessed via path expressions. Path acces
 
 The following examples illustrate field access for a record, index-based element access for an ordered list, and also a composition thereof.
 
-##### Examples
+###### Examples
 
     ({'list': [ 'a', 'b', 'c']}).list
 
@@ -174,7 +176,7 @@ The following examples illustrate field access for a record, index-based element
 
     ({ 'list': [ 'a', 'b', 'c']}).list[2]
 
-### <a id="Operator_Expression">Operator Expression
+#### <a id="Operator_expression">Operator expression
     
 Operators perform a specific operation on the input values or expressions. AsterixDB SQL++ provides a full set of operators that you can use within its statements. Here are the categories of SQL++ operators:
 
@@ -198,7 +200,7 @@ The following table summarizes the precedence order (from higher to lower) of al
 | AND                                                                         | conjunction |
 | OR                                                                          | disjunction |
 
-###  <a id="Select_Statement">Select Statement
+###  <a id="Select_statement">Select statement
 
     SelectStatement    ::=	( WithClause )? SelectSetOperation (OrderbyClause )? ( LimitClause )?
     SelectSetOperation ::=	 SelectBlock ( (<UNION> | <INTERSECT> | <EXCEPT>)  ( <ALL>)? ( SelectBlock | Subquery ) )*
@@ -241,9 +243,10 @@ The following table summarizes the precedence order (from higher to lower) of al
 
 A SELECT statement always return a collection.  `SELECT ELEMENT expression` returns a collection that consists of evaluation results of the expression,  one per binding tuple. All regular SQL-style SELECT clauses could be expressed by `SELECT ELEMENT`.  For example, `SELECT exprA AS fieldA, exprB AS fieldB` is a syntactic suger of `SELECT ELEMENT { 'fieldA': expr1, 'fieldB': exprB }`. 
 
+#### <a id="Select-from-where">Select-from-where
 The following example shows a query that selects and returns one user from the table FacebookUsers.
 
-##### Example
+###### Example
 
     SELECT ELEMENT user
     FROM FacebookUsers user
@@ -251,7 +254,7 @@ The following example shows a query that selects and returns one user from the t
 
 The next example shows a query that retrieves the organizations that the selected user has worked in, using the `CORRELATE` clause to unnest the nested collection `employment` in the user's record.
 
-##### Example
+###### Example
  	
     SELECT ELEMENT employment."organization-name"
     FROM FacebookUsers AS user
