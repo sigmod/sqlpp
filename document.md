@@ -194,9 +194,10 @@ The following table summarizes the precedence order (from higher to lower) of al
     SelectStatement    ::=	( WithClause )? SelectSetOperation (OrderbyClause )? ( LimitClause )?
     SelectSetOperation ::=	 SelectBlock ( ("UNION" | "INTERSECT" | "EXCEPT" ) ( "ALL" )? ( SelectBlock | Subquery ) )*
     Subquery	       ::=	"(" SelectStatement ")"
-    SelectBlock	       ::=	( SelectClause ( FromClause ( WithClause )? )? (WhereClause )? ( GroupbyClause ( LetClause )?
-                                ( HavingClause )? )? | FromClause ( WithClause )? ( WhereClause )? ( GroupbyClause ( WithClause )?
-                                ( HavingClause )? )? SelectClause 
+    SelectBlock	       ::=	SelectClause ( FromClause ( WithClause )?)? (WhereClause )? 
+                                ( GroupbyClause ( LetClause )? ( HavingClause )? )? 
+                                | FromClause ( WithClause )? ( WhereClause )? ( GroupbyClause ( WithClause )?
+                                  ( HavingClause )? )? SelectClause 
     SelectClause       ::=	"SELECT" ( "ALL" | "DISTINCT" )? ( SelectRegular | SelectElement )
     SelectRegular      ::=	Projection ( "," Projection )*
     SelectElement      ::=	( "RAW" | "ELEMENT" | "VALUE" ) Expression
