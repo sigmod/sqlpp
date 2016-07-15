@@ -195,7 +195,8 @@ The following table summarizes the precedence order (from higher to lower) of al
     SelectSetOperation ::=	 SelectBlock ( ("UNION" | "INTERSECT" | "EXCEPT" ) ( "ALL" )? ( SelectBlock | Subquery ) )*
     Subquery	       ::=	"(" SelectStatement ")"
     SelectBlock	       ::=	( SelectClause ( FromClause ( WithClause )? )? (WhereClause )? ( GroupbyClause ( LetClause )?
-                                <br> ( HavingClause )? )? | FromClause ( WithClause )? ( WhereClause )? ( GroupbyClause ( WithClause )? <br> ( HavingClause )? )? SelectClause 
+                                ( HavingClause )? )? | FromClause ( WithClause )? ( WhereClause )? ( GroupbyClause ( WithClause )?
+                                ( HavingClause )? )? SelectClause 
     SelectClause       ::=	"SELECT" ( "ALL" | "DISTINCT" )? ( SelectRegular | SelectElement )
     SelectRegular      ::=	Projection ( "," Projection )*
     SelectElement      ::=	( "RAW" | "ELEMENT" | "VALUE" ) Expression
@@ -216,8 +217,8 @@ The following table summarizes the precedence order (from higher to lower) of al
     HavingClause       ::=	"HAVING" Expression
     LimitClause	       ::=	"LIMIT" Expression ( "OFFSET" Expression )?
   
-  LetElement	     ::=	Variable "=" Expression
-  WithElement	     ::=	Variable "AS" Expression
+    LetElement	       ::=	Variable "=" Expression
+    WithElement	       ::=	Variable "AS" Expression
 
 A SELECT statement always return a collection.  `SELECT ELEMENT expression` returns a collection that consists of evaluation results of the expression,  one per binding tuple. All regular SQL-style SELECT clauses could be expressed by `SELECT ELEMENT`.  For example, `SELECT exprA AS fieldA, exprB AS fieldB` is a syntactic suger of `SELECT ELEMENT { 'fieldA': expr1, 'fieldB': exprB }`. 
 
