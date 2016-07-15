@@ -12,7 +12,16 @@
     * [Constructor](#Constructor)
   * [Path Expression](#Path_Expression)
   * [Operator Expression](#Operator_Expression)
+  * [Conditional Expression](#Conditional_Expression)
+  * [Quantified Expression](#Quantified_Expression)
   * [SELECT Statement](#SELECT_Statement)
+    * [Syntax](#Syntax)
+    * [Filter](#Filter)
+    * [Unnest](#Unnest)
+    * [Join](#Join)
+    * [Group By](#Group_BY)
+    * [Order By](#ORDER_BY)
+    * [Limit](#Limit)
 * [3. DDL and DML Statements](#DDL_and_DML_Statements)
 
 ## <a id="Introduction">1. Introduction</a><font size="4"> <a href="#toc">[Back to TOC]</a></font>
