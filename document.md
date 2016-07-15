@@ -151,43 +151,29 @@ The following examples illustrate field access for a record, index-based element
 
     ({ 'list': [ 'a', 'b', 'c']}).list[2]
 
-### Logical Expressions
+### Operators
+    
+Operators perform a specific operation on the input values or expressions. AsterixDB SQL++ provides a full set of operators that you can use within its statements. Here are the categories of SQL++ operators:
 
-    NotExpr  ::= "NOT"? OrExpr
-    OrExpr   ::= AndExpr ( "or" AndExpr )*
-    AndExpr  ::= RelExpr ( "and" RelExpr )*
+* Arithmetic Operators, to perform basic mathematical operations (such as addition, subtraction, multiplication, and divisions) on numbers.
+* Collection Operators, to evaluate expressions on collections or objects.
+* Comparison Operators, to compare two expressions.
+* Conditional Operators, to evaluate conditional logic in an expression
+* Logical Operators, to combine operators using Boolean logic.
+* String Operators, to concatenate two expressions.
 
-As in most languages, boolean expressions can be built up from smaller expressions by combining them with the logical connectives and/or. Legal boolean values in SQL++ are `TRUE`, `FALSE`, and `NULL`. (`NULL`s in SQL++ are treated much like SQL treats its unknown truth value in boolean expressions.)
+The following table summarizes the precedence order (from higher to lower) of all operators:
 
-The following is an example of a conjuctive range predicate in SQL++. It will yield `TRUE` if a is bound to 4, `NULL` if a is bound to `NULL`, and `FALSE` otherwise.
-
-##### Example
-
-    a > 3 and a < 5
-
-### Comparison Expressions
-
-    RelExpr ::= AddExpr ( ( "<" | ">" | "<=" | ">=" | "=" | "!=" | "~=") AddExpr )?
-
-SQL++ has the usual list of suspects, plus one, for comparing pairs of atomic values. The "plus one" is the last operator listed above, which is the "roughly equal" operator provided for similarity queries. (See the separate document on [AsterixDB Similarity Queries](similarity.html) for more details on similarity matching.)
-
-An example comparison expression (which yields the boolean value true) is shown below.
-
-##### Example
-
-    5 > 3
-
-### Arithmetic Expressions
-
-    AddExpr  ::= MultExpr ( ( "+" | "-" ) MultExpr )*
-    MultExpr ::= UnaryExpr ( ( "*" | "/" | "%" | "^"| "idiv" ) UnaryExpr )*
-    UnaryExpr ::= ( ( "+" | "-" | "NOT"? "EXISTS" ) )? ValueExpr
-
-SQL++ also supports the usual cast of characters for arithmetic expressions. The example below evaluates to 25.
-
-##### Example
-
-    3 ^ 2 + 4 ^ 2
+| Operator                                                                    | Operation |
+|-----------------------------------------------------------------------------|-----------|
+| +, -, EXISTS, NOT EXISTS                                                    |  identity, negation  |
+| ^                                                                           |  multiplication, division  |
+| *, /                                                                        |  addition, subtraction |
+| IS NULL, IS NOT NULL, IS MISSING, IS NOT MISSING, <br>IS UNKNOWN, IS NOT UNKNOWN| special value test |
+| =, !=, <, >, <=, >=, LIKE, NOT LIKE, IN, NOT IN                             | comparison  |
+| NOT                                                                         | logical negation |
+| AND                                                                         | conjunction |
+| OR                                                                          | disjunction |
 
 ###  <a id="SELECT_Statement">SELECT Statement
 	SelectStatement	::=	( WithClause )? SelectSetOperation (OrderbyClause )? ( LimitClause )?
