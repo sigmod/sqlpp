@@ -14,7 +14,7 @@
   * [Operator Expression](#Operator_Expression)
   * [Conditional Expression](#Conditional_Expression)
   * [Quantified Expression](#Quantified_Expression)
-  * [SELECT Statement](#SELECT_Statement)
+  * [Select Statement](#Select_Statement)
     * [Syntax](#Syntax)
     * [Filter](#Filter)
     * [Unnest](#Unnest)
@@ -195,15 +195,14 @@ The following table summarizes the precedence order (from higher to lower) of al
     SelectSetOperation ::=	 SelectBlock ( (<UNION> | <INTERSECT> | <EXCEPT>)  ( <ALL>)? ( SelectBlock | Subquery ) )*
     Subquery	       ::=	"(" SelectStatement ")"
     SelectBlock	       ::=	SelectClause ( FromClause ( WithClause )?)? (WhereClause )? 
-                                ( GroupbyClause ( LetClause )? ( HavingClause )? )? 
-                                | 
-                                FromClause ( WithClause )? ( WhereClause )? ( GroupbyClause ( WithClause )?
-                                ( HavingClause )? )? SelectClause 
+                            ( GroupbyClause ( LetClause )? ( HavingClause )? )? 
+                            | FromClause ( WithClause )? ( WhereClause )? ( GroupbyClause ( WithClause )?
+                              ( HavingClause )? )? SelectClause 
     SelectClause       ::=	<SELECT> ( <ALL> | <DISTINCT> )? ( SelectRegular | SelectElement )
     SelectRegular      ::=	Projection ( "," Projection )*
     SelectElement      ::=	( <RAW> | <ELEMENT> | <VALUE> ) Expression
     
-    Projection	       ::=	( Expression ( <AS> )? Identifier | Expression "." "*"  | "*" )
+    Projection	       ::=	( Expression ( <AS> )? Identifier | "*" )
   
     FromClause	       ::=	<FROM> FromTerm ( "," FromTerm )*
     FromTerm	       ::=	Expression (( <AS> )? Variable)? ( <AT> Variable )? 
@@ -220,9 +219,9 @@ The following table summarizes the precedence order (from higher to lower) of al
     WhereClause	       ::=	<WHERE> Expression
     OrderbyClause      ::=	<ORDER> <BY> Expression ( <ASC> | <DESC> )? ( "," Expression ( <ASC> | <DESC> )? )*
     GroupbyClause      ::=	<GROUP> <BY> ( Expression ( (<AS>)? Variable )? ( "," Expression ( (<AS>)? Variable )? )* 
-                                (<GROUP> <AS> Variable
-                                 ("(" Variable <AS> VariableReference ("," Variable <AS> VariableReference )* ")")?
-                                )?
+                            (<GROUP> <AS> Variable
+                              ("(" Variable <AS> VariableReference ("," Variable <AS> VariableReference )* ")")?
+                            )?
     HavingClause       ::=	<HAVING> Expression
     LimitClause	       ::=	<LIMIT> Expression ( <OFFSET> Expression )?
 
