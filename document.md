@@ -5,7 +5,7 @@
 * [1. Introduction](#Introduction)
 * [2. Queries](#Queries)
   * [Expressions](#Expressions)  
-    * [Primary expression](#Primary_expressions)
+    * [Primary expressions](#Primary_expressions)
       * [Literals](#Literals)
       * [Variable references](#Variable_references)
       * [Parenthesized expressions](#Parenthesized_expressions)
@@ -41,15 +41,15 @@ New AsterixDB users are encouraged to read and work through the (friendlier) gui
 
 ## <a id="Queries">2. Queries</a>
 
-    Query ::= (Expression | SelectStatement) ";"
-
 A SQL++ query can be any legal SQL++ expression or Select statment. A query should always end with a semicolon.
+
+    Query ::= (Expression | SelectStatement) ";"
 
 ### <a id="Expression">Expressions
 
     Expression ::= ( OperatorExpression | ConditionExpression | QuantifiedExpression )
 
-SQL++ is a fully composable expression language. Each SQL++ expression returns zero or more Asterix Data Model (ADM) instances. There are three major kinds of expressions in SQL++. At the topmost level, an SQL++ expression can be an OperatorExpr (similar to a mathematical expression), an IfThenElse (to choose between two alternative values), or a QuantifiedExpression (which yields a boolean value). Each will be detailed as we explore the full SQL++ grammar.
+SQL++ is a fully composable expression language. Each SQL++ expression returns zero or more Asterix Data Model (ADM) instances. There are three major kinds of expressions in SQL++. At the topmost level, an SQL++ expression can be an OperatorExpression (similar to a mathematical expression), an ConditionalExpression (to choose between alternative values), or a QuantifiedExpression (which yields a boolean value). Each will be detailed as we explore the full SQL++ grammar.
 
 #### <a id="Primary_expressions">Primary Expressions
 
@@ -68,6 +68,7 @@ The most basic building block for any SQL++ expression is the PrimaryExpr. This 
                        | FloatLiteral
                        | DoubleLiteral
                        | <NULL>
+                       | <MISSING>
                        | <TRUE>
                        | <FALSE>
     QuotedString   ::= ("\`" (<ESCAPE_APOS> | ~["\'"])* "\`")
@@ -84,9 +85,9 @@ The most basic building block for any SQL++ expression is the PrimaryExpr. This 
                      | <DIGITS> ( "." <DIGITS> )?
                      | "." <DIGITS>
 
-Literals (constants) in SQL++ can be strings, integers, floating point values, double values, boolean constants, or the constant value `NULL`. The `NULL` value in SQL++ has "unknown" or "missing" value semantics, similar to (though not identical to) nulls in the relational query language SQL.
+Literals (constants) in SQL++ can be strings, integers, floating point values, double values, boolean constants, special constant values like `NULL` and `MISSING`. The `NULL` value has "unknown" value semantics, identifical to nulls in the relational query language SQL. The `MISSING` value is only meaningful in the context of field accesses and it means a field does not exist in a record at all.
 
-The following are some simple examples of SQL++ literals. Since SQL++ is an expression language, each example is also a complete, legal SQL++ query (!).
+The following are some simple examples of SQL++ literals.
 
 ###### Examples
 
@@ -95,11 +96,11 @@ The following are some simple examples of SQL++ literals. Since SQL++ is an expr
 
 ##### <a id="Variable_references">Variable References
 
-    VariableRef ::= <VARIABLE>|<QuotedString>
+    VariableReference ::= <VARIABLE>|<QuotedString>
     <VARIABLE>  ::= <LETTER> (<LETTER> | <DIGIT> | "_" | "$")*
     <LETTER>    ::= ["A" - "Z", "a" - "z"]
 
-A variable in SQL++ can be bound to any legal ADM value. A variable reference refers to the value to which an in-scope variable is bound. (E.g., a variable binding may originate from one of the `FROM` or `LET` clauses of a SELECT statement or from an input parameter in the context of an SQL++ function body.)
+A variable in SQL++ can be bound to any legal ADM value. A variable reference refers to the value to which an in-scope variable is bound. (E.g., a variable binding may originate from one of the `FROM`, `WITH` or `LET` clauses of a SELECT statement or from an input parameter in the context of a function body.)
 
 ##### Examples
 
@@ -112,7 +113,7 @@ A variable in SQL++ can be bound to any legal ADM value. A variable reference re
 
 As in most languages, an expression may be parenthesized. In SQL++, a subquery is also an parenthesized expression.
 
-Since SQL++ is an expression language, the following example expression is actually also a complete, legal SQL++ query whose result is the value 2. (As such, you can have Big Fun explaining to your boss how AsterixDB and SQL++ can turn your 1000-node shared-nothing Big Data cluster into a $5M calculator in its spare time.)
+The following expression is evaluated to value 2.
 
 ###### Example
 
@@ -180,12 +181,10 @@ The following examples illustrate field access for a record, index-based element
     
 Operators perform a specific operation on the input values or expressions. AsterixDB SQL++ provides a full set of operators that you can use within its statements. Here are the categories of SQL++ operators:
 
-* Arithmetic Operators, to perform basic mathematical operations (such as addition, subtraction, multiplication, and divisions) on numbers.
-* Collection Operators, to evaluate expressions on collections or objects.
-* Comparison Operators, to compare two expressions.
-* Conditional Operators, to evaluate conditional logic in an expression
+* Arithmetic operators, to perform basic mathematical operations;
+* Collection operators, to evaluate expressions on collections or objects;
+* Comparison operators, to compare two expressions;
 * Logical Operators, to combine operators using Boolean logic.
-* String Operators, to concatenate two expressions.
 
 The following table summarizes the precedence order (from higher to lower) of all operators:
 
@@ -199,6 +198,19 @@ The following table summarizes the precedence order (from higher to lower) of al
 | NOT                                                                         | logical negation |
 | AND                                                                         | conjunction |
 | OR                                                                          | disjunction |
+
+##### <a id="Arithmetic operators">Arithmetic operators
+
+##### <a id="Collection operators">Collection operators
+
+##### <a id="Comparison operators">Comparison operators
+
+##### <a id="Logical operators">Logical operators
+
+##### <a id="Logical operators">Logical operators
+
+
+
 
 ###  <a id="Select_statements">Select statements
 
@@ -680,4 +692,3 @@ We close this guide to SQL++ with one final example of a query expression.
 
     FROM {{ "great", "brilliant", "awesome" }} AS praise
     SELECT ELEMENT string-concat(["AsterixDB is ", praise])
-
