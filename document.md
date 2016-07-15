@@ -22,7 +22,7 @@ New AsterixDB users are encouraged to read and work through the (friendlier) gui
 
 A SQL++ query can be any legal SQL++ expression or SELECT statment.
 
-    Expression ::= ( OperatorExpr | IfThenElse | QuantifiedExpression )
+    Expression ::= ( OperatorExpression | ConditionExpression | QuantifiedExpression )
 
 SQL++ is a fully composable expression language. Each SQL++ expression returns zero or more Asterix Data Model (ADM) instances. There are three major kinds of expressions in SQL++. At the topmost level, an SQL++ expression can be an OperatorExpr (similar to a mathematical expression), an IfThenElse (to choose between two alternative values), or a QuantifiedExpression (which yields a boolean value). Each will be detailed as we explore the full SQL++ grammar.
 
@@ -31,23 +31,23 @@ SQL++ is a fully composable expression language. Each SQL++ expression returns z
     PrimaryExpr ::= Literal
                   | VariableReference
                   | ParenthesizedExpression
-                  | FunctionCallExpr
-                  | ListConstructor
-                  | RecordConstructor
+                  | FunctionCallExpression
+                  | Constructor
 
 The most basic building block for any SQL++ expression is the PrimaryExpr. This can be a simple literal (constant) value, a reference to a query variable that is in scope, a parenthesized expression, a function call,  a newly constructed list of ADM instances, or a newly constructed ADM record.
 
 #### Literals
 
-    Literal ::= StringLiteral
-                     | IntegerLiteral
-                     | FloatLiteral
-                     | DoubleLiteral
-                     | "null"
-                     | "true"
-                     | "false"
-    QuotedString  ::= ("\"" (<ESCAPE_APOS> | ~["\'"])* "\"")
+    Literal        ::= StringLiteral
+                       | IntegerLiteral
+                       | FloatLiteral
+                       | DoubleLiteral
+                       | <NULL>
+                       | <TRUE>
+                       | <FALSE>
+    QuotedString   ::= ("\`" (<ESCAPE_APOS> | ~["\'"])* "\`")
     StringLiteral  ::= ("\'" (<ESCAPE_APOS> | ~["\'"])* "\'")
+                       |("\"" (<ESCAPE_APOS> | ~["\'"])* "\"")
     <ESCAPE_QUOT>  ::= "\\\""
     <ESCAPE_APOS>  ::= "\\\'"
     IntegerLiteral ::= <DIGITS>
@@ -95,7 +95,7 @@ Since SQL++ is an expression language, the following example expression is actua
 
 #### Function Calls
 
-    FunctionCallExpr ::= FunctionOrTypeName "(" ( Expression ( "," Expression )* )? ")"
+    FunctionCallExpression ::= FunctionOrTypeName "(" ( Expression ( "," Expression )* )? ")"
 
 Functions are included in SQL++, like most languages, as a way to package useful functionality or to componentize complicated or reusable SQL++ computations. A function call is a legal SQL++ query expression that represents the ADM value resulting from the evaluation of its body expression with the given parameter bindings; the parameter value bindings can themselves be any SQL++ expressions.
 
