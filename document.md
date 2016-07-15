@@ -190,30 +190,31 @@ The following table summarizes the precedence order (from higher to lower) of al
 | OR                                                                          | disjunction |
 
 ###  <a id="SELECT_Statement">SELECT Statement
-  SelectStatement    ::=	( WithClause )? SelectSetOperation (OrderbyClause )? ( LimitClause )?
-  SelectSetOperation ::=	 SelectBlock ( ("UNION" | "INTERSECT" | "EXCEPT" ) ( "ALL" )? ( SelectBlock | Subquery ) )*
-  Subquery	     ::=	"(" SelectStatement ")"
-  SelectBlock	     ::=	( SelectClause ( FromClause ( WithClause )? )? (WhereClause )? ( GroupbyClause ( LetClause )?
+
+    SelectStatement    ::=	( WithClause )? SelectSetOperation (OrderbyClause )? ( LimitClause )?
+    SelectSetOperation ::=	 SelectBlock ( ("UNION" | "INTERSECT" | "EXCEPT" ) ( "ALL" )? ( SelectBlock | Subquery ) )*
+    Subquery	       ::=	"(" SelectStatement ")"
+    SelectBlock	       ::=	( SelectClause ( FromClause ( WithClause )? )? (WhereClause )? ( GroupbyClause ( LetClause )?
                                 <br> ( HavingClause )? )? | FromClause ( WithClause )? ( WhereClause )? ( GroupbyClause ( WithClause )? <br> ( HavingClause )? )? SelectClause 
-  SelectClause	     ::=	"SELECT" ( "ALL" | "DISTINCT" )? ( SelectRegular | SelectElement )
-  SelectRegular	     ::=	Projection ( "," Projection )*
-  SelectElement	     ::=	( "RAW" | "ELEMENT" | "VALUE" ) Expression
+    SelectClause       ::=	"SELECT" ( "ALL" | "DISTINCT" )? ( SelectRegular | SelectElement )
+    SelectRegular      ::=	Projection ( "," Projection )*
+    SelectElement      ::=	( "RAW" | "ELEMENT" | "VALUE" ) Expression
+    
+    Projection	       ::=	( Expression ( "AS" )? Identifier | Expression "." "*"  | "*" )
   
-  Projection	     ::=	( Expression ( "AS" )? Identifier | Expression "." "*"  | "*" )
-  
-  FromClause	     ::=	"FROM" FromTerm ( "," FromTerm )*
-  FromTerm	     ::=	Expression ( "AS" )? Variable ( "AT" Variable )? ( ( JoinType )? ( JoinClause | UnnestClause ) )*
-  JoinClause	     ::=	"JOIN" Expression ( "AS" )? Variable ( "AT" Variable )? "on" Expression
-  UnnestClause	     ::=	( "UNNEST" | "CORRELATE" | "FLATTEN" ) Expression ( "AS" )? Variable ( "AT" Variable )?
-  JoinType	     ::=	( "INNER" | "LEFT" ( "OUTER" )? )
+    FromClause	       ::=	"FROM" FromTerm ( "," FromTerm )*
+    FromTerm	       ::=	Expression ( "AS" )? Variable ( "AT" Variable )? ( ( JoinType )? ( JoinClause | UnnestClause ) )*
+    JoinClause	       ::=	"JOIN" Expression ( "AS" )? Variable ( "AT" Variable )? "on" Expression
+    UnnestClause       ::=	( "UNNEST" | "CORRELATE" | "FLATTEN" ) Expression ( "AS" )? Variable ( "AT" Variable )?
+    JoinType	       ::=	( "INNER" | "LEFT" ( "OUTER" )? )
 	
-  WithClause	     ::=	( ( "LET" | "LETTING" ) LetElement ( "," LetElement )* | "WITH" WithElement ( "," WithElement )* )
+    WithClause	       ::=	( ( "LET" | "LETTING" ) LetElement ( "," LetElement )* | "WITH" WithElement ( "," WithElement )* )
   
-  WhereClause	     ::=	"WHERE" Expression
-  OrderbyClause	     ::=	"ORDER" "BY" Expression ( "ASC" | "DESC" )? ( "," Expression ( "ASC" | "DESC" )? )*
-  GroupbyClause	     ::=	"GROUP" "BY" ( Expression ( ( "AS" )? Variable )? ( "," Expression ( ( "AS" )? Variable )? )* 
-  HavingClause	     ::=	"HAVING" Expression
-  LimitClause	     ::=	"LIMIT" Expression ( "OFFSET" Expression )?
+    WhereClause	       ::=	"WHERE" Expression
+    OrderbyClause      ::=	"ORDER" "BY" Expression ( "ASC" | "DESC" )? ( "," Expression ( "ASC" | "DESC" )? )*
+    GroupbyClause      ::=	"GROUP" "BY" ( Expression ( ( "AS" )? Variable )? ( "," Expression ( ( "AS" )? Variable )? )* 
+    HavingClause       ::=	"HAVING" Expression
+    LimitClause	       ::=	"LIMIT" Expression ( "OFFSET" Expression )?
   
   LetElement	     ::=	Variable "=" Expression
   WithElement	     ::=	Variable "AS" Expression
