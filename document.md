@@ -24,7 +24,6 @@
       * [Existential quatifications](#Existential_quantifications)
       * [Universal quantifications](#Universal_quantifications)
   * [Select statement](#Select_statements)
-    * [Syntax](#Syntax)
     * [Select-from-where](#select-from-where)
     * [Unnest](#Unnest)
     * [Join](#Join)
@@ -193,13 +192,19 @@ The following table summarizes the precedence order (from higher to lower) of al
 | +, -, EXISTS, NOT EXISTS                                                    |  identity, negation  |
 | ^                                                                           |  multiplication, division  |
 | *, /                                                                        |  addition, subtraction |
-| IS NULL, IS NOT NULL, IS MISSING, IS NOT MISSING, <br>IS UNKNOWN, IS NOT UNKNOWN| special value test |
+| IS NULL, IS NOT NULL, IS MISSING, IS NOT MISSING, <br>IS UNKNOWN, IS NOT UNKNOWN| comparison |
 | =, !=, <, >, <=, >=, LIKE, NOT LIKE, IN, NOT IN                             | comparison  |
 | NOT                                                                         | logical negation |
 | AND                                                                         | conjunction |
 | OR                                                                          | disjunction |
 
 ##### <a id="Arithmetic operators">Arithmetic operators
+| Operator |  Purpose                                                                       | Example |
+|-------------------------------------------------------------------------------------------|-----------|
+| +, -     |  When they are unary operators, these denote a positive or negative expression.| -1        |
+|          |  When they are binary operators, these add or substract                        | 1+2, 2-1  |           
+| *, /     |                                                                                |           |
+| ^        |                                                                                |           |
 
 ##### <a id="Collection operators">Collection operators
 
