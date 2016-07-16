@@ -44,7 +44,7 @@ A SQL++ query can be any legal SQL++ expression or Select statment. A query shou
 
 ## <a id="Expression">Expressions
 
-    Expression ::= ( OperatorExpression | ConditionExpression | QuantifiedExpression )
+    Expression ::= OperatorExpression | ConditionExpression | QuantifiedExpression
 
 SQL++ is a fully composable expression language. Each SQL++ expression returns zero or more Asterix Data Model (ADM) instances. There are three major kinds of expressions in SQL++. At the topmost level, an SQL++ expression can be an OperatorExpression (similar to a mathematical expression), an ConditionalExpression (to choose between alternative values), or a QuantifiedExpression (which yields a boolean value). Each will be detailed as we explore the full SQL++ grammar.
 
@@ -68,9 +68,9 @@ The most basic building block for any SQL++ expression is the PrimaryExpr. This 
                        | <MISSING>
                        | <TRUE>
                        | <FALSE>
-    QuotedString   ::= ("\`" (<ESCAPE_APOS> | ~["\'"])* "\`")
-    StringLiteral  ::= ("\'" (<ESCAPE_APOS> | ~["\'"])* "\'")
-                       |("\"" (<ESCAPE_APOS> | ~["\'"])* "\"")
+    QuotedString   ::= "\`" (<ESCAPE_APOS> | ~["\'"])* "\`"
+    StringLiteral  ::= "\'" (<ESCAPE_APOS> | ~["\'"])* "\'"
+                       | "\"" (<ESCAPE_APOS> | ~["\'"])* "\""
     <ESCAPE_QUOT>  ::= "\\\""
     <ESCAPE_APOS>  ::= "\\\'"
     IntegerLiteral ::= <DIGITS>
@@ -130,7 +130,7 @@ The following example is a (built-in) function call expression whose value is 8.
 
 #### <a id="Constructors">Constructors
 
-    ListConstructor          ::= ( OrderedListConstructor | UnorderedListConstructor )
+    ListConstructor          ::= OrderedListConstructor | UnorderedListConstructor
     OrderedListConstructor   ::= "[" ( Expression ( "," Expression )* )? "]"
     UnorderedListConstructor ::= "{{" ( Expression ( "," Expression )* )? "}}"
     RecordConstructor        ::= "{" ( FieldBinding ( "," FieldBinding )* )? "}"
