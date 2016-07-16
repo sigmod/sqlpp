@@ -32,7 +32,7 @@
     * [Limit](#Limit)
 * [3. DDL and DML Statements](#DDL_and_DML_Statements)
 
-## <a id="Introduction">1. Introduction</a><font size="4">
+# <a id="Introduction">1. Introduction</a><font size="4">
 
 This document is intended as a reference guide to the full syntax and semantics of the SQL++ Query Language, a language for talking to AsterixDB.
 
