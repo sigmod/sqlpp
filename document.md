@@ -257,7 +257,7 @@ The following example illustrates the form of a conditional expression.
 
 ### <a id="Quantified_expressions">Quantified expressions
 
-    QuantifiedExpression ::= ( ( "SOME" ) | ( "EVERY" ) ) Variable "in" Expression ( "," Variable "in" Expression )* "SATISFIES" Expression
+    QuantifiedExpression ::= ( <SOME> | <EVERY> ) Variable <IN> Expression ( "," Variable "in" Expression )* <SATISFIES> Expression
 
 Quantified expressions are used for expressing existential or universal predicates involving the elements of a collection.
 
