@@ -199,8 +199,8 @@ The following table summarizes the precedence order (from higher to lower) of al
 | OR                                                                          | disjunction |
 
 ##### <a id="Arithmetic operators">Arithmetic operators
-| Operator |  Purpose                                                                       | Example |
-|-------------------------------------------------------------------------------------------|-----------|
+| Operator |  Purpose                                                                       | Example   |
+|----------|--------------------------------------------------------------------------------|-----------|
 | +, -     |  When they are unary operators, these denote a positive or negative expression.| -1        |
 |          |  When they are binary operators, these add or substract                        | 1+2, 2-1  |           
 | *, /     |                                                                                |           |
