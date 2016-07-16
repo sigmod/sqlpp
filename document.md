@@ -201,10 +201,10 @@ The following table summarizes the precedence order (from higher to lower) of al
 ##### <a id="Arithmetic operators">Arithmetic operators
 | Operator |  Purpose                                                                       | Example    |
 |----------|--------------------------------------------------------------------------------|------------|
-| +, -     |  When they are unary operators, these denote a <br>positive or negative expression.| -1         |
-|          |  When they are binary operators, these add or substract.                       | 1+2, 2-1   |           
-| *, /     |  Multiply, divide.                                                             | 3*2, 4/2.0 |
-| ^        |  Exponentiation.                                                               | 3^5        |
+| +, -     |  When they are unary operators, these denote a <br>positive or negative expression.| SELECT -1; |
+|          |  When they are binary operators, these add or substract.                       | SELECT 1+2; SELECT 2-1;   |           
+| *, /     |  Multiply, divide.                                                             | SELECT 3*2; SELECT 4/2.0; |
+| ^        |  Exponentiation.                                                               | SELECT 3^5;       |
 
 ##### <a id="Collection operators">Collection operators
 | Operator   |  Purpose                                     | Example    |
@@ -235,6 +235,11 @@ The following table summarizes the precedence order (from higher to lower) of al
 
 ##### <a id="Logical operators">Logical operators
 
+| Operator |  Purpose                                   | Example    |
+|----------|-----------------------------------------------------------------------------|------------|
+| NOT      |  Returns true if the following condition is false, otherwise returns false. | SELECT NOT TRUE;  |
+| AND      |  Returns true if both branches are true, otherwise returns false.           | SELECT TRUE AND FALSE; | 
+| OR       |  Returns true if one branch is true, otherwise returns false.               | SELECT FALSE OR FALSE; |
 
 
 
