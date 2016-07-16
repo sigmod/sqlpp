@@ -222,7 +222,7 @@ The following table summarizes the precedence order (from higher to lower) of al
 | IS NOT NULL    |  Test if a value is not null.              | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS NOT NULL; | 
 | IS MISSING     |  Test if a value is missing.               | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS MISSING; |
 | IS NOT MISSING |  Test if a value is not missing.           | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS NOT MISSing;|
-| IS UNKNOWN     |  Test if a value is either null or missing.| SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS UNKNOWN; | 
+| IS UNKNOWN     |  Test if a value is null or missing.       | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS UNKNOWN; | 
 | IS NOT UNKNOWN |  Test if a value is not null nor missing.  | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS NOT UNKNOWN;| 
 | =              |  Equality test.                            | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid=10; |
 | !=             |  Inequality test.                          | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid!=10;|
@@ -230,8 +230,8 @@ The following table summarizes the precedence order (from higher to lower) of al
 | >              |  Greater than.                             | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid>10; |
 | <=             |  Less than or equal to.                    | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid<=10; |
 | >=             |  Greater than or equal to.                 | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid>=10; |
-| LIKE           |  Test if the left side matches a<br> pattern defined at the right<br> side. In the pattern,  "%" matches any <br> string while "_" matches any <br> character. | |
-| NOT LIKE       |  Test if the left side does not <br>match a pattern defined at the right<br> side. In the pattern,  "%" matches any <br> string while "_" matches any <br> character. |  | 
+| LIKE           |  Test if the left side matches a<br> pattern defined at the right<br> side. In the pattern,  "%" matches  <br>any string while "_" matches <br> any character. | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name LIKE "%Giesen%";|
+| NOT LIKE       |  Test if the left side does not <br>match a pattern defined at the right<br> side. In the pattern,  "%" matches <br>any string while "_" matches <br> any character. | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name NOT LIKE "%Giesen%";| 
 
 ##### <a id="Logical operators">Logical operators
 
