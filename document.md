@@ -165,7 +165,7 @@ When constructing nested records there needs to be a space between the closing b
     Field     ::= "." Identifier
     Index     ::= "[" ( Expression | "?" ) "]"
 
-Components of complex types in ADM are accessed via path expressions. Path access can be applied to the result of an SQL++ expression that yields an instance of such a type, e.g., a record or list instance. For records, path access is based on field names. For ordered lists, path access is based on (zero-based) array-style indexing. SQL++ also supports an "I'm feeling lucky" style index accessor, [?], for selecting an arbitrary element from an ordered list. Attempts to access non-existent fields or list elements produce a null (i.e., missing information) result as opposed to signaling a runtime error.
+Components of complex types in ADM are accessed via path expressions. Path access can be applied to the result of an SQL++ expression that yields an instance of  a complex type, e.g., a record or list instance. For records, path access is based on field names. For ordered lists, path access is based on (zero-based) array-style indexes. SQL++ also supports an "I'm feeling lucky" style index accessor, [?], for selecting an arbitrary element from an ordered list. Attempts to access non-existent fields or out-of-bound list elements produce a missing.
 
 The following examples illustrate field access for a record, index-based element access for an ordered list, and also a composition thereof.
 
@@ -200,6 +200,8 @@ The following table summarizes the precedence order (from higher to lower) of al
 | OR                                                                          | disjunction |
 
 #### <a id="Arithmetic operators">Arithmetic operators
+Arithemtic operators are used to exponentiate, negate, add, subtract, multiply, and divide numeric values.
+ 
 | Operator |  Purpose                                                                       | Example    |
 |----------|--------------------------------------------------------------------------------|------------|
 | +, -     |  When they are unary operators, these denote a <br>positive or negative expression.| SELECT -1; |
@@ -208,6 +210,8 @@ The following table summarizes the precedence order (from higher to lower) of al
 | ^        |  Exponentiation.                                                               | SELECT 3^5;       |
 
 #### <a id="Collection operators">Collection operators
+Collection operators are used for membership tests (IN, NOT IN) or empty collection tests (EXISTS, NOT EXISTS).
+
 | Operator   |  Purpose                                     | Example    |
 |------------|----------------------------------------------|------------|
 | IN         |  Membership test.                            | SELECT * FROM TweetMessages tm <br>WHERE tm.user.lang IN ["en", "de"]; |
@@ -217,6 +221,8 @@ The following table summarizes the precedence order (from higher to lower) of al
 
 
 #### <a id="Comparison operators">Comparison operators
+Comparison operators are used to compare values.
+
 | Operator       |  Purpose                                   | Example    |
 |----------------|--------------------------------------------|------------|
 | IS NULL        |  Test if a value is null.                  | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS NULL; |
@@ -235,6 +241,7 @@ The following table summarizes the precedence order (from higher to lower) of al
 | NOT LIKE       |  Test if the left side does not <br>match a pattern defined at the right<br> side. In the pattern,  "%" matches <br>any string while "_" matches <br> any character. | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name NOT LIKE "%Giesen%";| 
 
 #### <a id="Logical_operators">Logical operators
+Logical operators perform logical `inverse`, `and`, `or` operatorions for boolean values, `null` or `missing`.
 
 | Operator |  Purpose                                   | Example    |
 |----------|-----------------------------------------------------------------------------|------------|
@@ -242,6 +249,20 @@ The following table summarizes the precedence order (from higher to lower) of al
 | AND      |  Returns true if both branches are true, otherwise returns false.           | SELECT TRUE AND FALSE; | 
 | OR       |  Returns true if one branch is true, otherwise returns false.               | SELECT FALSE OR FALSE; |
 
+The following table is the truth table for `AND` and `OR`.
+
+| A  | B  | A AND B  | A OR B |
+|----|----|----------|--------|
+| TRUE | TRUE | TRUE | TRUE |
+| TRUE | FLASE | FALSE | TRUE |
+| TRUE | NULL | NULL | TRUE |
+| TRUE | MISSING | MISSING | TRUE |
+| FALSE | FALSE | FALSE | FALSE |
+| FALSE | NULL | FALSE | NULL |
+| FLASE | MISSING | FALSE | MISSING |
+| NULL | NULL | NULL | NULL |
+| NULL | MISSING | MISSING | NULL |
+| MISSING | MISSING | MISSING | MISSING |
 
 ### <a id="Conditional_expressions">Conditional expressions
 
