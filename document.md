@@ -207,12 +207,12 @@ The following table summarizes the precedence order (from higher to lower) of al
 | ^        |  Exponentiation.                                                               | 3^5        |
 
 ##### <a id="Collection operators">Collection operators
-| Operator   |  Purpose                                   | Example    |
-|------------|--------------------------------------------|------------|
-| IN         |  Membership test.                          | SELECT * FROM TweetMessages tm <br>WHERE tm.user.lang IN ["en", "de"]; |
-| NOT IN     |  Non-membership test.                      | SELECT * FROM TweetMessages tm <br>WHERE tm.user.lang NOT IN ["en"]; |
-| EXISTS     |  Check whether a collection is not empty.  | SELECT * FROM TweetMessages tm <br>WHERE EXISTS tm.referedTopics; |
-| NOT EXISTS |  Check whether a collection is empty.      | SELECT * FROM TweetMessages tm <br>WHERE NOT EXISTS tm.referedTopics; |
+| Operator   |  Purpose                                     | Example    |
+|------------|----------------------------------------------|------------|
+| IN         |  Membership test.                            | SELECT * FROM TweetMessages tm <br>WHERE tm.user.lang IN ["en", "de"]; |
+| NOT IN     |  Non-membership test.                        | SELECT * FROM TweetMessages tm <br>WHERE tm.user.lang NOT IN ["en"]; |
+| EXISTS     |  Check whether a collection is not empty.    | SELECT * FROM TweetMessages tm <br>WHERE EXISTS tm.referedTopics; |
+| NOT EXISTS |  Check whether a collection is empty.        | SELECT * FROM TweetMessages tm <br>WHERE NOT EXISTS tm.referedTopics; |
 
 
 ##### <a id="Comparison operators">Comparison operators
