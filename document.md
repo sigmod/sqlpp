@@ -38,19 +38,19 @@ This document is intended as a reference guide to the full syntax and semantics 
 
 New AsterixDB users are encouraged to read and work through the (friendlier) guide "AsterixDB 101: An ADM and SQL++ Primer" before attempting to make use of this document. In addition, readers are advised to read and understand the Asterix Data Model (ADM) reference guide since a basic understanding of ADM concepts is a prerequisite to understanding SQL++. In what follows, we detail the features of the SQL++ language in a grammar-guided manner: we list and briefly explain each of the productions in the SQL++ grammar, offering examples for clarity in cases where doing so seems needed or helpful.
 
-## <a id="Queries">2. Queries</a>
+# <a id="Queries">2. Queries</a>
 
 A SQL++ query can be any legal SQL++ expression or Select statment. A query should always end with a semicolon.
 
     Query ::= (Expression | SelectStatement) ";"
 
-### <a id="Expression">Expressions
+## <a id="Expression">Expressions
 
     Expression ::= ( OperatorExpression | ConditionExpression | QuantifiedExpression )
 
 SQL++ is a fully composable expression language. Each SQL++ expression returns zero or more Asterix Data Model (ADM) instances. There are three major kinds of expressions in SQL++. At the topmost level, an SQL++ expression can be an OperatorExpression (similar to a mathematical expression), an ConditionalExpression (to choose between alternative values), or a QuantifiedExpression (which yields a boolean value). Each will be detailed as we explore the full SQL++ grammar.
 
-#### <a id="Primary_expressions">Primary Expressions
+### <a id="Primary_expressions">Primary Expressions
 
     PrimaryExpr ::= Literal
                   | VariableReference
@@ -60,7 +60,7 @@ SQL++ is a fully composable expression language. Each SQL++ expression returns z
 
 The most basic building block for any SQL++ expression is the PrimaryExpr. This can be a simple literal (constant) value, a reference to a query variable that is in scope, a parenthesized expression, a function call,  a newly constructed list of ADM instances, or a newly constructed ADM record.
 
-##### <a id="Literals">Literals
+#### <a id="Literals">Literals
 
     Literal        ::= StringLiteral
                        | IntegerLiteral
@@ -88,12 +88,12 @@ Literals (constants) in SQL++ can be strings, integers, floating point values, d
 
 The following are some simple examples of SQL++ literals.
 
-###### Examples
+##### Examples
 
     'a string'
     42
 
-##### <a id="Variable_references">Variable References
+#### <a id="Variable_references">Variable References
 
     VariableReference ::= <VARIABLE>|<QuotedString>
     <VARIABLE>  ::= <LETTER> (<LETTER> | <DIGIT> | "_" | "$")*
@@ -118,7 +118,7 @@ The following expression is evaluated to value 2.
 
     ( 1 + 1 )
 
-##### <a id="Function_call_expressions">Function call expressions
+#### <a id="Function_call_expressions">Function call expressions
 
     FunctionCallExpression ::= FunctionOrTypeName "(" ( Expression ( "," Expression )* )? ")"
 
@@ -126,11 +126,11 @@ Functions are included in SQL++, like most languages, as a way to package useful
 
 The following example is a (built-in) function call expression whose value is 8.
 
-###### Example
+##### Example
 
     "length"('a string')
 
-##### <a id="Constructors">Constructors
+#### <a id="Constructors">Constructors
 
     ListConstructor          ::= ( OrderedListConstructor | UnorderedListConstructor )
     OrderedListConstructor   ::= "[" ( Expression ( "," Expression )* )? "]"
@@ -142,7 +142,7 @@ A major feature of SQL++ is its ability to construct new ADM data instances. Thi
 
 The following examples illustrate how to construct a new ordered list with 3 items, a new unordered list with 4 items, and a new record with 2 fields, respectively. List elements can be homogeneous (as in the first example), which is the common case, or they may be heterogeneous (as in the second example). The data values and field name values used to construct lists and records in constructors are all simply SQL++ expressions. Thus the list elements, field names, and field values used in constructors can be simple literals (as in these three examples) or they can come from query variable references or even arbitrarily complex SQL++ expressions.
 
-###### Examples
+##### Examples
 
     [ 'a', 'b', 'c' ]
 
@@ -153,12 +153,12 @@ The following examples illustrate how to construct a new ordered list with 3 ite
       'project members': {{ 'vinayakb', 'dtabass', 'chenli' }}
     }
 
-###### Note
+##### Note
 
 When constructing nested records there needs to be a space between the closing braces to avoid confusion with the `}}` token that ends an unordered list constructor:
 `{ 'a' : { 'b' : 'c' }}` will fail to parse while `{ 'a' : { 'b' : 'c' } }` will work.
 
-#### <a id="Path_expressions">Path expressions
+### <a id="Path_expressions">Path expressions
 
     ValueExpr ::= PrimaryExpr ( Field | Index )*
     Field     ::= "." Identifier
@@ -168,7 +168,7 @@ Components of complex types in ADM are accessed via path expressions. Path acces
 
 The following examples illustrate field access for a record, index-based element access for an ordered list, and also a composition thereof.
 
-###### Examples
+##### Examples
 
     ({'list': [ 'a', 'b', 'c']}).list
 
@@ -176,7 +176,7 @@ The following examples illustrate field access for a record, index-based element
 
     ({ 'list': [ 'a', 'b', 'c']}).list[2]
 
-#### <a id="Operator_expressions">Operator expressions
+### <a id="Operator_expressions">Operator expressions
     
 Operators perform a specific operation on the input values or expressions. AsterixDB SQL++ provides a full set of operators that you can use within its statements. Here are the categories of SQL++ operators:
 
@@ -198,7 +198,7 @@ The following table summarizes the precedence order (from higher to lower) of al
 | AND                                                                         | conjunction |
 | OR                                                                          | disjunction |
 
-##### <a id="Arithmetic operators">Arithmetic operators
+#### <a id="Arithmetic operators">Arithmetic operators
 | Operator |  Purpose                                                                       | Example    |
 |----------|--------------------------------------------------------------------------------|------------|
 | +, -     |  When they are unary operators, these denote a <br>positive or negative expression.| SELECT -1; |
@@ -206,7 +206,7 @@ The following table summarizes the precedence order (from higher to lower) of al
 | *, /     |  Multiply, divide.                                                             | SELECT 3*2; SELECT 4/2.0; |
 | ^        |  Exponentiation.                                                               | SELECT 3^5;       |
 
-##### <a id="Collection operators">Collection operators
+#### <a id="Collection operators">Collection operators
 | Operator   |  Purpose                                     | Example    |
 |------------|----------------------------------------------|------------|
 | IN         |  Membership test.                            | SELECT * FROM TweetMessages tm <br>WHERE tm.user.lang IN ["en", "de"]; |
@@ -215,7 +215,7 @@ The following table summarizes the precedence order (from higher to lower) of al
 | NOT EXISTS |  Check whether a collection is empty.        | SELECT * FROM TweetMessages tm <br>WHERE NOT EXISTS tm.referedTopics; |
 
 
-##### <a id="Comparison operators">Comparison operators
+#### <a id="Comparison operators">Comparison operators
 | Operator       |  Purpose                                   | Example    |
 |----------------|--------------------------------------------|------------|
 | IS NULL        |  Test if a value is null.                  | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS NULL; |
@@ -233,7 +233,7 @@ The following table summarizes the precedence order (from higher to lower) of al
 | LIKE           |  Test if the left side matches a<br> pattern defined at the right<br> side. In the pattern,  "%" matches  <br>any string while "_" matches <br> any character. | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name LIKE "%Giesen%";|
 | NOT LIKE       |  Test if the left side does not <br>match a pattern defined at the right<br> side. In the pattern,  "%" matches <br>any string while "_" matches <br> any character. | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name NOT LIKE "%Giesen%";| 
 
-##### <a id="Logical operators">Logical operators
+#### <a id="Logical_operators">Logical operators
 
 | Operator |  Purpose                                   | Example    |
 |----------|-----------------------------------------------------------------------------|------------|
@@ -242,9 +242,38 @@ The following table summarizes the precedence order (from higher to lower) of al
 | OR       |  Returns true if one branch is true, otherwise returns false.               | SELECT FALSE OR FALSE; |
 
 
+### <a id="Conditional_expressions">Conditional expressions
+
+    IfThenElse ::= "IF" "(" Expression ")" "THEN" Expression "ELSE" Expression
+
+A conditional expression is useful for choosing between two alternative values based on a
+boolean condition.  If its first (`IF`) expression is true, its second (`THEN`) expression's
+value is returned, and otherwise its third (`ELSE`) expression is returned.
+
+The following example illustrates the form of a conditional expression.
+##### Example
+
+    IF (2 < 3) THEN "yes" ELSE "no"
+
+### <a id="Quantified_expressions">Quantified expressions
+
+    QuantifiedExpression ::= ( ( "SOME" ) | ( "EVERY" ) ) Variable "in" Expression ( "," Variable "in" Expression )* "SATISFIES" Expression
+
+Quantified expressions are used for expressing existential or universal predicates involving the elements of a collection.
+
+The following pair of examples illustrate the use of a quantified expression to test that every (or some) element in the set [1, 2, 3] of integers is less than three. The first example yields `FALSE` and second example yields `TRUE`.
+
+It is useful to note that if the set were instead the empty set, the first expression would yield `TRUE` ("every" value in an empty set satisfies the condition) while the second expression would yield `FALSE` (since there isn't "some" value, as there are no values in the set, that satisfies the condition).
+
+##### Examples
+
+    EVERY x IN [ 1, 2, 3 ] SATISFIES x < 3
+    SOME x IN [ 1, 2, 3 ] SATISFIES x < 3
+
+In SQL++, an arbitrary subquery can appear at any place where an expression could appear. Different from SQL,  subqueries in `Projection`s or any boolean predicates are not restrained to return singleton, single-column relations, instead, they can return arbitrary collections. The following query is a variant of the prior group-by query example. Instead of listing all messages for every sender location, the query retrieves a list of the top three reply messages with smallest message-ids for each sender location.
 
 
-###  <a id="Select_statements">Select statements
+##  <a id="Select_statements">Select statements
 
     SelectStatement    ::=	( WithClause )? SelectSetOperation (OrderbyClause )? ( LimitClause )?
     SelectSetOperation ::=	 SelectBlock ( (<UNION> | <INTERSECT> | <EXCEPT>)  ( <ALL>)? ( SelectBlock | Subquery ) )*
@@ -287,10 +316,10 @@ The following table summarizes the precedence order (from higher to lower) of al
 
 A SELECT statement always return a collection.  `SELECT ELEMENT expression` returns a collection that consists of evaluation results of the expression,  one per binding tuple. All regular SQL-style SELECT clauses could be expressed by `SELECT ELEMENT`.  For example, `SELECT exprA AS fieldA, exprB AS fieldB` is a syntactic suger of `SELECT ELEMENT { 'fieldA': expr1, 'fieldB': exprB }`. 
 
-#### <a id="Select-from-where">Select-from-where
+### <a id="Select-from-where">Select-from-where
 The following example shows a query that selects and returns one user from the table FacebookUsers.
 
-###### Example
+##### Example
 
     SELECT ELEMENT user
     FROM FacebookUsers user
@@ -298,7 +327,7 @@ The following example shows a query that selects and returns one user from the t
 
 The next example shows a query that retrieves the organizations that the selected user has worked in, using the `CORRELATE` clause to unnest the nested collection `employment` in the user's record.
 
-###### Example
+##### Example
  	
     SELECT ELEMENT employment."organization-name"
     FROM FacebookUsers AS user
@@ -321,7 +350,7 @@ Note that `CORRELATE` has the "inner" semantics --- if the user does not have an
 
 The next example shows a query that joins two tables, FacebookUsers and FacebookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. 
 
-##### Example
+#### Example
 
 	SELECT user.name uname, message.message message
     FROM FacebookUsers user,
@@ -347,7 +376,7 @@ In fact, all join queries could be expressed by `CORRELATE` clauses. For instanc
 
 In the next example, a `WITH` clause is used to bind a variable to all of a user's FacebookMessages. The query returns one record per user, with result records containing the user's name and the set of all messages by that user.
 
-##### Example
+#### Example
 
     SELECT user.name AS uname, messages AS messages
     FROM FacebookUsers user
@@ -361,7 +390,7 @@ In the next example, a `WITH` clause is used to bind a variable to all of a user
 
 The following example returns all TwitterUsers ordered by their followers count (most followers first) and language. When ordering `NULL` is treated as being smaller than any other value if `NULL`s are encountered in the ordering key(s).
 
-##### Example
+#### Example
 
       SELECT ELEMENT user
       FROM TwitterUsers AS user
@@ -369,7 +398,7 @@ The following example returns all TwitterUsers ordered by their followers count 
 
 The next example illustrates the use of the `GROUP BY` clause in SQL++. After the `GROUP BY` clause in the query,  the existing variables before the clause will each contain a collection of items following the `GROUP BY` clause; the collected items are the values that the source variable was bound to in the tuples that formed the group. For grouping `NULL` is handled as a single value.
 
-##### Example
+#### Example
 
       SELECT loc AS location, messages AS messages
       FROM FacebookMessages AS x
@@ -378,7 +407,7 @@ The next example illustrates the use of the `GROUP BY` clause in SQL++. After th
 
 The use of the `LIMIT` clause is illustrated in the next example.
 
-##### Example
+#### Example
 
       SELECT ELEMENET user
       FROM TwitterUsers AS user
@@ -387,40 +416,10 @@ The use of the `LIMIT` clause is illustrated in the next example.
 
 The final example shows how SQL++ `DISTINCT` keyword works.
 
-##### Example
+#### Example
 
       SELECT DISTINCT x."sender-location" as location, x.message as message
       FROM FacebookMessages AS x
-
-### Conditional Expression
-
-    IfThenElse ::= "IF" "(" Expression ")" "THEN" Expression "ELSE" Expression
-
-A conditional expression is useful for choosing between two alternative values based on a
-boolean condition.  If its first (`IF`) expression is true, its second (`THEN`) expression's
-value is returned, and otherwise its third (`ELSE`) expression is returned.
-
-The following example illustrates the form of a conditional expression.
-##### Example
-
-    IF (2 < 3) THEN "yes" ELSE "no"
-
-### Quantified Expressions
-
-    QuantifiedExpression ::= ( ( "SOME" ) | ( "EVERY" ) ) Variable "in" Expression ( "," Variable "in" Expression )* "SATISFIES" Expression
-
-Quantified expressions are used for expressing existential or universal predicates involving the elements of a collection.
-
-The following pair of examples illustrate the use of a quantified expression to test that every (or some) element in the set [1, 2, 3] of integers is less than three. The first example yields `FALSE` and second example yields `TRUE`.
-
-It is useful to note that if the set were instead the empty set, the first expression would yield `TRUE` ("every" value in an empty set satisfies the condition) while the second expression would yield `FALSE` (since there isn't "some" value, as there are no values in the set, that satisfies the condition).
-
-##### Examples
-
-    EVERY x IN [ 1, 2, 3 ] SATISFIES x < 3
-    SOME x IN [ 1, 2, 3 ] SATISFIES x < 3
-
-In SQL++, an arbitrary subquery can appear at any place where an expression could appear. Different from SQL,  subqueries in `Projection`s or any boolean predicates are not restrained to return singleton, single-column relations, instead, they can return arbitrary collections. The following query is a variant of the prior group-by query example. Instead of listing all messages for every sender location, the query retrieves a list of the top three reply messages with smallest message-ids for each sender location.
 
 ##### Examples
       SELECT loc AS location, 
