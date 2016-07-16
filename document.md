@@ -82,14 +82,17 @@ The most basic building block for any SQL++ expression is the PrimaryExpr. This 
                      | <DIGITS> ( "." <DIGITS> )?
                      | "." <DIGITS>
 
-Literals (constants) in SQL++ can be strings, integers, floating point values, double values, boolean constants, special constant values like `NULL` and `MISSING`. The `NULL` value has "unknown" value semantics, identifical to nulls in the relational query language SQL. The `MISSING` value is only meaningful in the context of field accesses and it means a field does not exist in a record at all.
+Literals (constants) in SQL++ can be strings, integers, floating point values, double values, boolean constants, special constant values like `NULL` and `MISSING`. The `NULL` value is identifical to nulls in the relational query language SQL, which mean the value of a field is unknown. The `MISSING` value is only meaningful in the context of field accesses and it means a field does not exist in a record at all.
 
 The following are some simple examples of SQL++ literals.
 
 ##### Examples
 
     'a string'
+    "test string"
     42
+
+Different from standard SQL, double quotes are the same as single quotes and could also be used for string literals in SQL++.  For delimited identifiers, we use backticks, i.e., \`id\`.
 
 #### <a id="Variable_references">Variable References
 
@@ -269,9 +272,6 @@ It is useful to note that if the set were instead the empty set, the first expre
     EVERY x IN [ 1, 2, 3 ] SATISFIES x < 3
     SOME x IN [ 1, 2, 3 ] SATISFIES x < 3
 
-In SQL++, an arbitrary subquery can appear at any place where an expression could appear. Different from SQL,  subqueries in `Projection`s or any boolean predicates are not restrained to return singleton, single-column relations, instead, they can return arbitrary collections. The following query is a variant of the prior group-by query example. Instead of listing all messages for every sender location, the query retrieves a list of the top three reply messages with smallest message-ids for each sender location.
-
-
 ##  <a id="Select_statements">Select statements
 
     SelectStatement    ::=	( WithClause )? SelectSetOperation (OrderbyClause )? ( LimitClause )?
@@ -419,6 +419,8 @@ The final example shows how SQL++ `DISTINCT` keyword works.
 
       SELECT DISTINCT x."sender-location" as location, x.message as message
       FROM FacebookMessages AS x
+
+In SQL++, an arbitrary subquery can appear at any place where an expression could appear. Different from SQL,  subqueries in `Projection`s or any boolean predicates are not restrained to return singleton, single-column relations, instead, they can return arbitrary collections. The following query is a variant of the prior group-by query example. Instead of listing all messages for every sender location, the query retrieves a list of the top three reply messages with smallest message-ids for each sender location.
 
 ##### Examples
       SELECT loc AS location, 
