@@ -190,7 +190,7 @@ The following table summarizes the precedence order (from higher to lower) of al
 | Operator                                                                    | Operation |
 |-----------------------------------------------------------------------------|-----------|
 | +, -, EXISTS, NOT EXISTS                                                    |  identity, negation  |
-| ^                                                                           |  multiplication, division  |
+| ^                                                                           |  exponentiation  |
 | *, /                                                                        |  addition, subtraction |
 | IS NULL, IS NOT NULL, IS MISSING, IS NOT MISSING, <br>IS UNKNOWN, IS NOT UNKNOWN| comparison |
 | =, !=, <, >, <=, >=, LIKE, NOT LIKE, IN, NOT IN                             | comparison  |
@@ -199,14 +199,21 @@ The following table summarizes the precedence order (from higher to lower) of al
 | OR                                                                          | disjunction |
 
 ##### <a id="Arithmetic operators">Arithmetic operators
-| Operator |  Purpose                                                                       | Example   |
-|----------|--------------------------------------------------------------------------------|-----------|
-| +, -     |  When they are unary operators, these denote a positive or negative expression.| -1        |
-|          |  When they are binary operators, these add or substract                        | 1+2, 2-1  |           
-| *, /     |                                                                                |           |
-| ^        |                                                                                |           |
+| Operator |  Purpose                                                                       | Example    |
+|----------|--------------------------------------------------------------------------------|------------|
+| +, -     |  When they are unary operators, these denote a <br>positive or negative expression.| -1         |
+|          |  When they are binary operators, these add or substract.                       | 1+2, 2-1   |           
+| *, /     |  Multiply, divide.                                                             | 3*2, 4/2.0 |
+| ^        |  Exponentiation.                                                               | 3^5        |
 
 ##### <a id="Collection operators">Collection operators
+| Operator   |  Purpose                                   | Example    |
+|------------|--------------------------------------------|------------|
+| IN         |  Membership test.                          | SELECT * FROM TweetMessages tm <br>WHERE tm.user.lang IN ["en", "de"] |
+| NOT IN     |  Non-membership test.                      | SELECT * FROM TweetMessages tm <br>WHERE tm.user.lang NOT IN ["en"] |
+| EXISTS     |  Check whether a collection is not empty.  | SELECT * FROM TweetMessages tm <br>WHERE EXISTS tm.referedTopics |
+| NOT EXISTS |  Check whether a collection is empty.      | SELECT * FROM TweetMessages tm <br>WHERE NOT EXISTS tm.referedTopics |
+
 
 ##### <a id="Comparison operators">Comparison operators
 
