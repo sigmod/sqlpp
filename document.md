@@ -21,8 +21,6 @@
       * [Logical Operators](#Logical_Operators)
     * [Conditional expressions](#Conditional_expressions)
     * [Quantified expressions](#Quantified_expressions)
-      * [Existential quatifications](#Existential_quantifications)
-      * [Universal quantifications](#Universal_quantifications)
   * [Select statement](#Select_statements)
     * [Select-from-where](#select-from-where)
     * [Unnest](#Unnest)
@@ -257,7 +255,8 @@ The following example illustrates the form of a conditional expression.
 
 ### <a id="Quantified_expressions">Quantified expressions
 
-    QuantifiedExpression ::= ( <SOME> | <EVERY> ) Variable <IN> Expression ( "," Variable "in" Expression )* <SATISFIES> Expression
+    QuantifiedExpression ::= ( <SOME> | <EVERY> ) Variable <IN> Expression ( "," Variable "in" Expression )*
+                             <SATISFIES> Expression
 
 Quantified expressions are used for expressing existential or universal predicates involving the elements of a collection.
 
