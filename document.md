@@ -178,10 +178,10 @@ The following examples illustrate field access for a record, index-based element
     
 Operators perform a specific operation on the input values or expressions. AsterixDB SQL++ provides a full set of operators that you can use within its statements. Here are the categories of SQL++ operators:
 
-* Arithmetic operators[#Arithmetic_operators], to perform basic mathematical operations;
-* Collection operators[#Collection_operators], to evaluate expressions on collections or objects;
-* Comparison operators[#Comparison_operators], to compare two expressions;
-* Logical Operators[#Logical_operators], to combine operators using Boolean logic.
+* [Arithmetic operators](#Arithmetic_operators), to perform basic mathematical operations;
+* [Collection operators](#Collection_operators), to evaluate expressions on collections or objects;
+* [Comparison operators](#Comparison_operators), to compare two expressions;
+* [Logical Operators](#Logical_operators), to combine operators using Boolean logic.
 
 The following table summarizes the precedence order (from higher to lower) of all operators:
 
