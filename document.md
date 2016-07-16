@@ -230,8 +230,8 @@ The following table summarizes the precedence order (from higher to lower) of al
 | >              |  Greater than.                             | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid>10; |
 | <=             |  Less than or equal to.                    | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid<=10; |
 | >=             |  Greater than or equal to.                 | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid>=10; |
-| LIKE           |  Test if the left side matches a<br> pattern defined at the right side. <br> In the pattern,  "%" matches any string <br> while "_" matches any character. | |
-| NOT LIKE       |  Test if the left side does not <br>match a pattern defined at the right side. <br> In the pattern,  "%" matches any string <br> while "_" matches any character. |  | 
+| LIKE           |  Test if the left side matches a<br> pattern defined at the right<br> side. In the pattern,  "%" matches any <br> string while "_" matches any <br> character. | |
+| NOT LIKE       |  Test if the left side does not <br>match a pattern defined at the right<br> side. In the pattern,  "%" matches any <br> string while "_" matches any <br> character. |  | 
 
 ##### <a id="Logical operators">Logical operators
 
