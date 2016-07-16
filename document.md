@@ -17,8 +17,8 @@
     * [Operator expressions](#Operator_expressions)
       * [Arithmetic operators](#Arithmetic_operators)
       * [Collection operators](#Collection_operators)
-      * [Comparison Operators](#Comparison_operators)
-      * [Logical Operators](#Logical_Operators)
+      * [Comparison operators](#Comparison_operators)
+      * [Logical operators](#Logical_Operators)
     * [Conditional expressions](#Conditional_expressions)
     * [Quantified expressions](#Quantified_expressions)
   * [Select statement](#Select_statements)
@@ -126,7 +126,7 @@ The following example is a (built-in) function call expression whose value is 8.
 
 ##### Example
 
-    "length"('a string')
+    length('a string')
 
 #### <a id="Constructors">Constructors
 
@@ -178,10 +178,10 @@ The following examples illustrate field access for a record, index-based element
     
 Operators perform a specific operation on the input values or expressions. AsterixDB SQL++ provides a full set of operators that you can use within its statements. Here are the categories of SQL++ operators:
 
-* Arithmetic operators, to perform basic mathematical operations;
-* Collection operators, to evaluate expressions on collections or objects;
-* Comparison operators, to compare two expressions;
-* Logical Operators, to combine operators using Boolean logic.
+* Arithmetic operators[#Arithmetic_operators], to perform basic mathematical operations;
+* Collection operators[#Collection_operators], to evaluate expressions on collections or objects;
+* Comparison operators[#Comparison_operators], to compare two expressions;
+* Logical Operators[#Logical_operators], to combine operators using Boolean logic.
 
 The following table summarizes the precedence order (from higher to lower) of all operators:
 
@@ -242,11 +242,11 @@ The following table summarizes the precedence order (from higher to lower) of al
 
 ### <a id="Conditional_expressions">Conditional expressions
 
-    IfThenElse ::= "IF" "(" Expression ")" "THEN" Expression "ELSE" Expression
+    IfThenElse ::= <IF> "(" Expression ")" <THEN> Expression <ELSE> Expression
 
 A conditional expression is useful for choosing between two alternative values based on a
-boolean condition.  If its first (`IF`) expression is true, its second (`THEN`) expression's
-value is returned, and otherwise its third (`ELSE`) expression is returned.
+boolean condition.  If its first (<IF>) expression is true, its second (<THEN>) expression's
+value is returned, and otherwise its third (<ELSE>) expression is returned.
 
 The following example illustrates the form of a conditional expression.
 ##### Example
