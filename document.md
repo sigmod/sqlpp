@@ -209,17 +209,32 @@ The following table summarizes the precedence order (from higher to lower) of al
 ##### <a id="Collection operators">Collection operators
 | Operator   |  Purpose                                   | Example    |
 |------------|--------------------------------------------|------------|
-| IN         |  Membership test.                          | SELECT * FROM TweetMessages tm <br>WHERE tm.user.lang IN ["en", "de"] |
-| NOT IN     |  Non-membership test.                      | SELECT * FROM TweetMessages tm <br>WHERE tm.user.lang NOT IN ["en"] |
-| EXISTS     |  Check whether a collection is not empty.  | SELECT * FROM TweetMessages tm <br>WHERE EXISTS tm.referedTopics |
-| NOT EXISTS |  Check whether a collection is empty.      | SELECT * FROM TweetMessages tm <br>WHERE NOT EXISTS tm.referedTopics |
+| IN         |  Membership test.                          | SELECT * FROM TweetMessages tm <br>WHERE tm.user.lang IN ["en", "de"]; |
+| NOT IN     |  Non-membership test.                      | SELECT * FROM TweetMessages tm <br>WHERE tm.user.lang NOT IN ["en"]; |
+| EXISTS     |  Check whether a collection is not empty.  | SELECT * FROM TweetMessages tm <br>WHERE EXISTS tm.referedTopics; |
+| NOT EXISTS |  Check whether a collection is empty.      | SELECT * FROM TweetMessages tm <br>WHERE NOT EXISTS tm.referedTopics; |
 
 
 ##### <a id="Comparison operators">Comparison operators
+| Operator       |  Purpose                                   | Example    |
+|----------------|--------------------------------------------|------------|
+| IS NULL        |  Test if a value is null.                  | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS NULL; |
+| IS NOT NULL    |  Test if a value is not null.              | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS NOT NULL; | 
+| IS MISSING     |  Test if a value is missing.               | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS MISSING; |
+| IS NOT MISSING |  Test if a value is not missing.           | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS NOT MISSing;|
+| IS UNKNOWN     |  Test if a value is either null or missing.| SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS UNKNOWN; | 
+| IS NOT UNKNOWN |  Test if a value is not null nor missing.  | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS NOT UNKNOWN;| 
+| =              |  Equality test.                            | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid=10; |
+| !=             |  Inequality test.                          | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid!=10;|
+| <              |  Less than.                                | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid<10; |
+| >              |  Greater than.                             | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid>10; |
+| <=             |  Less than or equal to.                    | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid<=10; |
+| >=             |  Greater than or equal to.                 | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid>=10; |
+| LIKE           |  Test if the left side matches a pattern <br>defined at the right side. In the pattern, <br> "%" matches any string while "_" matches any character. | |
+| NOT LIKE       |  Test if the left side does not match a pattern <br>defined at the right side. In the pattern, <br> "%" matches any string while "_" matches any character. |  | 
 
 ##### <a id="Logical operators">Logical operators
 
-##### <a id="Logical operators">Logical operators
 
 
 
