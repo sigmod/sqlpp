@@ -36,19 +36,13 @@ This document is intended as a reference guide to the full syntax and semantics 
 
 New AsterixDB users are encouraged to read and work through the (friendlier) guide "AsterixDB 101: An ADM and SQL++ Primer" before attempting to make use of this document. In addition, readers are advised to read and understand the Asterix Data Model (ADM) reference guide since a basic understanding of ADM concepts is a prerequisite to understanding SQL++. In what follows, we detail the features of the SQL++ language in a grammar-guided manner: we list and briefly explain each of the productions in the SQL++ grammar, offering examples for clarity in cases where doing so seems needed or helpful.
 
-# <a id="Queries">2. Queries</a>
-
-A SQL++ query can be any legal SQL++ expression or Select statment. A query should always end with a semicolon.
-
-    Query ::= (Expression | SelectStatement) ";"
-
-## <a id="Expression">Expressions
+# <a id="Expressions">Expressions
 
     Expression ::= OperatorExpression | ConditionExpression | QuantifiedExpression
 
 SQL++ is a fully composable expression language. Each SQL++ expression returns zero or more Asterix Data Model (ADM) instances. There are three major kinds of expressions in SQL++. At the topmost level, an SQL++ expression can be an OperatorExpression (similar to a mathematical expression), an ConditionalExpression (to choose between alternative values), or a QuantifiedExpression (which yields a boolean value). Each will be detailed as we explore the full SQL++ grammar.
 
-### <a id="Primary_expressions">Primary Expressions
+## <a id="Primary_expressions">Primary Expressions
 
     PrimaryExpr ::= Literal
                   | VariableReference
@@ -58,7 +52,7 @@ SQL++ is a fully composable expression language. Each SQL++ expression returns z
 
 The most basic building block for any SQL++ expression is the PrimaryExpr. This can be a simple literal (constant) value, a reference to a query variable that is in scope, a parenthesized expression, a function call,  a newly constructed list of ADM instances, or a newly constructed ADM record.
 
-#### <a id="Literals">Literals
+### <a id="Literals">Literals
 
     Literal        ::= StringLiteral
                        | IntegerLiteral
@@ -86,7 +80,7 @@ Literals (constants) in SQL++ can be strings, integers, floating point values, d
 
 The following are some simple examples of SQL++ literals.
 
-##### Examples
+#### Examples
 
     'a string'
     "test string"
@@ -94,7 +88,7 @@ The following are some simple examples of SQL++ literals.
 
 Different from standard SQL, double quotes are the same as single quotes and could also be used for string literals in SQL++.  For delimited identifiers, we use backticks, i.e., \`id\`.
 
-#### <a id="Variable_references">Variable References
+### <a id="Variable_references">Variable References
 
     VariableReference ::= <VARIABLE>|<QuotedString>
     <VARIABLE>  ::= <LETTER> (<LETTER> | <DIGIT> | "_" | "$")*
@@ -102,12 +96,12 @@ Different from standard SQL, double quotes are the same as single quotes and cou
 
 A variable in SQL++ can be bound to any legal ADM value. A variable reference refers to the value to which an in-scope variable is bound. (E.g., a variable binding may originate from one of the `FROM`, `WITH` or `LET` clauses of a SELECT statement or from an input parameter in the context of a function body.)
 
-##### Examples
+#### Examples
 
     tweet
     id
 
-#### <a id="Parenthesized_expressions">Parenthesized expressions
+### <a id="Parenthesized_expressions">Parenthesized expressions
 
     ParenthesizedExpression ::= "(" Expression ")" | Subquery
 
@@ -115,11 +109,11 @@ As in most languages, an expression may be parenthesized. In SQL++, a subquery i
 
 The following expression is evaluated to value 2.
 
-###### Example
+##### Example
 
     ( 1 + 1 )
 
-#### <a id="Function_call_expressions">Function call expressions
+### <a id="Function_call_expressions">Function call expressions
 
     FunctionCallExpression ::= FunctionOrTypeName "(" ( Expression ( "," Expression )* )? ")"
 
@@ -127,11 +121,11 @@ Functions are included in SQL++, like most languages, as a way to package useful
 
 The following example is a (built-in) function call expression whose value is 8.
 
-##### Example
+#### Example
 
     length('a string')
 
-#### <a id="Constructors">Constructors
+### <a id="Constructors">Constructors
 
     ListConstructor          ::= OrderedListConstructor | UnorderedListConstructor
     OrderedListConstructor   ::= "[" ( Expression ( "," Expression )* )? "]"
@@ -143,7 +137,7 @@ A major feature of SQL++ is its ability to construct new ADM data instances. Thi
 
 The following examples illustrate how to construct a new ordered list with 3 items, a new unordered list with 4 items, and a new record with 2 fields, respectively. List elements can be homogeneous (as in the first example), which is the common case, or they may be heterogeneous (as in the second example). The data values and field name values used to construct lists and records in constructors are all simply SQL++ expressions. Thus the list elements, field names, and field values used in constructors can be simple literals (as in these three examples) or they can come from query variable references or even arbitrarily complex SQL++ expressions.
 
-##### Examples
+#### Examples
 
     [ 'a', 'b', 'c' ]
 
@@ -154,7 +148,7 @@ The following examples illustrate how to construct a new ordered list with 3 ite
       'project members': {{ 'vinayakb', 'dtabass', 'chenli' }}
     }
 
-##### Note
+#### Note
 
 When constructing nested records there needs to be a space between the closing braces to avoid confusion with the `}}` token that ends an unordered list constructor:
 `{ 'a' : { 'b' : 'c' }}` will fail to parse while `{ 'a' : { 'b' : 'c' } }` will work.
@@ -169,7 +163,7 @@ Components of complex types in ADM are accessed via path expressions. Path acces
 
 The following examples illustrate field access for a record, index-based element access for an ordered list, and also a composition thereof.
 
-##### Examples
+#### Examples
 
     ({'list': [ 'a', 'b', 'c']}).list
 
@@ -199,7 +193,7 @@ The following table summarizes the precedence order (from higher to lower) of al
 | AND                                                                         | conjunction |
 | OR                                                                          | disjunction |
 
-#### <a id="Arithmetic operators">Arithmetic operators
+### <a id="Arithmetic operators">Arithmetic operators
 Arithemtic operators are used to exponentiate, negate, add, subtract, multiply, and divide numeric values.
  
 | Operator |  Purpose                                                                       | Example    |
@@ -209,7 +203,7 @@ Arithemtic operators are used to exponentiate, negate, add, subtract, multiply, 
 | *, /     |  Multiply, divide.                                                             | SELECT 3*2; SELECT 4/2.0; |
 | ^        |  Exponentiation.                                                               | SELECT 3^5;       |
 
-#### <a id="Collection operators">Collection operators
+### <a id="Collection operators">Collection operators
 Collection operators are used for membership tests (IN, NOT IN) or empty collection tests (EXISTS, NOT EXISTS).
 
 | Operator   |  Purpose                                     | Example    |
@@ -220,7 +214,7 @@ Collection operators are used for membership tests (IN, NOT IN) or empty collect
 | NOT EXISTS |  Check whether a collection is empty.        | SELECT * FROM TweetMessages tm <br>WHERE NOT EXISTS tm.referedTopics; |
 
 
-#### <a id="Comparison operators">Comparison operators
+### <a id="Comparison operators">Comparison operators
 Comparison operators are used to compare values.
 
 | Operator       |  Purpose                                   | Example    |
@@ -240,7 +234,7 @@ Comparison operators are used to compare values.
 | LIKE           |  Test if the left side matches a<br> pattern defined at the right<br> side. In the pattern,  "%" matches  <br>any string while "_" matches <br> any character. | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name LIKE "%Giesen%";|
 | NOT LIKE       |  Test if the left side does not <br>match a pattern defined at the right<br> side. In the pattern,  "%" matches <br>any string while "_" matches <br> any character. | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name NOT LIKE "%Giesen%";| 
 
-#### <a id="Logical_operators">Logical operators
+### <a id="Logical_operators">Logical operators
 Logical operators perform logical `inverse`, `and`, `or` operatorions for boolean values, `null` or `missing`.
 
 | Operator |  Purpose                                   | Example    |
@@ -273,7 +267,7 @@ boolean condition.  If its first (<IF>) expression is true, its second (<THEN>) 
 value is returned, and otherwise its third (<ELSE>) expression is returned.
 
 The following example illustrates the form of a conditional expression.
-##### Example
+#### Example
 
     IF (2 < 3) THEN "yes" ELSE "no"
 
@@ -292,6 +286,13 @@ It is useful to note that if the set were instead the empty set, the first expre
 
     EVERY x IN [ 1, 2, 3 ] SATISFIES x < 3
     SOME x IN [ 1, 2, 3 ] SATISFIES x < 3
+
+
+# <a id="Queries">2. Queries</a>
+
+A SQL++ query can be any legal SQL++ expression or Select statment. A query should always end with a semicolon.
+
+    Query ::= (Expression | SelectStatement) ";"
 
 ##  <a id="Select_statements">Select statements
 
