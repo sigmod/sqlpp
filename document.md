@@ -3,7 +3,7 @@
 ## <a id="toc">Table of Contents</a> ##
 
 * [1. Introduction](#Introduction)
-* [Expressions](#Expressions)  
+* [2. Expressions](#Expressions)  
   * [Primary expressions](#Primary_expressions)
     * [Literals](#Literals)
     * [Variable references](#Variable_references)
@@ -20,7 +20,7 @@
     * [Logical operators](#Logical_Operators)
   * [Conditional expressions](#Conditional_expressions)
   * [Quantified expressions](#Quantified_expressions)
-* [2. Queries](#Queries)
+* [3. Queries](#Queries)
   * [Select statement](#Select_statements)
     * [Select-from-where](#select-from-where)
     * [Unnest](#Unnest)
@@ -28,7 +28,7 @@
     * [Group By](#Group_By)
     * [Order By](#ORDER_BY)
     * [Limit](#Limit)
-* [3. DDL and DML Statements](#DDL_and_DML_Statements)
+* [4. DDL and DML Statements](#DDL_and_DML_Statements)
 
 # <a id="Introduction">1. Introduction</a><font size="4">
 
