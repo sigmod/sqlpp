@@ -40,7 +40,7 @@ New AsterixDB users are encouraged to read and work through the (friendlier) gui
 
     Expression ::= OperatorExpression | ConditionExpression | QuantifiedExpression
 
-SQL++ is a fully composable expression language. Each SQL++ expression returns zero or more Asterix Data Model (ADM) instances. There are three major kinds of expressions in SQL++. At the topmost level, an SQL++ expression can be an OperatorExpression (similar to a mathematical expression), an ConditionalExpression (to choose between alternative values), or a QuantifiedExpression (which yields a boolean value). Each will be detailed as we explore the full SQL++ grammar.
+Each SQL++ expression returns zero or more Asterix Data Model (ADM) instances. There are three major kinds of expressions in SQL++. At the topmost level, an SQL++ expression can be an OperatorExpression (similar to a mathematical expression), an ConditionalExpression (to choose between alternative values), or a QuantifiedExpression (which yields a boolean value). Each will be detailed as we explore the full SQL++ grammar.
 
 ## <a id="Primary_expressions">Primary Expressions
 
@@ -50,7 +50,7 @@ SQL++ is a fully composable expression language. Each SQL++ expression returns z
                   | FunctionCallExpression
                   | Constructor
 
-The most basic building block for any SQL++ expression is the PrimaryExpr. This can be a simple literal (constant) value, a reference to a query variable that is in scope, a parenthesized expression, a function call,  a newly constructed list of ADM instances, or a newly constructed ADM record.
+The most basic building block for any SQL++ expression is PrimaryExpression. This can be a simple literal (constant) value, a reference to a query variable that is in scope, a parenthesized expression, a function call,  a newly constructed list of ADM instances, or a newly constructed ADM record.
 
 ### <a id="Literals">Literals
 
@@ -86,15 +86,15 @@ The following are some simple examples of SQL++ literals.
     "test string"
     42
 
-Different from standard SQL, double quotes are the same as single quotes and could also be used for string literals in SQL++.  For delimited identifiers, we use backticks, i.e., \`id\`.
+Different from standard SQL, double quotes are the same as single quotes and could also be used for string literals in SQL++. Backticks, i.e., \`id\`, are for delimited identifiers.
 
 ### <a id="Variable_references">Variable References
 
-    VariableReference ::= <VARIABLE>|<QuotedString>
-    <VARIABLE>  ::= <LETTER> (<LETTER> | <DIGIT> | "_" | "$")*
+    VariableReference ::= <IDENTIFIER>|<QuotedString>
+    <IDENTIFIER>  ::= <LETTER> (<LETTER> | <DIGIT> | "_" | "$")*
     <LETTER>    ::= ["A" - "Z", "a" - "z"]
 
-A variable in SQL++ can be bound to any legal ADM value. A variable reference refers to the value to which an in-scope variable is bound. (E.g., a variable binding may originate from one of the `FROM`, `WITH` or `LET` clauses of a SELECT statement or from an input parameter in the context of a function body.)
+A variable in SQL++ can be bound to any legal ADM value. A variable reference refers to the value to which an in-scope variable is bound. (E.g., a variable binding may originate from one of the `FROM`, `WITH` or `LET` clauses of a select statement or from an input parameter in the context of a function body.)
 
 #### Examples
 
@@ -105,7 +105,7 @@ A variable in SQL++ can be bound to any legal ADM value. A variable reference re
 
     ParenthesizedExpression ::= "(" Expression ")" | Subquery
 
-As in most languages, an expression may be parenthesized. In SQL++, a subquery is also an parenthesized expression.
+An expression can be parenthesized, which usually is used for controlling the precedence order. In SQL++, a subquery is also an parenthesized expression.
 
 The following expression is evaluated to value 2.
 
@@ -115,7 +115,7 @@ The following expression is evaluated to value 2.
 
 ### <a id="Function_call_expressions">Function call expressions
 
-    FunctionCallExpression ::= FunctionOrTypeName "(" ( Expression ( "," Expression )* )? ")"
+    FunctionCallExpression ::= FunctionName "(" ( Expression ( "," Expression )* )? ")"
 
 Functions are included in SQL++, like most languages, as a way to package useful functionality or to componentize complicated or reusable SQL++ computations. A function call is a legal SQL++ query expression that represents the ADM value resulting from the evaluation of its body expression with the given parameter bindings; the parameter value bindings can themselves be any SQL++ expressions.
 
@@ -148,11 +148,6 @@ The following examples illustrate how to construct a new ordered list with 3 ite
       'project members': {{ 'vinayakb', 'dtabass', 'chenli' }}
     }
 
-#### Note
-
-When constructing nested records there needs to be a space between the closing braces to avoid confusion with the `}}` token that ends an unordered list constructor:
-`{ 'a' : { 'b' : 'c' }}` will fail to parse while `{ 'a' : { 'b' : 'c' } }` will work.
-
 ### <a id="Path_expressions">Path expressions
 
     ValueExpr ::= PrimaryExpr ( Field | Index )*
@@ -173,7 +168,7 @@ The following examples illustrate field access for a record, index-based element
 
 ### <a id="Operator_expressions">Operator expressions
     
-Operators perform a specific operation on the input values or expressions. AsterixDB SQL++ provides a full set of operators that you can use within its statements. Here are the categories of SQL++ operators:
+Operators perform a specific operation on the input values or expressions. AsterixDB SQL++ provides a full set of operators that you can use within its statements. Here are the categories of operators:
 
 * [Arithmetic operators](#Arithmetic_operators), to perform basic mathematical operations;
 * [Collection operators](#Collection_operators), to evaluate expressions on collections or objects;
@@ -257,6 +252,15 @@ The following table is the truth table for `AND` and `OR`.
 | NULL | NULL | NULL | NULL |
 | NULL | MISSING | MISSING | NULL |
 | MISSING | MISSING | MISSING | MISSING |
+
+The following table demonstrates the results of `NOT` on possible inputs.
+
+| A  | NOT A |
+|----|----|
+| TRUE | FALSE |
+| FALSE | TRUE |
+| NULL | NULL |
+| MISSING | MISSING | 
 
 ### <a id="Conditional_expressions">Conditional expressions
 
