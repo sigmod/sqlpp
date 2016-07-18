@@ -359,7 +359,7 @@ The following BNFs (Backus–Naur Forms) show the grammar of select statements i
     OrderbyClause      ::=	<ORDER> <BY> Expression ( <ASC> | <DESC> )? ( "," Expression ( <ASC> | <DESC> )? )*
     LimitClause	       ::=	<LIMIT> Expression ( <OFFSET> Expression )?
 
-In this section, we will use two collections, `FacebookUsers` and `FacebookMessages`, as running examples to explain select queries. The contents of the two example datasets are shown as follows.
+In this section, we will use two stored collections (a.k.a, tables in the SQL-92 vocabulary), `FacebookUsers` and `FacebookMessages`, as running examples to explain select queries. The contents of the two example collections are shown as follows.
 
 `FacebookUsers` collection:
 
@@ -417,7 +417,7 @@ In SQL++,  `Select *` returns a nested record for each input binding tuple, wher
     SELECT *
     FROM FacebookUsers user;
 
-Since `user` is the only binding varibale generated in the `FROM` clause, it returns:
+Since `user` is the only binding varibale generated in the from clause, it returns:
 
     [
       { "user": { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "user-since": datetime("2012-08-20T10:10:00.000Z"), "friend-ids": {{ 2, 3, 6, 10 }}, "employment": [ { "organization-name": "Codetechno", "start-date": date("2006-08-06") }, { "organization-name": "geomedia", "start-date": date("2010-06-17"), "end-date": date("2010-01-26") } ] } },
@@ -426,7 +426,7 @@ Since `user` is the only binding varibale generated in the `FROM` clause, it ret
     ]
 
 ### <a id="Select_distinct">Select distinct
-SQL++ `DISTINCT` keyword is used to eliminate duplicate items in a result set. The following example shows how it works.
+SQL++ `DISTINCT` keyword is used to eliminate duplicate items in results. The following example shows how it works.
 
 #### Example
 
@@ -441,10 +441,10 @@ It returns:
     ]
 
 ### <a id="Unnamed_projections">Unnamed projections
-The same as standard SQL, SQL++ supports unnamed projections, for which a name is generated.  The name generation falls into three cases:
+Similar to standard SQL, SQL++ supports unnamed projections, for which names are generated. The name generation falls into three cases:
 
   * if the projection expression is a variable reference expression, the generated name is the same as the name of the variable;
-  * if the projection expression is a field access expression, the generated name is the last identifier in the expression;
+  * if the projection expression is a field access expression, the generated name is same as the string of the last identifier in the expression;
   * for all other cases, the underlying query processor will generate a unique name.
 
 #### Example
@@ -459,10 +459,10 @@ It outputs:
       { "$1": "MargaritaStoddard", "alias": "Margarita" }
     ]
 
-In the result, "$1" is the generated name for `substr(user.name, 1)`, while "alias" is the generated name for `substr(user.name, 1)`.
+In the result, `$1` is the generated name for `substr(user.name, 1)`, while `alias` is the generated name for `substr(user.name, 1)`.
 
 ### <a id="Abbreviatory_field_access_expressions">Abbreviatory field access expressions
-Similar to standard SQL, field access expressions can be abbreviatory in many places where there is no ambiguity. In the next example, variable `user` is the only possible variable reference for field `name` and `alias` and thus it can be omitted in the query.
+Similar to standard SQL, field access expressions can be abbreviatory when there is no ambiguity. In the next example, variable `user` is the only possible variable reference for field `name` and `alias` and thus it can be omitted in the query.
 
 #### Example
 
@@ -477,7 +477,7 @@ It outputs:
     ]
 
 ## <a id="Unnest_clauses">Unnest clauses
-For each input tuple, Unnest clause flatterns a expression that returns to a collection value into each element value and produces multiple tuples, each of which is the original tuple augmented a flattern element value.
+For each input tuple, Unnest clause flatterns a expression that returns a collection into individual items and produces multiple tuples, each of which is the original input tuple augmented with a flattern item.
 
 ### <a id="Inner_unnests">Inner unnests
 The next example shows a query that retrieves the organizations that the selected user has worked in, using the `UNNEST` clause to unnest the nested collection `employment` in the user's record.
@@ -508,9 +508,11 @@ Note that `UNNEST` has the "inner" semantics --- if a user does not have any emp
 
 It returns:
 
-    [ 
+    [
       { "user_id": 1 }
     ]
+
+Note that for the case that `user.foo` is an empty collection or a `MISSING`, `employment` is evaluated to `MISSING`. For the case that `user.foo` is a `NULL`, `employment` is evaluated to `NULL`.
 
 ### <a id="Expressing_joins_using_unnests">Expressing joins using unnests
 The next example shows a query that joins two tables, FacebookUsers and FacebookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be seen as "for each Facebook user, unnest the entire `FacebookMessages` collection and then filters the output with condition `message.`\``author-id`\``= user.id`".  Though the semantics sound like a nested loop join, the underlying AsterixDB query processor will generate a query plan using hash join to evaluate the query since the filtering condition is based on equality of fields from `FacebookUsers` and `FacebookMessages`.
