@@ -22,7 +22,10 @@
   * [Quantified expressions](#Quantified_expressions)
 * [3. Queries](#Queries)
   * [Select statement](#Select_statements)
-  * [Select clause](#select-from-where)
+  * [Select clause](#Select_clause)
+    * [Select element/value/raw](#Select_element)
+    * [SQL-style select](#SQL_select)
+    * [Select *](#Select_*)
   * [Where clause](#Where_clause)
   * [Unnest clause](#Unnest_clause)
     * [Inner unnest](#Innner_clause)
@@ -305,6 +308,8 @@ A SQL++ query can be any legal SQL++ expression or Select statment. A query shou
 
 ##  <a id="Select_statements">Select statements
 
+The following BNFs show the grammar of select statements in AsterixDB SQL++.
+
     SelectStatement    ::=	( WithClause )? SelectSetOperation (OrderbyClause )? ( LimitClause )?
     SelectSetOperation ::=	 SelectBlock ( (<UNION> | <INTERSECT> | <EXCEPT>)  ( <ALL>)? ( SelectBlock | Subquery ) )*
     Subquery	       ::=	"(" SelectStatement ")"
@@ -344,33 +349,44 @@ A SQL++ query can be any legal SQL++ expression or Select statment. A query shou
     OrderbyClause      ::=	<ORDER> <BY> Expression ( <ASC> | <DESC> )? ( "," Expression ( <ASC> | <DESC> )? )*
     LimitClause	       ::=	<LIMIT> Expression ( <OFFSET> Expression )?
 
-### <a id="Select_clause">Select clause
-A SELECT statement always return a collection.  `SELECT ELEMENT expression` returns a collection that consists of evaluation results of the expression, one per binding tuple. In SQL++, all regular SQL-style SELECT clauses could be expressed by `SELECT ELEMENT`.  For example, `SELECT exprA AS fieldA, exprB AS fieldB` is a syntactic suger of `SELECT ELEMENT { 'fieldA': expr1, 'fieldB': exprB }`. 
+## <a id="Select_clause">Select clause
+A select clause always return a collection, no matter the enclosing select statement is a top-level query or a subquery.
+
+### <a id="Select_element">Select element/value/raw
+`SELECT ELEMENT expression` returns a collection that consists of evaluation results of the expression, one per binding tuple. 
 The following example shows a query that selects and returns one user from the table FacebookUsers.
 
-##### Example
+#### Example
 
     SELECT ELEMENT user
     FROM FacebookUsers user
     WHERE user.id = 8
 
-The next example shows a query that retrieves the organizations that the selected user has worked in, using the `CORRELATE` clause to unnest the nested collection `employment` in the user's record.
+### <a id="SQL_select">SQL-style select
+In SQL++, all traditional SQL-style select clauses could be expressed by `SELECT ELEMENT`.  For example, `SELECT exprA AS fieldA, exprB AS fieldB` is a syntactic suger of `SELECT ELEMENT { 'fieldA': expr1, 'fieldB': exprB }`. 
+
+    SELECT ELEMENT user
+    FROM FacebookUsers user
+    WHERE user.id = 8
+
+### <a id="Unnest_clause">Unnest clause
+The next example shows a query that retrieves the organizations that the selected user has worked in, using the `UNNEST` clause to unnest the nested collection `employment` in the user's record.
 
 ##### Example
  	
     SELECT ELEMENT employment."organization-name"
     FROM FacebookUsers AS user
-    CORRELATE user.employment AS employment
+    UNNEST user.employment AS employment
     WHERE user.id = 8
 
-A equivalent query could be rewritten as:
+SQL++ allows correlations among different from terms, i.e., a right side `From` binding expression can refer to variables defined on its left side. A equivalent unnesting query could be rewritten as:
 	
     SELECT ELEMENT employment."organization-name" 
     FROM FacebookUsers AS user, 
     	user.employment AS employment
     WHERE user.id = 8
 
-Note that `CORRELATE` has the "inner" semantics --- if the user does not have any employment history, the query will return an empty result set. However, `LEFT OUTER CORRELATE` has the "left outer" semantics --- the following query will return a result set that only contains a `NULL` if the user does not have any employment history.
+Note that `UNNEST` has the "inner" semantics --- if a user does not have any employment history, the tuple corresponding to the user will not be emitted in the result. However, `LEFT OUTER UNNESt` has the "left outer" semantics --- the following query will return a result set that only contains a `NULL` if the user does not have any employment history.
 
 	SELECT ELEMENT employment."organization-name" 
     FROM FacebookUsers AS user
