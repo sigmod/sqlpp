@@ -31,6 +31,7 @@
   * [Where clause](#Where_clause)
   * [Unnest clause](#Unnest_clause)
     * [Inner unnest](#Innner_unnest)
+    * [Multiple from terms](#Multiple_from_terms)
     * [Left outer unnest](#Left_outer_unnest)
     * [Joins](#Joins)
   * [Join clause](#Join Clause)
@@ -464,11 +465,16 @@ It returns:
       { "user_id": 1, "org_name": "geomedia" }
     ]
 
-Note that `UNNEST` has the "inner" semantics --- if a user does not have any employment history, the tuple corresponding to the user will not be emitted in the result. SQL++ allows correlations among different from terms, i.e., a right side `From` binding expression can refer to variables defined on its left side. A equivalent unnesting query could be rewritten as:
+Note that `UNNEST` has the "inner" semantics --- if a user does not have any employment history, the tuple corresponding to the user will not be emitted in the result.
+
+### <a id="Multiple_from_terms">Multiple from terms
+SQL++ allows correlations among different from terms, i.e., a right side `From` binding expression can refer to variables defined on its left side. A equivalent query to the above unnesting query could be rewritten as:
 
     SELECT user.id user_id, employment.`organization-name` org_name 
     FROM FacebookUsers AS user, user.employment AS employment
     WHERE user.id = 1;
+
+In general, query string like `expr1 AS v1 UNNEST expr2 AS v2` is equivalent to `expr1 AS v1, expr2 AS v2`.
 
 ### <a id="Left_outer_unnest">Left outer unnest
 `LEFT OUTER UNNEST` has the "left outer" semantics. For example, field `foo` does not exist in the record for the user with id being 1, but the returned result set still contains the user's id.
@@ -518,6 +524,16 @@ For instance, the above join queries could be expressed by a `UNNEST` clause:
     ) AS message;
 
 Thanks to the allowed correlations among `FROM` terms, the unnesting query can be read as "for each Facebook user, unnest the filtered `FacebookMessages` sub-collection with condition `message.`\``author-id`\``= user.id`".
+
+Similarly, replacing `UNNEST` with `,` in the above query yeld the same semantics:
+
+    SELECT user.name uname, message.message message
+    FROM FacebookUsers user, 
+      (	 
+    	SELECT ELEMENT message
+    	FROM FacebookMessages message
+    	WHERE message.`author-id` = user.id
+      ) AS message;
 
 ## <a id="Join_clause">Join clause
 Using a join clause, the join queries above can be expressed as:
