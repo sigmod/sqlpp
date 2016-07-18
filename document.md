@@ -29,8 +29,8 @@
   * [Where clause](#Where_clause)
   * [Unnest clause](#Unnest_clause)
     * [Inner unnest](#Innner_unnest)
-    * [Left outer unnest](#left_outer_unnest)
-    * [Join](#join)
+    * [Left outer unnest](#Left_outer_unnest)
+    * [Join](#Join)
   * [Join clause](#Join Clause)
     * [Inner join](#Inner_join)
     * [Left outer join](#Left_outer_join)
@@ -441,7 +441,7 @@ Note that `UNNEST` has the "inner" semantics --- if a user does not have any emp
     WHERE user.id = 1;
 
 ### <a id="Left_outer_unnest">Left outer unnest
-`LEFT OUTER UNNESt` has the "left outer" semantics. For example, field `foo` does not exist in the record for the user with id being 1, but the returned result set still contains the user's id.
+`LEFT OUTER UNNEST` has the "left outer" semantics. For example, field `foo` does not exist in the record for the user with id being 1, but the returned result set still contains the user's id.
 
     SELECT user.id user_id, employment.`organization-name` org_name
     FROM FacebookUsers AS user
@@ -455,7 +455,7 @@ It returns:
     ]
 
 ### <a id="Join">Join
-The next example shows a query that actually joins two tables, FacebookUsers and FacebookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be seen as for each Facebook user, unnest the entire `FacebookMessages` collection and then filters the output with condition `message./`author-id/` = user.id`.  Apparently, the underlying query processor will generate a query plan using hash join to evaluate the query since the condition is based on equality of fields from `FacebookUsers` and `FacebookMessages`.
+The next example shows a query that joins two tables (in a SQL-92 fashion), FacebookUsers and FacebookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be seen as for each Facebook user, unnest the entire `FacebookMessages` collection and then filters the output with condition `message.`author-id` = user.id`.  Apparently, the underlying query processor will generate a query plan using hash join to evaluate the query since the condition is based on equality of fields from `FacebookUsers` and `FacebookMessages`.
 
 #### Example
 
