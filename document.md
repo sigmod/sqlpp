@@ -724,7 +724,7 @@ In SQL++, an arbitrary subquery can appear at any place where an expression coul
 
 ##### Example
 
-    SELECT loc AS location, 
+    SELECT x.`author-id` AS author, 
       (
             SELECT ELEMENT m.message 
             FROM x AS m
@@ -733,13 +733,13 @@ In SQL++, an arbitrary subquery can appear at any place where an expression coul
             LIMIT 3
       ) AS replies
     FROM FacebookMessages AS x
-    GROUP BY x.`author-id` AS loc;
+    GROUP BY x.`author-id`;
 
 It returns:
 
-    [ 
-      { "replies": [ " dislike iphone its touch-screen is horrible", " can't stand at&t the network is horrible:(", " like verizon the 3G is awesome:)" ], "location": 1 }, 
-      { "replies": [ " like samsung the plan is amazing", " like t-mobile its platform is mind-blowing" ], "location": 2 }
+    [
+      { "replies": [ " dislike iphone its touch-screen is horrible", " can't stand at&t the network is horrible:(", " like verizon the 3G is awesome:)" ], "author": 1 },
+      { "replies": [ " like samsung the plan is amazing", " like t-mobile its platform is mind-blowing" ], "author": 2 }
     ]
 
 ## <a id="Vs_SQL-92">SQL++ Vs. SQL-92
