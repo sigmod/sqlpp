@@ -773,7 +773,7 @@ Internally, the query is rewritten by the compiler to the following form:
     GROUP BY msg.`author-id` AS uid GROUP AS `$1`(msg AS msg);
 
 ### <a id="Aggregation_functions">Aggregation functions
-SQL++ aggregation functions take a collection as its input and output a scalar value. Those functions are functional and can be invoked at any places where an expression is allowed. Here is the list AsterixDB SQL++ builtin aggregation functions, w.r.t. how they handle `NULLs`/`MISSINGs` in the input collection or empty input collections:
+SQL++ aggregation functions take a collection as its input and output a scalar value. Those functions are functional and can be invoked at any places where an expression is allowed. Here is the list of AsterixDB SQL++ builtin aggregation functions, w.r.t. how they handle `NULLs`/`MISSINGs` in the input collection or empty input collections:
 
 | Function   | NULL | MISSING |  Empty Collection |
 |------------|------|---------|-------------------|
@@ -788,8 +788,54 @@ SQL++ aggregation functions take a collection as its input and output a scalar v
 | COLL_SQL-MIN  | ignored | ignored | NULL |
 | COLL_SQL-AVG  | ignored | ignored | NULL |
 
-### <a id="SQL-92_aggregation_functions">SQL-92 aggregation functions
+#### Example
 
+    COLL_AVG(
+        (
+          SELECT VALUE len(`friend-ids`) FROM FacebookUsers
+        )
+     );
+
+It returns:
+
+    3.3333333333333335
+
+#### Example
+
+    SELECT uid, COLL_COUNT(g)
+    FROM FacebookMessages message
+    GROUP BY message.`author-id` AS uid GROUP AS g(message AS fb_msg);
+    
+It returns:
+
+    [
+      { "$1": 5, "uid": 1 },
+      { "$1": 2, "uid": 2 }
+    ]
+    
+### <a id="SQL-92_aggregation_functions">SQL-92 aggregation functions
+To be compatiable with standard SQL aggregation functions, SQL++ supports SQL-92 aggregation function symbols (i.e., `COUNT`, `SUM`, `MAX`, `MIN`, and `AVG`) and the compiler is able to rewrite them into queries that only use SQL++ builtin aggregation functions. The next example will demonstrate the concept.
+
+#### Example
+
+    SELECT uid, COUNT(msg)
+    FROM FacebookMessages msg
+    GROUP BY msg.`author-id` AS uid;
+
+It returns:
+
+    [
+      { "$1": 5, "uid": 1 },
+      { "$1": 2, "uid": 2 }
+    ]
+
+Note that `COUNT` is not aggregation function but a special function symbol from which the compiler rewrites to the following query:
+
+    SELECT uid, COLL_COUNT( (SELECT g.msg FROM `$1` AS g) )
+    FROM FacebookMessages msg
+    GROUP BY msg.`author-id` AS uid GROUP AS `$1`(msg AS msg);
+
+The same rewriting applies to `SUM`, `MAX`, `MIN`, and `AVG` as well.
 
 ### <a id="SQL-92_compilant_gby">SQL-92 compilant Group By aggregations
 
