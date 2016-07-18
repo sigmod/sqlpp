@@ -759,6 +759,19 @@ It returns:
       { "$1": [ { "message": " like samsung the plan is amazing" }, { "message": " like t-mobile its platform is mind-blowing" } ], "uid": 2 }
     ]
 
+Internally, the query is rewritten by the compiler to the following form:
+
+    SELECT uid, 
+           (
+             SELECT msg.message
+             FROM (SELECT ElEMENT g.msg FROM `$1` AS g) AS msg
+             WHERE msg.`in-response-to` > 0
+             ORDER BY msg.`message-id`
+             LIMIT 2
+           )
+    FROM FacebookMessages msg
+    GROUP BY msg.`author-id` AS uid GROUP AS `$1`(msg AS msg);
+
 ### <a id="Aggregation_functions">Aggregation functions
 
 
