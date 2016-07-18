@@ -764,13 +764,15 @@ The following matrix is a comparison cheating sheet for SQL++ and SQL-92.
 | Features |  SQL++ | SQL-92 |
 |----------|--------|--------|
 | Select * | Returns nested records. | Returns flattern concatenated records. |
-| Subqueries | Returns collections.  | The returned collection of records is casted into a scalar if a subquery presents<br> is a projection expression or is used as one side of a comparison expression<br> or as the input of a function call expression. |
+| Subqueries | Returns collections.  | The returned collection of records is casted into a scalar if a subquery presents is a projection expression or is used as one side of a comparison expression or as the input of a function call expression. |
 | Aggregation functions |  Functional  |   Stateful   |
 
-For things beyond the cheating sheet,  SQL++ is SQL-92 compilant. Morever, SQL++ offers the following additional features beyond SQL-92:
+For things beyond the cheating sheet,  SQL++ is SQL-92 compilant. Morever, SQL++ offers the following additional features beyond SQL-92 (a.k.a, the `++` part):
 
   * Fully composable, a subquery can iteratve over any immediate collection and present anywhere in a query;
-  * Dynamic typing, SQL++ defers the type checks that cannot be determined at compile time to runtime.
+  * Schema-free, the query language does not assume the existence of a fixed schema for any data it processes;
+  * Correlated from terms, a right-side from term expression can refer to variables defined by from terms on its left;
+  * Powerful Group By, in addition to a fixed set of aggregations as in standard SQL, groups created by the Group By clause are directly usable in nested queries.
 
 ## <a id="DDL_and_DML_Statements">3. DDL and DML Statements</a>
 
