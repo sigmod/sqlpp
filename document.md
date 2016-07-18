@@ -697,7 +697,7 @@ The SQL++ `Group By` clause generalizes standard SQL's `Group By` semantics, but
 
 ### <a id="Group_variables">Group variables
 In a `Group By` clause, in addition to binding variables for grouping keys, SQL++ also allows a user to define a group variable.
-After grouping by, in-scope variables include grouping key binding variables as well as the group variable. The group variable binds to one collection for each group --- the collection contains nested records in which each field results from a renamed variable defined in the parens after the group variable declaration:
+After grouping, in-scope variables include grouping key binding variables as well as the group variable. The group variable binds to one collection for each group --- the collection contains nested records where each field results from a renamed variable defined in the parens after the group variable declaration:
 
     <GROUP> <AS> Variable ("(" Variable <AS> VariableReference ("," Variable <AS> VariableReference )* ")")?
 
@@ -714,7 +714,7 @@ It returns:
       { "g": [ { "fb_msg": { "message-id": 6, "author-id": 2, "in-response-to": 1, "sender-location": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" } }, { "fb_msg": { "message-id": 3, "author-id": 2, "in-response-to": 4, "sender-location": point("48.09,81.01"), "message": " like samsung the plan is amazing" } } ], "author-id": 2 }
     ]
 
-As we can see from the results, for each output group, the renamed variable `message`, `fb_msg` becomes a field in the nested records that constitute the collection called `g`.
+As we can see from the results, for each output group, the renamed variable `message`, `fb_msg`, becomes a field in the nested records that constitute the collection with field name `g`.
 
 The group variable makes more complex, composable, nested subqueries over a group possible. The next example shows a case where there is subquery in the select clause to further process the resulting groups, which is denoted by the group variable `g`, from the Group By clause.
 
@@ -745,7 +745,7 @@ In the SQL++ syntax, group key variables are optional. If a group key variable i
   * if the group by expression is a field access expression, the generated variable's name is the same as the string of last identifier in the expression;
   * for all other cases, a compilation generates a unique variable, however, the user query cannot refer to this generated variable.
 
-The next two examples demonstrate queries that do not provide binding variables for group key expressions.
+The next example demonstrates a query that do not provide binding variables for group key expressions.
 
 #### Example
 
@@ -763,12 +763,12 @@ The next two examples demonstrate queries that do not provide binding variables 
 It returns:
 
     [
-      { "$1": [ { "message": " dislike iphone its touch-screen is horrible" }, { "message": " can't stand at&t the network is horrible:(" } ], "uid": 1 },
-      { "$1": [ { "message": " like samsung the plan is amazing" }, { "message": " like t-mobile its platform is mind-blowing" } ], "uid": 2 }
+      { "$1": [ { "message": " dislike iphone its touch-screen is horrible" }, { "message": " can't stand at&t the network is horrible:(" } ], "author-id": 1 },
+      { "$1": [ { "message": " like samsung the plan is amazing" }, { "message": " like t-mobile its platform is mind-blowing" } ], "author-id": 2 }
     ]
 
 ### <a id="Implicit_group_variables">Implicit group variables
-The group variable is optional. If a user query does not declare the group variable, the compiler will generate a variable, which includes all binding variables defined in the `FROM` clause as renaming variables. However, after the Group By clause, the user query cannot refer to the generated group variable, but can still refer to binding variables defined in the `FROM` clause just that those binding variables bind to a collection of values.
+The group variable is also optional. If a user query does not declare the group variable, the compiler will generate a group variable, which includes all binding variables defined in the `FROM` clause as renaming variables. However, after grouping, the user query cannot refer to the generated group variable, but can still refer to binding variables defined in the `FROM` clause just that those binding variables bind to a collection of values.
 
 #### Example
 
@@ -809,10 +809,10 @@ SQL++ aggregation functions take a collection as its input and output a scalar v
 | Function   | NULL | MISSING |  Empty Collection |
 |------------|------|---------|-------------------|
 | COLL_COUNT | counted | counted | 0 |
-| COLL_SUM   | returns NULL | returns MISSING |  NULL |
-| COLL_MAX   | returns NULL | returns MISSING | NULL |
-| COLL_MIN  | returns NULL | returns MISSING | NULL |
-| COLL_AVG  | returns NULL | returns MISSING | NULL |
+| COLL_SUM   | returns NULL | returns NULL |  NULL |
+| COLL_MAX   | returns NULL | returns NULL | NULL |
+| COLL_MIN  | returns NULL | returns NULL | NULL |
+| COLL_AVG  | returns NULL | returns NULL | NULL |
 | COLL_SQL-COUNT | not counted | not counted | 0 |
 | COLL_SQL-SUM   | ignored | ignored |  NULL |
 | COLL_SQL-MAX   | ignored | ignored | NULL |
@@ -959,7 +959,7 @@ The following matrix is a comparison cheating sheet for SQL++ and SQL-92.
 | String literal | Double quotes and single quotes | Singe quotes |
 | Delimited identifiers | Backticks | Double quotes |
 
-For things beyond the cheating sheet,  SQL++ is SQL-92 compilant. Morever, SQL++ offers the following additional features beyond SQL-92 (a.k.a, the `++` part):
+For things beyond the cheating sheet,  SQL++ is SQL-92 compilant. Morever, SQL++ offers the following additional features beyond SQL-92 (a.k.a, the "++" part):
 
   * Fully composable, a subquery can iteratve over any immediate collection and present anywhere in a query;
   * Schema-free, the query language does not assume the existence of a fixed schema for any data it processes;
