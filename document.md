@@ -468,7 +468,7 @@ It returns:
       { "user_id": 1 }
     ]
 
-### <a id="Joins">Joins
+### <a id="Express_joins_using_unnests">Expressing joins using unnests
 The next example shows a query that joins two tables (in a SQL-92 fashion), FacebookUsers and FacebookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be seen as for each Facebook user, unnest the entire `FacebookMessages` collection and then filters the output with condition `message.`\``author-id`\``= user.id`.  Apparently, the underlying query processor will generate a query plan using hash join to evaluate the query since the condition is based on equality of fields from `FacebookUsers` and `FacebookMessages`.
 
 #### Example
@@ -528,6 +528,7 @@ SQL++ allows correlations among different from terms, i.e., a right side `From` 
 
 In general, query string like `expr1 AS v1 UNNEST expr2 AS v2` is equivalent to `expr1 AS v1, expr2 AS v2`.
 
+### <a id="Expressing_joins_using_from_terms">Expressing joins using from terms
 Thanks to the allowed correlations among `FROM` terms, the unnesting query can be read as "for each Facebook user, unnest the filtered `FacebookMessages` sub-collection with condition `message.`\``author-id`\``= user.id`".
 
 Similarly, replacing `UNNEST` with `,` in the above query yeld the same semantics:
@@ -614,8 +615,8 @@ In SQL++, an arbitrary subquery can appear at any place where an expression coul
 It returns:
 
     [ 
-      { "replies": [ " dislike iphone its touch-screen is horrible", " can't stand at&t the network is horrible:(", " like verizon the 3G is awesome:)" ], "location": 1 }
-      , { "replies": [ " like samsung the plan is amazing", " like t-mobile its platform is mind-blowing" ], "location": 2 }
+      { "replies": [ " dislike iphone its touch-screen is horrible", " can't stand at&t the network is horrible:(", " like verizon the 3G is awesome:)" ], "location": 1 }, 
+      { "replies": [ " like samsung the plan is amazing", " like t-mobile its platform is mind-blowing" ], "location": 2 }
     ]
 
 ## <a id="DDL_and_DML_Statements">3. DDL and DML Statements</a> <font size="4"><a href="#toc">[Back to TOC]</a></font>
