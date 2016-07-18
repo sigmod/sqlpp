@@ -413,12 +413,22 @@ Since `user` is the only binding varibale generated in the `FROM` clause, it ret
     ]
 
 ### <a id="Select_distinct">Select distinct
-The following example shows how SQL++ `DISTINCT` keyword works.
+`DISTINCT` is used to eliminate duplicate items in a result set. The following example shows how SQL++ `DISTINCT` keyword works.
 
 #### Example
 
-      SELECT DISTINCT x."sender-location" as location, x.message as message
-      FROM FacebookMessages AS x
+    SELECT DISTINCT * FROM [1, 2, 2, 3] AS foo;
+
+It returns:
+
+    [ 
+      { "foo": 1 },
+      { "foo": 2 },
+      { "foo": 3 }
+    ]
+
+## <a id="From_clause">From clause
+In SQL++, a `From` clause can iterate over any valid SQL++ expressions
 
 ## <a id="Unnest_clause">Unnest clause
 For each input tuple, Unnest clause flatterns a expression that returns to a collection value into each element value and produces multiple copies of the input tuple, each of which contains a flattern element value of the collection.
@@ -427,7 +437,7 @@ For each input tuple, Unnest clause flatterns a expression that returns to a col
 The next example shows a query that retrieves the organizations that the selected user has worked in, using the `UNNEST` clause to unnest the nested collection `employment` in the user's record.
 
 #### Example
- 	
+
     SELECT user.id user_id, employment.`organization-name` org_name
     FROM FacebookUsers AS user
     UNNEST user.employment AS employment
@@ -554,27 +564,22 @@ In SQL++, an arbitrary subquery can appear at any place where an expression coul
 
 ##### Example
 
-      SELECT loc AS location, 
-      	(
-            	SELECT ELEMENT m.message 
-                FROM x AS m
-                WHERE m.`in-response-to` > 0
-                ORDER BY m.`message-id`
-                LIMIT 3
-      	) AS replies
-      FROM FacebookMessages AS x
-      GROUP BY x.`sender-location` AS loc;
+    SELECT loc AS location, 
+      (
+            SELECT ELEMENT m.message 
+            FROM x AS m
+            WHERE  m.`in-response-to` > 0
+            ORDER BY m.`message-id`
+            LIMIT 3
+      ) AS replies
+    FROM FacebookMessages AS x
+    GROUP BY x.`author-id` AS loc;
 
 It returns:
 
     [ 
-      { "replies": [ " dislike iphone its touch-screen is horrible" ], "location": point("41.66,80.87") },
-      { "replies": [ " can't stand at&t its plan is terrible" ], "location": point("38.97,77.49") }, 
-      { "replies": [ " like verizon the 3G is awesome:)" ], "location": point("40.33,80.87") }, 
-      { "replies": [ " can't stand motorola the touch-screen is terrible" ], "location": point("42.5,70.01") },
-      { "replies": [ " like samsung the plan is amazing" ], "location": point("48.09,81.01") },
-      { "replies": [ " like t-mobile its platform is mind-blowing" ], "location": point("31.5,75.56") }, 
-      { "replies": [ " can't stand at&t the network is horrible:(" ], "location": point("37.73,97.04") }
+      { "replies": [ " dislike iphone its touch-screen is horrible", " can't stand at&t the network is horrible:(", " like verizon the 3G is awesome:)" ], "location": 1 }
+      , { "replies": [ " like samsung the plan is amazing", " like t-mobile its platform is mind-blowing" ], "location": 2 }
     ]
 
 ## <a id="DDL_and_DML_Statements">3. DDL and DML Statements</a> <font size="4"><a href="#toc">[Back to TOC]</a></font>
