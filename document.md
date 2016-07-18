@@ -22,12 +22,17 @@
   * [Quantified expressions](#Quantified_expressions)
 * [3. Queries](#Queries)
   * [Select statement](#Select_statements)
-    * [Select-from-where](#select-from-where)
-    * [Unnest](#Unnest)
-    * [Join](#Join)
-    * [Group By](#Group_By)
-    * [Order By](#ORDER_BY)
-    * [Limit](#Limit)
+  * [Select clause](#select-from-where)
+  * [Where clause](#Where_clause)
+  * [Unnest clause](#Unnest_clause)
+    * [Inner unnest](#Innner_clause)
+    * [Left outer unnest](#left_outer_unnest)
+  * [Join](#Join Clause)(#Join_cluase)
+    * [Inner join](#Inner_join)
+    * [Left outer join](#Left_outer_join)
+  * [Group By clause](#Group_By)
+  * [Order By clause](#ORDER_BY)
+  * [Limit clause](#Limit)
 * [4. DDL and DML Statements](#DDL_and_DML_Statements)
 
 # <a id="Introduction">1. Introduction</a><font size="4">
@@ -339,9 +344,8 @@ A SQL++ query can be any legal SQL++ expression or Select statment. A query shou
     OrderbyClause      ::=	<ORDER> <BY> Expression ( <ASC> | <DESC> )? ( "," Expression ( <ASC> | <DESC> )? )*
     LimitClause	       ::=	<LIMIT> Expression ( <OFFSET> Expression )?
 
-A SELECT statement always return a collection.  `SELECT ELEMENT expression` returns a collection that consists of evaluation results of the expression,  one per binding tuple. All regular SQL-style SELECT clauses could be expressed by `SELECT ELEMENT`.  For example, `SELECT exprA AS fieldA, exprB AS fieldB` is a syntactic suger of `SELECT ELEMENT { 'fieldA': expr1, 'fieldB': exprB }`. 
-
-### <a id="Select-from-where">Select-from-where
+### <a id="Select_clause">Select clause
+A SELECT statement always return a collection.  `SELECT ELEMENT expression` returns a collection that consists of evaluation results of the expression, one per binding tuple. In SQL++, all regular SQL-style SELECT clauses could be expressed by `SELECT ELEMENT`.  For example, `SELECT exprA AS fieldA, exprB AS fieldB` is a syntactic suger of `SELECT ELEMENT { 'fieldA': expr1, 'fieldB': exprB }`. 
 The following example shows a query that selects and returns one user from the table FacebookUsers.
 
 ##### Example
