@@ -45,7 +45,9 @@
     * [Implicit group variables](#Implicit_group_variables)
     * [Aggregation functions](#Aggregation_functions)
     * [SQL-92 aggregation functions](#SQL-92_aggregation_functions)
-    * [SQL-92 compilant Group By aggregations](#SQL-92_compilant_gby)
+    * [SQL-92 compilant Group By aggregations](#SQL-92_compilant_gby
+    * [Column aliases](#Column_alias)
+  * [Where clauases and Having clauses](#Where_having_clauses)
   * [Order By clauses](#Order_By_clauses)
   * [Limit clauses](#Limit_clauses)
   * [SQL++ Vs. SQL-92](#Vs_SQL-92)
@@ -886,6 +888,25 @@ In principle, `msg` in the select clause is sugarized as a collection (as descri
     SELECT `author-id` AS `author-id`, COLL_COUNT( (SELECT g.msg FROM `$2` AS g) )
     FROM FacebookMessages msg
     GROUP BY msg.`author-id` AS `author-id` GROUP AS `$2`(msg AS msg);
+
+### <a id="Column_alias">Column alias
+Some SQL vendors (e.g., [MySQL](http://dev.mysql.com/doc/refman/5.7/en/problems-with-alias.html)) allow the use of column alias in `Group By`, `Order By` and `Having` clauses.  AsterixDB SQL++ also allows that. 
+
+#### Example
+
+    SELECT msg.`author-id` AS aid, COUNT(msg)
+    FROM FacebookMessages msg
+    GROUP BY aid;
+
+It returns:
+
+    [ 
+      { "$1": 5, "aid": 1 },
+      { "$1": 2, "aid": 2 }
+    ]
+
+## <a id="Where_having_clauses">Where clauases and Having clauses
+Both `Where` clauses and `Having` clauses are used to filter input data based on a condition expression, where only tuples for which the condition expression evaluates to true can be propgated. Note that if the condition expression evaluates to be `NULL` or `MISSING`, the tuple will be disgarded as well.
 
 ## <a id="Order_By_clauses">Order By clauses
 The following example returns all `FacebookUsers` ordered by their friend numbers. When ordering, `MISSING` and `NULL` is treated as being smaller than any other value if `MISSING` or `NULL`s are encountered in the ordering key(s), and `MISSING` is treated as smaller than `NULL`.
