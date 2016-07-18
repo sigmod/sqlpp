@@ -440,7 +440,7 @@ It returns:
     ]
 
 ### <a id="Unnamed_projections">Unnamed projections
-Similar to standard SQL, SQL++ supports unnamed projections, for which a name is generated.  The name generation falls into three cases:
+The same as standard SQL, SQL++ supports unnamed projections, for which a name is generated.  The name generation falls into three cases:
 
   * if the projection expression is a variable reference expression, the generated name is the same as the name of the variable;
   * if the projection expression is a field access expression, the generated name is the last identifier in the expression;
@@ -573,6 +573,52 @@ or
     	FROM FacebookMessages message
     	WHERE message.`author-id` = user.id
       ) AS message;
+
+### <a id="Implicit_binding_variables">Implicit binding variables
+
+Similar to standard SQL, SQL++ supports implicit `FROM` binding variables (i.e., aliases), for which a binding variable is generated. The variable generation falls into three cases:
+
+  * if the binding expression is a variable reference expression, the generated variable has the same name as the referred variable;
+  * if the binding expression is a field access expression, the generated variable has its name the same as the string of last identifier in the field access expression;
+  * for all other cases, a compilation error will be raised.
+
+The next two examples demonstrate queries that do not provide binding variables for from clauses.
+
+#### Example
+
+    SELECT FacebookUsers.name, FacebookMessages.message
+    FROM FacebookUsers, FacebookMessages
+    WHERE FacebookMessages.`author-id` = FacebookUsers.id;
+
+It returns:
+
+    [ 
+      { "name": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" },
+      { "name": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" },
+      { "name": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" },
+      { "name": "MargaritaStoddard", "message": " like verizon the 3G is awesome:)" },
+      { "name": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" },
+      { "name": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" },
+      { "name": "IsbelDull", "message": " like samsung the plan is amazing" }
+    ]
+
+#### Example
+
+    SELECT FacebookUsers.name, FacebookMessages.message message
+    FROM FacebookUsers, 
+      (	 
+    	SELECT ELEMENT FacebookMessages
+    	FROM FacebookMessages
+    	WHERE FacebookMessages.`author-id` = FacebookUsers.id
+      );
+
+It will raise an error:
+
+     Error: Need an alias for the enclosed expression:
+     (select element $FacebookMessages
+      from $FacebookMessages as $FacebookMessages
+      where ($FacebookMessages."author-id" = $FacebookUsers.id)
+     )
 
 ## <a id="Join_clauses">Join clauses
 AsterixDB SQL++ supports both inner joins and left outer joins.
