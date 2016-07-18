@@ -404,7 +404,7 @@ In SQL++,  `Select *` returns a nested record for each input binding tuple, wher
 #### Example
    
     SELECT *
-    FROM FacebookUsers user
+    FROM FacebookUsers user;
 
 Since `user` is the only binding varibale generated in the `FROM` clause, it returns:
 
@@ -413,7 +413,10 @@ Since `user` is the only binding varibale generated in the `FROM` clause, it ret
       { "user": { "id": 2, "alias": "Isbel", "name": "IsbelDull", "user-since": datetime("2011-01-22T10:10:00.000Z"), "friend-ids": {{ 1, 4 }}, "employment": [ { "organization-name": "Hexviafind", "start-date": date("2010-04-27") } ] } }
     ]
 
-### <a id="Unnest_clause">Unnest clause
+## <a id="Unnest_clause">Unnest clause
+For each input tuple, Unnest clause flatterns a expression that returns to a collection value into each element value and produces multiple copies of the input tuple, each of which contains a flattern element value of the collection.
+
+### <a id="Inner_unnest">Inner unnest
 The next example shows a query that retrieves the organizations that the selected user has worked in, using the `UNNEST` clause to unnest the nested collection `employment` in the user's record.
 
 #### Example
@@ -421,7 +424,7 @@ The next example shows a query that retrieves the organizations that the selecte
     SELECT user.id user_id, employment.`organization-name` org_name
     FROM FacebookUsers AS user
     UNNEST user.employment AS employment
-    WHERE user.id = 1
+    WHERE user.id = 1;
 
 It returns:
 
@@ -430,29 +433,47 @@ It returns:
       { "user_id": 1, "org_name": "geomedia" }
     ]
 
-SQL++ allows correlations among different from terms, i.e., a right side `From` binding expression can refer to variables defined on its left side. A equivalent unnesting query could be rewritten as:
-	
-    SELECT ELEMENT employment."organization-name" 
-    FROM FacebookUsers AS user, 
-    	user.employment AS employment
-    WHERE user.id = 1
+Note that `UNNEST` has the "inner" semantics --- if a user does not have any employment history, the tuple corresponding to the user will not be emitted in the result. SQL++ allows correlations among different from terms, i.e., a right side `From` binding expression can refer to variables defined on its left side. A equivalent unnesting query could be rewritten as:
 
-Note that `UNNEST` has the "inner" semantics --- if a user does not have any employment history, the tuple corresponding to the user will not be emitted in the result. However, `LEFT OUTER UNNESt` has the "left outer" semantics --- the following query will return a result set that only contains a `NULL` if the user does not have any employment history.
-
-	SELECT ELEMENT employment."organization-name" 
-    FROM FacebookUsers AS user
-    LEFT OUTER CORRELATE user.employment AS employment
+    SELECT user.id user_id, employment.`organization-name` org_name 
+    FROM FacebookUsers AS user, user.employment AS employment
     WHERE user.id = 1;
 
-The next example shows a query that joins two tables, FacebookUsers and FacebookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. 
+### <a id="Left_outer_unnest">Left outer unnest
+`LEFT OUTER UNNESt` has the "left outer" semantics. For example, field `foo` does not exist in the record for the user with id being 1, but the returned result set still contains the user's id.
+
+    SELECT user.id user_id, employment.`organization-name` org_name
+    FROM FacebookUsers AS user
+    LEFT OUTER UNNEST user.foo AS employment
+    WHERE user.id = 1;
+
+It returns:
+
+    [ 
+      { "user_id": 1 }
+    ]
+
+The next example shows a query that actually joins two tables, FacebookUsers and FacebookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be seen as for each Facebook user, unnest the entire `FacebookMessages` collection and then filters the output with condition `message.\`author-id\` = user.id`.  Apparently, the underlying query processor will generate a query plan using hash join to evaluate the query since the condition is based on equality of fields from `FacebookUsers` and `FacebookMessages`.
 
 #### Example
 
-	SELECT user.name uname, message.message message
-    FROM FacebookUsers user,
-    	       FacebookMessages message
-    WHERE message."author-id" = user.id;
+    SELECT user.name uname, message.message message
+    FROM FacebookUsers user, FacebookMessages message
+    WHERE message.`author-id` = user.id;
 
+It returns:
+
+    [
+      { "uname": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" },
+      { "uname": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" },
+      { "uname": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" },
+      { "uname": "MargaritaStoddard", "message": " like verizon the 3G is awesome:)" },
+      { "uname": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" },
+      { "uname": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" },
+      { "uname": "IsbelDull", "message": " like samsung the plan is amazing" }
+    ]  
+ 
+## <a id="Join_clause">Join clause
 An equivalent query of the join query above can be written as:
 	
     SELECT user.name uname, message.message message
