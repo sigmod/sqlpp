@@ -353,7 +353,7 @@ In this section, we will use two collections, `FacebookUsers` and `FacebookMessa
 
 `FacebookUsers` collection:
 
-    {"id":1,"alias":"Margarita","name":"MargaritaStoddard","user-since":datetime("2012-08-20T10:10:00"),"friend-ids":{{2,3,6,10}},"employment":[{"organization-name":"Codetechno","start-date":date("2006-08-06")}]}
+    {"id":1,"alias":"Margarita","name":"MargaritaStoddard","user-since":datetime("2012-08-20T10:10:00"),"friend-ids":{{2,3,6,10}},"employment":[{"organization-name":"Codetechno","start-date":date("2006-08-06")},{"organization-name":"geomedia","start-date":date("2010-06-17"),"end-date":date("2010-01-26")}]}
     {"id":2,"alias":"Isbel","name":"IsbelDull","user-since":datetime("2011-01-22T10:10:00"),"friend-ids":{{1,4}},"employment":[{"organization-name":"Hexviafind","start-date":date("2010-04-27")}]}
 
 `FacebookMessages` collection:
@@ -382,7 +382,7 @@ The following example shows a query that selects and returns one user from the t
 It returns:
 
     [
-     {"id":1,"alias":"Margarita","name":"MargaritaStoddard","user-since":datetime("2012-08-20T10:10:00"),"friend-ids":{{2,3,6,10}},"employment":[{"organization-name":"Codetechno","start-date":date("2006-08-06")}]}
+      { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "user-since": datetime("2012-08-20T10:10:00.000Z"), "friend-ids": {{ 2, 3, 6, 10 }}, "employment": [ { "organization-name": "Codetechno", "start-date": date("2006-08-06") }, { "organization-name": "geomedia", "start-date": date("2010-06-17"), "end-date": date("2010-01-26") } ] }
     ]
 
 ### <a id="SQL_select">SQL-style select
@@ -395,7 +395,7 @@ In SQL++, all traditional SQL-style select clauses could be expressed by `SELECT
 It returns:
 
     [
-     {"user_alias":"Margarita","user_name":"MargaritaStoddard"}
+      {"user_alias":"Margarita","user_name":"MargaritaStoddard"}
     ]
 
 ### <a id="Select_*">Select *
@@ -406,10 +406,10 @@ In SQL++,  `Select *` returns a nested record for each input binding tuple, wher
     SELECT *
     FROM FacebookUsers user
 
-It returns:
+Since `user` is the only binding varibale generated in the `FROM` clause, it returns:
 
     [
-      { "user": { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "user-since": datetime("2012-08-20T10:10:00.000Z"), "friend-ids": {{ 2, 3, 6, 10 }}, "employment": [ { "organization-name": "Codetechno", "start-date": date("2006-08-06") } ] } },
+      { "user": { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "user-since": datetime("2012-08-20T10:10:00.000Z"), "friend-ids": {{ 2, 3, 6, 10 }}, "employment": [ { "organization-name": "Codetechno", "start-date": date("2006-08-06") }, { "organization-name": "geomedia", "start-date": date("2010-06-17"), "end-date": date("2010-01-26") } ] } },
       { "user": { "id": 2, "alias": "Isbel", "name": "IsbelDull", "user-since": datetime("2011-01-22T10:10:00.000Z"), "friend-ids": {{ 1, 4 }}, "employment": [ { "organization-name": "Hexviafind", "start-date": date("2010-04-27") } ] } }
     ]
 
@@ -418,24 +418,31 @@ The next example shows a query that retrieves the organizations that the selecte
 
 #### Example
  	
-    SELECT ELEMENT employment."organization-name"
+    SELECT user.id user_id, employment.`organization-name` org_name
     FROM FacebookUsers AS user
     UNNEST user.employment AS employment
-    WHERE user.id = 8
+    WHERE user.id = 1
+
+It returns:
+
+    [
+      { "user_id": 1, "org_name": "Codetechno" },
+      { "user_id": 1, "org_name": "geomedia" }
+    ]
 
 SQL++ allows correlations among different from terms, i.e., a right side `From` binding expression can refer to variables defined on its left side. A equivalent unnesting query could be rewritten as:
 	
     SELECT ELEMENT employment."organization-name" 
     FROM FacebookUsers AS user, 
     	user.employment AS employment
-    WHERE user.id = 8
+    WHERE user.id = 1
 
 Note that `UNNEST` has the "inner" semantics --- if a user does not have any employment history, the tuple corresponding to the user will not be emitted in the result. However, `LEFT OUTER UNNESt` has the "left outer" semantics --- the following query will return a result set that only contains a `NULL` if the user does not have any employment history.
 
 	SELECT ELEMENT employment."organization-name" 
     FROM FacebookUsers AS user
     LEFT OUTER CORRELATE user.employment AS employment
-    WHERE user.id = 8
+    WHERE user.id = 1;
 
 The next example shows a query that joins two tables, FacebookUsers and FacebookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. 
 
