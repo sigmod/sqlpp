@@ -420,11 +420,12 @@ Since `user` is the only binding varibale generated in the `FROM` clause, it ret
 
     [
       { "user": { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "user-since": datetime("2012-08-20T10:10:00.000Z"), "friend-ids": {{ 2, 3, 6, 10 }}, "employment": [ { "organization-name": "Codetechno", "start-date": date("2006-08-06") }, { "organization-name": "geomedia", "start-date": date("2010-06-17"), "end-date": date("2010-01-26") } ] } },
-      { "user": { "id": 2, "alias": "Isbel", "name": "IsbelDull", "user-since": datetime("2011-01-22T10:10:00.000Z"), "friend-ids": {{ 1, 4 }}, "employment": [ { "organization-name": "Hexviafind", "start-date": date("2010-04-27") } ] } }
+      { "user": { "id": 2, "alias": "Isbel", "name": "IsbelDull", "user-since": datetime("2011-01-22T10:10:00.000Z"), "friend-ids": {{ 1, 4 }}, "employment": [ { "organization-name": "Hexviafind", "start-date": date("2010-04-27") } ] } },
+      { "user": { "id": 3, "alias": "Emory", "name": "EmoryUnk", "user-since": datetime("2012-07-10T10:10:00.000Z"), "friend-ids": {{ 1, 5, 8, 9 }}, "employment": [ { "organization-name": "geomedia", "start-date": date("2010-06-17"), "end-date": date("2010-01-26") } ] } }
     ]
 
 ### <a id="Select_distinct">Select distinct
-`DISTINCT` is used to eliminate duplicate items in a result set. The following example shows how SQL++ `DISTINCT` keyword works.
+SQL++ `DISTINCT` keyword is used to eliminate duplicate items in a result set. The following example shows how it works.
 
 #### Example
 
@@ -439,7 +440,7 @@ It returns:
     ]
 
 ## <a id="Unnest_clauses">Unnest clauses
-For each input tuple, Unnest clause flatterns a expression that returns to a collection value into each element value and produces multiple copies of the input tuple, each of which contains a flattern element value of the collection.
+For each input tuple, Unnest clause flatterns a expression that returns to a collection value into each element value and produces multiple tuples, each of which is the original tuple augmented a flattern element value.
 
 ### <a id="Inner_unnests">Inner unnests
 The next example shows a query that retrieves the organizations that the selected user has worked in, using the `UNNEST` clause to unnest the nested collection `employment` in the user's record.
@@ -458,7 +459,7 @@ It returns:
       { "user_id": 1, "org_name": "geomedia" }
     ]
 
-Note that `UNNEST` has the "inner" semantics --- if a user does not have any employment history, the tuple corresponding to the user will not be emitted in the result.
+Note that `UNNEST` has the "inner" semantics --- if a user does not have any employment history, no tuple corresponding to the user will be emitted in the result.
 
 ### <a id="Left_outer_unnests">Left outer unnests
 `LEFT OUTER UNNEST` has the "left outer" semantics. For example, field `foo` does not exist in the record for the user with id being 1, but the returned result set still contains the user's id.
@@ -475,7 +476,7 @@ It returns:
     ]
 
 ### <a id="Expressing_joins_using_unnests">Expressing joins using unnests
-The next example shows a query that joins two tables, FacebookUsers and FacebookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be seen as "for each Facebook user, unnest the entire `FacebookMessages` collection and then filters the output with condition `message.`\``author-id`\``= user.id`".  Of course, the underlying AsterixDB query processor will generate a query plan using hash join to evaluate the query since the condition is based on equality of fields from `FacebookUsers` and `FacebookMessages`.
+The next example shows a query that joins two tables, FacebookUsers and FacebookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be seen as "for each Facebook user, unnest the entire `FacebookMessages` collection and then filters the output with condition `message.`\``author-id`\``= user.id`".  Though the semantics sound like a nested loop join, the underlying AsterixDB query processor will generate a query plan using hash join to evaluate the query since the filtering condition is based on equality of fields from `FacebookUsers` and `FacebookMessages`.
 
 #### Example
 
@@ -496,7 +497,7 @@ It returns:
       { "uname": "IsbelDull", "message": " like samsung the plan is amazing" }
     ]  
 
-Similarly, the above query can also expressed as:
+Similarly, the above query can also be expressed as:
 
     SELECT user.name uname, message.message message
     FROM FacebookUsers user 
@@ -533,7 +534,7 @@ SQL++ allows correlations among different from terms, i.e., a right side `FROM` 
     FROM FacebookUsers AS user, user.employment AS employment
     WHERE user.id = 1;
 
-In general, query string like `expr1 AS v1 UNNEST expr2 AS v2` is equivalent to `expr1 AS v1, expr2 AS v2`.
+In the query, the second from term `user.employment AS employment` refers the variable `user` which is defined on its left side. In general, query string like `expr1 AS v1 UNNEST expr2 AS v2` is equivalent to `expr1 AS v1, expr2 AS v2`.
 
 ### <a id="Expressing_joins_using_from_terms">Expressing joins using from terms
 Replacing `UNNEST` with `,` the same join intent of the `UNNEST`-based join queries above could be expressed by (the first one is one of the SQL-92 ways to express the join intent):
