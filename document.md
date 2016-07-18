@@ -40,9 +40,14 @@
     * [Expressing joins using from terms](#Expressing_joins_using_from_terms)
     * [Implicit binding variables](#Implicit_binding_variables)
   * [Join clauses](#Join Clauses)
-    * [Inner Joins](#Inner_joins)
-    * [Left Outer Joins](#Left_outer_joins)
+    * [Inner joins](#Inner_joins)
+    * [Left outer joins](#Left_outer_joins)
   * [Group By clauses](#Group_By_clauses)
+    * [Group variables](#Group_variables)
+    * [Implicit group variables](#Implicit_group_variables)
+    * [Aggregation functions](#Aggregation_functions)
+    * [SQL-92 aggregation functions](#SQL-92_aggregation_functions)
+    * [SQL-92 compilant Group By aggregations](#SQL-92_compilant_gby)
   * [Order By clauses](#ORDER_BY_clauses)
   * [Limit clauses](#Limit)
   * [SQL++ Vs. SQL-92](#Vs_SQL-92)
@@ -687,7 +692,10 @@ The left-outer join query can also be expressed using `LEFT OUTER UNNEST`:
 In general, all join queries could be expressed by `UNNEST` clauses and all left outer join queries could be expressed by `LEFT OUTER UNNESTs`.
 
 ## <a id="Group_By_clauses">Group By clauses
-The SQL++ `Group By` clause generalizes standard SQL's `Group By` semantics. In a `Group By` clause, in addition to grouping keys, SQL++ also allows a user to define a group variable. After grouping by, the group variable binds to one collection for each group --- the collection contains nested records in which each field results from a renamed variable defined in the parens after the group variable declaration:
+The SQL++ `Group By` clause generalizes standard SQL's `Group By` semantics, but remains backward compatible to standard SQL Group By aggregations. 
+
+### <a id="Group_variables">Group variables
+In a `Group By` clause, in addition to grouping keys, SQL++ also allows a user to define a group variable. After grouping by, the group variable binds to one collection for each group --- the collection contains nested records in which each field results from a renamed variable defined in the parens after the group variable declaration:
 
     <GROUP> <AS> Variable ("(" Variable <AS> VariableReference ("," Variable <AS> VariableReference )* ")")?
 
@@ -706,7 +714,7 @@ It returns:
 
 As we can see from the results, for each output group, the renamed variable `message`, `fb_msg` becomes a field in the nested records that constitute the collection called `g`.
 
-The group variable makes more complex, composable, nested subqueries over a group possible.
+The group variable makes more complex, composable, nested subqueries over a group possible. The next example shows a case where there is subquery in the select clause to further process the resulting groups, which is denoted by the group variable `g`, from the Group By clause.
 
 #### Example
 
@@ -728,6 +736,37 @@ It returns:
       { "$1": [ { "message": " like samsung the plan is amazing" }, { "message": " like t-mobile its platform is mind-blowing" } ], "uid": 2 }
     ]
 
+### <a id="Implicit_group_variables">Implicit group variables
+The group variable is optional. If a user query does not declare the group variable, the compiler will generate a variable, which includes all binding variables defined in the `FROM` clause as renaming variables. However, after the Group By clause, the user query cannot refer to the generated group variable, but can still refer to binding variables defined in the `FROM` clause just that those binding variables bind to a collection of values.
+
+#### Example
+
+    SELECT uid, 
+           (
+             SELECT msg.message
+             FROM msg
+             WHERE msg.`in-response-to` > 0
+             ORDER BY msg.`message-id`
+             LIMIT 2
+           )
+    FROM FacebookMessages msg
+    GROUP BY msg.`author-id` AS uid;
+
+It returns:
+
+    [
+      { "$1": [ { "message": " dislike iphone its touch-screen is horrible" }, { "message": " can't stand at&t the network is horrible:(" } ], "uid": 1 },
+      { "$1": [ { "message": " like samsung the plan is amazing" }, { "message": " like t-mobile its platform is mind-blowing" } ], "uid": 2 }
+    ]
+
+### <a id="Aggregation_functions">Aggregation functions
+
+
+### <a id="SQL-92_aggregation_functions">SQL-92 aggregation functions
+
+
+### <a id="SQL-92_compilant_gby">SQL-92 compilant Group By aggregations
+
 
 ## <a id="Order_By_clauses">Order By clauses
 The following example returns all `FacebookUsers` ordered by their friend numbers. When ordering, `MISSING` and `NULL` is treated as being smaller than any other value if `MISSING` or `NULL`s are encountered in the ordering key(s), and `MISSING` is treated as smaller than `NULL`.
@@ -744,7 +783,7 @@ It returns:
       { "user": { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "user-since": datetime("2012-08-20T10:10:00.000Z"), "friend-ids": {{ 2, 3, 6, 10 }}, "employment": [ { "organization-name": "Codetechno", "start-date": date("2006-08-06") }, { "organization-name": "geomedia", "start-date": date("2010-06-17"), "end-date": date("2010-01-26") } ] } },
       { "user": { "id": 3, "alias": "Emory", "name": "EmoryUnk", "user-since": datetime("2012-07-10T10:10:00.000Z"), "friend-ids": {{ 1, 5, 8, 9 }}, "employment": [ { "organization-name": "geomedia", "start-date": date("2010-06-17"), "end-date": date("2010-01-26") } ] } },
       { "user": { "id": 2, "alias": "Isbel", "name": "IsbelDull", "user-since": datetime("2011-01-22T10:10:00.000Z"), "friend-ids": {{ 1, 4 }}, "employment": [ { "organization-name": "Hexviafind", "start-date": date("2010-04-27") } ] } }
-    ] 
+    ]
 
 ## <a id="Limit_clauses">Limit clauses
 Limit clause is used to bound the result set to a constant size.
