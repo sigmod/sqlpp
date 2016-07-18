@@ -28,8 +28,9 @@
     * [Select *](#Select_*)
   * [Where clause](#Where_clause)
   * [Unnest clause](#Unnest_clause)
-    * [Inner unnest](#Innner_clause)
+    * [Inner unnest](#Innner_unnest)
     * [Left outer unnest](#left_outer_unnest)
+    * [Join](#join)
   * [Join clause](#Join Clause)
     * [Inner join](#Inner_join)
     * [Left outer join](#Left_outer_join)
@@ -453,7 +454,8 @@ It returns:
       { "user_id": 1 }
     ]
 
-The next example shows a query that actually joins two tables, FacebookUsers and FacebookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be seen as for each Facebook user, unnest the entire `FacebookMessages` collection and then filters the output with condition `message.\`author-id\` = user.id`.  Apparently, the underlying query processor will generate a query plan using hash join to evaluate the query since the condition is based on equality of fields from `FacebookUsers` and `FacebookMessages`.
+### <a id="Join">Join
+The next example shows a query that actually joins two tables, FacebookUsers and FacebookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be seen as for each Facebook user, unnest the entire `FacebookMessages` collection and then filters the output with condition `message./`author-id/` = user.id`.  Apparently, the underlying query processor will generate a query plan using hash join to evaluate the query since the condition is based on equality of fields from `FacebookUsers` and `FacebookMessages`.
 
 #### Example
 
