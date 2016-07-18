@@ -30,20 +30,20 @@
     * [Unnamed projections](#Unnamed_projections)
   * [Where clauses](#Where_clauses)
   * [Unnest clauses](#Unnest_clauses)
-    * [Inner unnests](#Innner_unnests)
+    * [Inner unnests](#Inner_unnests)
     * [Left outer unnests](#Left_outer_unnests)
     * [Expressing joins using unnests](#Expressing_joins_using_unnests)
   * [From clauses](#From_clauses)
     * [Binding expressions](#Binding_expressions)
     * [Multiple from terms](#Multiple_from_terms)
-    * [Expressing joins using from terms](#Express_joins_using_from_terms)
+    * [Expressing joins using from terms](#Expressing_joins_using_from_terms)
     * [Implicit binding variables](#Implicit_binding_variables)
   * [Join clauses](#Join Clauses)
     * [Inner Joins](#Inner_joins)
     * [Left Outer Joins](#Left_outer_joins)
   * [Group By clauses](#Group_By_clauses)
   * [Order By clauses](#ORDER_BY_clauses)
-  * [Limit clause](#Limit)
+  * [Limit clauses](#Limit)
   * [SQL++ Vs. SQL-92](#Vs_SQL-92)
 * [4. DDL and DML Statements](#DDL_and_DML_Statements)
 
@@ -441,7 +441,7 @@ It returns:
 ## <a id="Unnest_clauses">Unnest clauses
 For each input tuple, Unnest clause flatterns a expression that returns to a collection value into each element value and produces multiple copies of the input tuple, each of which contains a flattern element value of the collection.
 
-### <a id="Inner_unnest">Inner unnest
+### <a id="Inner_unnests">Inner unnests
 The next example shows a query that retrieves the organizations that the selected user has worked in, using the `UNNEST` clause to unnest the nested collection `employment` in the user's record.
 
 #### Example
@@ -460,7 +460,7 @@ It returns:
 
 Note that `UNNEST` has the "inner" semantics --- if a user does not have any employment history, the tuple corresponding to the user will not be emitted in the result.
 
-### <a id="Left_outer_unnest">Left outer unnest
+### <a id="Left_outer_unnests">Left outer unnests
 `LEFT OUTER UNNEST` has the "left outer" semantics. For example, field `foo` does not exist in the record for the user with id being 1, but the returned result set still contains the user's id.
 
     SELECT user.id user_id, employment.`organization-name` org_name
@@ -474,7 +474,7 @@ It returns:
       { "user_id": 1 }
     ]
 
-### <a id="Express_joins_using_unnests">Expressing joins using unnests
+### <a id="Expressing_joins_using_unnests">Expressing joins using unnests
 The next example shows a query that joins two tables, FacebookUsers and FacebookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be seen as "for each Facebook user, unnest the entire `FacebookMessages` collection and then filters the output with condition `message.`\``author-id`\``= user.id`".  Of course, the underlying AsterixDB query processor will generate a query plan using hash join to evaluate the query since the condition is based on equality of fields from `FacebookUsers` and `FacebookMessages`.
 
 #### Example
