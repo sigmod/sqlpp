@@ -377,14 +377,26 @@ The following example shows a query that selects and returns one user from the t
 
     SELECT ELEMENT user
     FROM FacebookUsers user
-    WHERE user.id = 8
+    WHERE user.id = 1
+
+It returns:
+
+    [
+     {"id":1,"alias":"Margarita","name":"MargaritaStoddard","user-since":datetime("2012-08-20T10:10:00"),"friend-ids":{{2,3,6,10}},"employment":[{"organization-name":"Codetechno","start-date":date("2006-08-06")}]}
+    ]
 
 ### <a id="SQL_select">SQL-style select
 In SQL++, all traditional SQL-style select clauses could be expressed by `SELECT ELEMENT`.  For example, `SELECT exprA AS fieldA, exprB AS fieldB` is a syntactic suger of `SELECT ELEMENT { 'fieldA': expr1, 'fieldB': exprB }`. 
 
-    SELECT ELEMENT user
+    SELECT user.alias user_alias, user.name user_name
     FROM FacebookUsers user
-    WHERE user.id = 8
+    WHERE user.id = 1
+    
+It returns:
+
+    [
+     {"user_alias":"Margarita","user_name":"MargaritaStoddard"}
+    ]
 
 ### <a id="Unnest_clause">Unnest clause
 The next example shows a query that retrieves the organizations that the selected user has worked in, using the `UNNEST` clause to unnest the nested collection `employment` in the user's record.
