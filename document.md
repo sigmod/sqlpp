@@ -30,7 +30,7 @@
   * [Unnest clause](#Unnest_clause)
     * [Inner unnest](#Innner_clause)
     * [Left outer unnest](#left_outer_unnest)
-  * [Join](#Join Clause)(#Join_cluase)
+  * [Join clause](#Join Clause)
     * [Inner join](#Inner_join)
     * [Left outer join](#Left_outer_join)
   * [Group By clause](#Group_By)
@@ -308,7 +308,7 @@ A SQL++ query can be any legal SQL++ expression or Select statment. A query shou
 
 ##  <a id="Select_statements">Select statements
 
-The following BNFs show the grammar of select statements in AsterixDB SQL++.
+The following BNFs (Backus–Naur Forms) show the grammar of select statements in AsterixDB SQL++.
 
     SelectStatement    ::=	( WithClause )? SelectSetOperation (OrderbyClause )? ( LimitClause )?
     SelectSetOperation ::=	 SelectBlock ( (<UNION> | <INTERSECT> | <EXCEPT>)  ( <ALL>)? ( SelectBlock | Subquery ) )*
@@ -348,6 +348,23 @@ The following BNFs show the grammar of select statements in AsterixDB SQL++.
     
     OrderbyClause      ::=	<ORDER> <BY> Expression ( <ASC> | <DESC> )? ( "," Expression ( <ASC> | <DESC> )? )*
     LimitClause	       ::=	<LIMIT> Expression ( <OFFSET> Expression )?
+
+In this section, we will use two datasets, `FacebookUsers` and `FacebookMessages`, as running examples to explain select queries. The contents of the two example datasets are shown as follows.
+
+`FacebookUsers` dataset:
+
+    {"id":1,"alias":"Margarita","name":"MargaritaStoddard","user-since":datetime("2012-08-20T10:10:00"),"friend-ids":{{2,3,6,10}},"employment":[{"organization-name":"Codetechno","start-date":date("2006-08-06")}]}
+    {"id":2,"alias":"Isbel","name":"IsbelDull","user-since":datetime("2011-01-22T10:10:00"),"friend-ids":{{1,4}},"employment":[{"organization-name":"Hexviafind","start-date":date("2010-04-27")}]}
+
+`FacebookMessages` dataset:
+
+    {"message-id":2,"author-id":1,"in-response-to":4,"sender-location":point("41.66,80.87"),"message":" dislike iphone its touch-screen is horrible"}
+    {"message-id":3,"author-id":2,"in-response-to":4,"sender-location":point("48.09,81.01"),"message":" like samsung the plan is amazing"}
+    {"message-id":4,"author-id":1,"in-response-to":2,"sender-location":point("37.73,97.04"),"message":" can't stand at&t the network is horrible:("}
+    {"message-id":8,"author-id":1,"in-response-to":11,"sender-location":point("40.33,80.87"),"message":" like verizon the 3G is awesome:)"}
+    {"message-id":6,"author-id":2,"in-response-to":1,"sender-location":point("31.5,75.56"),"message":" like t-mobile its platform is mind-blowing"}
+    {"message-id":10,"author-id":1,"in-response-to":12,"sender-location":point("42.5,70.01"),"message":" can't stand motorola the touch-screen is terrible"}
+    {"message-id":11,"author-id":1,"in-response-to":1,"sender-location":point("38.97,77.49"),"message":" can't stand at&t its plan is terrible"}
 
 ## <a id="Select_clause">Select clause
 A select clause always return a collection, no matter the enclosing select statement is a top-level query or a subquery.
