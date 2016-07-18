@@ -28,6 +28,7 @@
     * [Select *](#Select_star)
     * [Select distinct](#Select_distinct)
     * [Unnamed projections](#Unnamed_projections)
+    * [Abbreviatory field access expressions](#Abbreviatory_field_access_expressions)
   * [Where clauses](#Where_clauses)
   * [Unnest clauses](#Unnest_clauses)
     * [Inner unnests](#Inner_unnests)
@@ -396,7 +397,7 @@ It returns:
     ]
 
 ### <a id="SQL_select">SQL-style select
-In SQL++, all traditional SQL-style select clauses could be expressed by `SELECT ELEMENT`.  For example, `SELECT exprA AS fieldA, exprB AS fieldB` is a syntactic suger of `SELECT ELEMENT { 'fieldA': expr1, 'fieldB': exprB }`. 
+In SQL++, all traditional SQL-style select clauses are supported and can be expressed by `SELECT ELEMENT`.  For example, `SELECT exprA AS fieldA, exprB AS fieldB` is a syntactic suger of `SELECT ELEMENT { 'fieldA': expr1, 'fieldB': exprB }`. 
 
     SELECT user.alias user_alias, user.name user_name
     FROM FacebookUsers user
@@ -459,6 +460,21 @@ It outputs:
     ]
 
 In the result, "$1" is the generated name for `substr(user.name, 1)`, while "alias" is the generated name for `substr(user.name, 1)`.
+
+### <a id="Abbreviatory_field_access_expressions">Abbreviatory field access expressions
+Similar to standard SQL, field access expressions can be abbreviatory in many places where there is no ambiguity. In the next example, variable `user` is the only possible variable reference for field `name` and `alias` and thus it can be omitted in the query.
+
+#### Example
+
+    SELECT substr(name, 1), alias
+    FROM FacebookUsers user
+    WHERE user.id = 1;
+
+It outputs:
+
+    [ 
+      { "$1": "MargaritaStoddard", "alias": "Margarita" }
+    ]
 
 ## <a id="Unnest_clauses">Unnest clauses
 For each input tuple, Unnest clause flatterns a expression that returns to a collection value into each element value and produces multiple tuples, each of which is the original tuple augmented a flattern element value.
