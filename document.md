@@ -695,7 +695,8 @@ In general, all join queries could be expressed by `UNNEST` clauses and all left
 The SQL++ `Group By` clause generalizes standard SQL's `Group By` semantics, but remains backward compatible to standard SQL Group By aggregations. 
 
 ### <a id="Group_variables">Group variables
-In a `Group By` clause, in addition to grouping keys, SQL++ also allows a user to define a group variable. After grouping by, the group variable binds to one collection for each group --- the collection contains nested records in which each field results from a renamed variable defined in the parens after the group variable declaration:
+In a `Group By` clause, in addition to binding variables for grouping keys, SQL++ also allows a user to define a group variable.
+After grouping by, in-scope variables include grouping key binding variables as well as the group variable. The group variable binds to one collection for each group --- the collection contains nested records in which each field results from a renamed variable defined in the parens after the group variable declaration:
 
     <GROUP> <AS> Variable ("(" Variable <AS> VariableReference ("," Variable <AS> VariableReference )* ")")?
 
@@ -759,18 +760,18 @@ It returns:
       { "$1": [ { "message": " like samsung the plan is amazing" }, { "message": " like t-mobile its platform is mind-blowing" } ], "uid": 2 }
     ]
 
-Internally, the query is rewritten by the compiler to the following form:
+In the query, in principle, `msg` is not a in-scope variable in the select cluase, however, the query above can be seen as a syntatic sugar of the following query: 
 
     SELECT uid, 
            (
              SELECT msg.message
-             FROM (SELECT ElEMENT g.msg FROM `$1` AS g) AS msg
+             FROM (SELECT ElEMENT g.msg FROM `$2` AS g) AS msg
              WHERE msg.`in-response-to` > 0
              ORDER BY msg.`message-id`
              LIMIT 2
            )
     FROM FacebookMessages msg
-    GROUP BY msg.`author-id` AS uid GROUP AS `$1`(msg AS msg);
+    GROUP BY msg.`author-id` AS uid GROUP AS `$2`(msg AS msg);
 
 ### <a id="Aggregation_functions">Aggregation functions
 SQL++ aggregation functions take a collection as its input and output a scalar value. Those functions are functional and can be invoked at any places where an expression is allowed. Here is the list of AsterixDB SQL++ builtin aggregation functions, w.r.t. how they handle `NULLs`/`MISSINGs` in the input collection or empty input collections:
@@ -814,7 +815,7 @@ It returns:
     ]
     
 ### <a id="SQL-92_aggregation_functions">SQL-92 aggregation functions
-To be compatiable with standard SQL aggregation functions, SQL++ supports SQL-92 aggregation function symbols (i.e., `COUNT`, `SUM`, `MAX`, `MIN`, and `AVG`) and the compiler is able to rewrite them into queries that only use SQL++ builtin aggregation functions. The next example will demonstrate the concept.
+To be compatiable with standard SQL aggregation functions, SQL++ supports SQL-92 aggregation function symbols (i.e., `COUNT`, `SUM`, `MAX`, `MIN`, and `AVG`) as syntatic sugars and the compiler is able to rewrite them into queries that only use SQL++ builtin aggregation functions. The next example will demonstrate the concept.
 
 #### Example
 
@@ -829,16 +830,31 @@ It returns:
       { "$1": 2, "uid": 2 }
     ]
 
-Note that `COUNT` is not aggregation function but a special function symbol from which the compiler rewrites to the following query:
+Note that `COUNT` is not aggregation function but a special syntatic sugar function symbol from which the compiler rewrites to the following query:
 
-    SELECT uid, COLL_COUNT( (SELECT g.msg FROM `$1` AS g) )
+    SELECT uid, COLL_COUNT( (SELECT g.msg FROM `$2` AS g) )
     FROM FacebookMessages msg
-    GROUP BY msg.`author-id` AS uid GROUP AS `$1`(msg AS msg);
+    GROUP BY msg.`author-id` AS uid GROUP AS `$2`(msg AS msg);
 
 The same rewriting applies to `SUM`, `MAX`, `MIN`, and `AVG` as well.
 
 ### <a id="SQL-92_compilant_gby">SQL-92 compilant Group By aggregations
+SQL++ provides full support for SQL-92 group by aggregation queries. The next query is such an example.
 
+#### Example
+
+    SELECT msg.`author-id`, COUNT(msg)
+    FROM FacebookMessages msg
+    GROUP BY msg.`author-id`;
+    
+It outputs:
+
+    [ 
+      { "$1": 5, "author-id": 1 },
+      { "$1": 2, "author-id": 2 }
+    ]
+
+In theory, `msg` should be 
 
 ## <a id="Order_By_clauses">Order By clauses
 The following example returns all `FacebookUsers` ordered by their friend numbers. When ordering, `MISSING` and `NULL` is treated as being smaller than any other value if `MISSING` or `NULL`s are encountered in the ordering key(s), and `MISSING` is treated as smaller than `NULL`.
