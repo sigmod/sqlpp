@@ -206,7 +206,7 @@ The following table summarizes the precedence order (from higher to lower) of al
 | AND                                                                         | conjunction |
 | OR                                                                          | disjunction |
 
-### <a id="Arithmetic operators">Arithmetic operators
+### <a id="Arithmetic_operators">Arithmetic operators
 Arithemtic operators are used to exponentiate, negate, add, subtract, multiply, and divide numeric values.
  
 | Operator |  Purpose                                                                       | Example    |
@@ -216,7 +216,7 @@ Arithemtic operators are used to exponentiate, negate, add, subtract, multiply, 
 | *, /     |  Multiply, divide.                                                             | SELECT 3*2; SELECT 4/2.0; |
 | ^        |  Exponentiation.                                                               | SELECT 3^5;       |
 
-### <a id="Collection operators">Collection operators
+### <a id="Collection_operators">Collection operators
 Collection operators are used for membership tests (IN, NOT IN) or empty collection tests (EXISTS, NOT EXISTS).
 
 | Operator   |  Purpose                                     | Example    |
@@ -227,7 +227,7 @@ Collection operators are used for membership tests (IN, NOT IN) or empty collect
 | NOT EXISTS |  Check whether a collection is empty.        | SELECT * FROM TweetMessages tm <br>WHERE NOT EXISTS tm.referedTopics; |
 
 
-### <a id="Comparison operators">Comparison operators
+### <a id="Comparison_operators">Comparison operators
 Comparison operators are used to compare values.
 
 | Operator       |  Purpose                                   | Example    |
