@@ -563,10 +563,16 @@ The next example illustrates the use of the `GROUP BY` clause in SQL++. After th
 
 #### Example
 
-      SELECT loc AS location, messages AS messages
-      FROM FacebookMessages AS x
-      LET messages = x.message
-      GROUP BY x."sender-location" AS loc;
+      SELECT FacebookMessages.`author-id`,  COUNT(FacebookMessages.message) msgCount
+      FROM FacebookMessages
+      GROUP BY FacebookMessages.`author-id`;
+
+It returns:
+
+      [ 
+        { "msgCount": 5, "author-id": 1 },
+        { "msgCount": 2, "author-id": 2 }
+      ]
 
 ## <a id="Order_by_clause">Order By clause
 The following example returns all `FacebookUsers` ordered by their friend numbers. When ordering, `MISSING` and `NULL` is treated as being smaller than any other value if `MISSING` or `NULL`s are encountered in the ordering key(s), and `MISSING` is treated as smaller than `NULL`.
