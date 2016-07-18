@@ -576,7 +576,7 @@ SQL++ allows correlations among different from terms, i.e., a right side `FROM` 
 In the query, the second from term `user.employment AS employment` refers the variable `user` which is defined on its left side. In general, query string like `expr1 AS v1 UNNEST expr2 AS v2` is equivalent to `expr1 AS v1, expr2 AS v2`.
 
 ### <a id="Expressing_joins_using_from_terms">Expressing joins using from terms
-Replacing `UNNEST` with `,` the same join intent of the `UNNEST`-based join queries above could be expressed by (the first one is one of the SQL-92 ways to express the join intent):
+Replacing `UNNEST` with `,` the same join intent of the `UNNEST`-based join queries described above (in [Expressing joins using unnests](#Expressing_joins_using_unnests)) could be expressed by (the first one is one of the SQL-92 ways to express the join intent):
 
     SELECT user.name uname, message.message message
     FROM FacebookUsers user, FacebookMessages message
@@ -597,7 +597,7 @@ or
 Similar to standard SQL, SQL++ supports implicit `FROM` binding variables (i.e., aliases), for which a binding variable is generated. The variable generation falls into three cases:
 
   * if the binding expression is a variable reference expression, the generated variable has the same name as the referred variable;
-  * if the binding expression is a field access expression, the generated variable has its name the same as the string of last identifier in the field access expression;
+  * if the binding expression is a field access expression, the generated variable's name is the same as the string of last identifier in the expression;
   * for all other cases, a compilation error will be raised.
 
 The next two examples demonstrate queries that do not provide binding variables for from clauses.
@@ -642,7 +642,7 @@ It will raise an error:
 AsterixDB SQL++ supports both inner joins and left outer joins.
 
 ### <a id="Inner_joins">Inner joins
-Using join clause, the same join intent described above can be expressed as:
+Using join clause, the same join intent described above (in [Expressing joins using unnests](#Expressing_joins_using_unnests) and [Expressing joins using from terms](#Expressing_joins_using_from_terms)) can be expressed as:
 
     SELECT user.name uname, message.message message
     FROM FacebookUsers user
