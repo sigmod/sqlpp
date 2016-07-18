@@ -687,20 +687,20 @@ The left-outer join query can also be expressed using `LEFT OUTER UNNEST`:
 In general, all join queries could be expressed by `UNNEST` clauses and all left outer join queries could be expressed by `LEFT OUTER UNNESTs`.
 
 ## <a id="Group_By_clauses">Group By clauses
-The next example illustrates the use of the `GROUP BY` clause in SQL++. After the `GROUP BY` clause in the query,  the existing variables before the clause will each contain a collection of items following the `GROUP BY` clause; the collected items are the values that the source variable was bound to in the tuples that formed the group.
+The SQL++ `Group By` clause generalizes standard SQL's `Group By` semantics. In a `Group By` clause, in addition to grouping keys, SQL++ also allows a user to define a group variable.
 
 #### Example
 
-      SELECT FacebookMessages.`author-id`,  COUNT(FacebookMessages.message) msgCount
-      FROM FacebookMessages
-      GROUP BY FacebookMessages.`author-id`;
+    SELECT *
+    FROM FacebookMessages message
+    GROUP BY message.`author-id` GROUP AS g(message AS fb_msg);
 
 It returns:
 
-      [ 
-        { "msgCount": 5, "author-id": 1 },
-        { "msgCount": 2, "author-id": 2 }
-      ]
+    [
+      { "g": [ { "fb_msg": { "message-id": 11, "author-id": 1, "in-response-to": 1, "sender-location": point("38.97,77.49"), "message": " can't stand at&t its plan is terrible" } }, { "fb_msg": { "message-id": 2, "author-id": 1, "in-response-to": 4, "sender-location": point("41.66,80.87"), "message": " dislike iphone its touch-screen is horrible" } }, { "fb_msg": { "message-id": 4, "author-id": 1, "in-response-to": 2, "sender-location": point("37.73,97.04"), "message": " can't stand at&t the network is horrible:(" } }, { "fb_msg": { "message-id": 8, "author-id": 1, "in-response-to": 11, "sender-location": point("40.33,80.87"), "message": " like verizon the 3G is awesome:)" } }, { "fb_msg": { "message-id": 10, "author-id": 1, "in-response-to": 12, "sender-location": point("42.5,70.01"), "message": " can't stand motorola the touch-screen is terrible" } } ], "author-id": 1 }, 
+      { "g": [ { "fb_msg": { "message-id": 6, "author-id": 2, "in-response-to": 1, "sender-location": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" } }, { "fb_msg": { "message-id": 3, "author-id": 2, "in-response-to": 4, "sender-location": point("48.09,81.01"), "message": " like samsung the plan is amazing" } } ], "author-id": 2 }
+    ]
 
 ## <a id="Order_By_clauses">Order By clauses
 The following example returns all `FacebookUsers` ordered by their friend numbers. When ordering, `MISSING` and `NULL` is treated as being smaller than any other value if `MISSING` or `NULL`s are encountered in the ordering key(s), and `MISSING` is treated as smaller than `NULL`.
