@@ -21,25 +21,29 @@
   * [Conditional expressions](#Conditional_expressions)
   * [Quantified expressions](#Quantified_expressions)
 * [3. Queries](#Queries)
-  * [Select statement](#Select_statements)
+  * [Select statement](#Select_statement)
   * [Select clause](#Select_clause)
     * [Select element/value/raw](#Select_element)
     * [SQL-style select](#SQL_select)
     * [Select *](#Select_star)
     * [Select distinct](#Select_distinct)
+    * []
   * [Where clause](#Where_clause)
   * [Unnest clause](#Unnest_clause)
-    * [Inner unnest](#Innner_unnest)
-    * [Left outer unnest](#Left_outer_unnest)
-    * [Expressing joins using unnests](#Express_joins_using_unnests)
+    * [Inner unnests](#Innner_unnests)
+    * [Left outer unnests](#Left_outer_unnests)
+    * [Expressing joins using unnests](#Expressing_joins_using_unnests)
   * [From clause](#From_clause)
     * [Binding expressions](#Binding_expressions)
     * [Multiple from terms](#Multiple_from_terms)
     * [Expressing joins using from terms](#Express_joins_using_from_terms)
   * [Join clause](#Join Clause)
+    * [Inner Joins](#Inner_joins)
+    * [Left Outer Joins](#Left_outer_joins)
   * [Group By clause](#Group_By)
   * [Order By clause](#ORDER_BY)
   * [Limit clause](#Limit)
+  * [SQL++ Vs. SQL-92](#Vs_SQL-92)
 * [4. DDL and DML Statements](#DDL_and_DML_Statements)
 
 # <a id="Introduction">1. Introduction</a><font size="4">
@@ -548,6 +552,8 @@ or
       ) AS message;
 
 ## <a id="Join_clause">Join clause
+AsterixDB SQL++ supports both inner joins and left outer joins.
+
 ### <a id="Inner_joins">Inner joins
 Using join clause, the same join intent described above can be expressed as:
 
