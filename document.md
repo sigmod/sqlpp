@@ -439,6 +439,27 @@ It returns:
       { "foo": 3 }
     ]
 
+### <a id="Unnamed_projections">Unnamed projections
+Similar to standard SQL, SQL++ supports unnamed projections, for which a name is generated.  The name generation falls into three cases:
+
+  * if the projection expression is a variable reference expression, the generated name is the same as the name of the variable;
+  * if the projection expression is a field access expression, the generated name is the last identifier in the expression;
+  * for all other cases, the underlying query processor will generate a unique name.
+
+#### Example
+
+    SELECT substr(user.name, 1), user.alias
+    FROM FacebookUsers user
+    WHERE user.id = 1;
+    
+It outputs:
+
+    [ 
+      { "$1": "MargaritaStoddard", "alias": "Margarita" }
+    ]
+
+In the result, "$1" is the generated name for `substr(user.name, 1)`, while "alias" is the generated name for `substr(user.name, 1)`.
+
 ## <a id="Unnest_clauses">Unnest clauses
 For each input tuple, Unnest clause flatterns a expression that returns to a collection value into each element value and produces multiple tuples, each of which is the original tuple augmented a flattern element value.
 
@@ -462,7 +483,7 @@ It returns:
 Note that `UNNEST` has the "inner" semantics --- if a user does not have any employment history, no tuple corresponding to the user will be emitted in the result.
 
 ### <a id="Left_outer_unnests">Left outer unnests
-`LEFT OUTER UNNEST` has the "left outer" semantics. For example, field `foo` does not exist in the record for the user with id being 1, but the returned result set still contains the user's id.
+`LEFT OUTER UNNEST` has the "left outer" semantics. For example, field `foo` does not exist in the record for the user with id being 1, but the returned results still contain the user's id.
 
     SELECT user.id user_id, employment.`organization-name` org_name
     FROM FacebookUsers AS user
@@ -553,7 +574,7 @@ or
     	WHERE message.`author-id` = user.id
       ) AS message;
 
-## <a id="Join_clause">Join clause
+## <a id="Join_clauses">Join clauses
 AsterixDB SQL++ supports both inner joins and left outer joins.
 
 ### <a id="Inner_joins">Inner joins
@@ -587,7 +608,7 @@ It returns
       { "uname": "EmoryUnk" }
     ]
    
-Note that for non-matched left-side input tuples, SQL++ produces a `MISSING` for the right-side binding variables. That explains why the last record in the result does not have a `message` field. This is different from standard which fills `NULL`s for the right-side of non-matches. The reason is that by nature, for non-matches in the join results, the fields from the right-side are "missing".
+Note that for non-matched left-side input tuples, SQL++ produces a `MISSING` for the right-side binding variables. That explains why the last record in the result does not have a `message` field. This is different from standard SQL which fills `NULL`s for the right-side of non-matches. The reason is that by nature, for non-matches in the join results, the fields from the right-side are "missing".
 
 The left-outer join query can also be expressed using `LEFT OUTER UNNEST`:
 
