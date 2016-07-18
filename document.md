@@ -773,7 +773,20 @@ Internally, the query is rewritten by the compiler to the following form:
     GROUP BY msg.`author-id` AS uid GROUP AS `$1`(msg AS msg);
 
 ### <a id="Aggregation_functions">Aggregation functions
+SQL++ aggregation functions take a collection as its input and output a scalar value. Those functions are functional and can be invoked at any places where an expression is allowed. Here is the list AsterixDB SQL++ builtin aggregation functions, w.r.t. how they handle `NULLs`/`MISSINGs` in the input collection or empty input collections:
 
+| Function   | NULL | MISSING |  Empty Collection |
+|------------|------|---------|-------------------|
+| COLL_COUNT | counted | counted | 0 |
+| COLL_SUM   | returns NULL | returns MISSING |  NULL |
+| COLL_MAX   | returns NULL | returns MISSING | NULL |
+| COLL_MIN  | returns NULL | returns MISSING | NULL |
+| COLL_AVG  | returns NULL | returns MISSING | NULL |
+| COLL_SQL-COUNT | not counted | not counted | 0 |
+| COLL_SQL-SUM   | ignored | ignored |  NULL |
+| COLL_SQL-MAX   | ignored | ignored | NULL |
+| COLL_SQL-MIN  | ignored | ignored | NULL |
+| COLL_SQL-AVG  | ignored | ignored | NULL |
 
 ### <a id="SQL-92_aggregation_functions">SQL-92 aggregation functions
 
