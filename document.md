@@ -995,6 +995,7 @@ The following matrix is a comparison cheating sheet for SQL++ and SQL-92.
 |----------|--------|--------|
 | Select * | Returns nested records. | Returns flattern concatenated records. |
 | Subqueries | Returns collections.  | The returned collection of records is casted into a scalar if a subquery presents is a projection expression or is used as one side of a comparison expression or as the input of a function call expression. |
+| Left outer join |  Fills `MISSINGs` for non-matches.  |   Fills `NULLs` for non-matches.    |
 | Aggregation functions |  Functional  |   Stateful   |
 | String literal | Double quotes and single quotes | Singe quotes |
 | Delimited identifiers | Backticks | Double quotes |
