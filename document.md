@@ -381,7 +381,7 @@ The following BNFs (Backus–Naur Forms) show the grammar of select statements i
     OrderbyClause      ::=	<ORDER> <BY> Expression ( <ASC> | <DESC> )? ( "," Expression ( <ASC> | <DESC> )? )*
     LimitClause	       ::=	<LIMIT> Expression ( <OFFSET> Expression )?
 
-In this section, we will use two stored collections (a.k.a, tables in the SQL-92 vocabulary), `FacebookUsers` and `FacebookMessages`, as running examples to explain select queries. The contents of the two example collections are shown as follows.
+In this section, we will use two stored collections (a.k.a. "tables" in the SQL-92 vocabulary), `FacebookUsers` and `FacebookMessages`, as running examples to explain select queries. The contents of the two example collections are shown as follows.
 
 `FacebookUsers` collection:
 
@@ -1031,7 +1031,7 @@ The following matrix is a comparison cheating sheet for SQL++ and SQL-92.
 | String literal | Double quotes and single quotes | Single quotes |
 | Delimited identifiers | Backticks | Double quotes |
 
-For things beyond the cheating sheet,  SQL++ is SQL-92 compilant. Morever, SQL++ offers the following additional features beyond SQL-92 (a.k.a, the "++" part):
+For things beyond the cheating sheet,  SQL++ is SQL-92 compilant. Morever, SQL++ offers the following additional features beyond SQL-92 (a.k.a. the "++" part):
 
   * Fully composable and functional, a subquery can iteratve over any immediate collection and present anywhere in a query;
   * Schema-free, the query language does not assume the existence of a fixed schema for any data it processes;
