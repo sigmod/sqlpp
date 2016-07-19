@@ -711,7 +711,7 @@ The left-outer join query can also be expressed using `LEFT OUTER UNNEST`:
 In general, all join queries could be expressed by `UNNEST` clauses and all left outer join queries could be expressed by `LEFT OUTER UNNESTs`.
 
 ## <a id="Group_By_clauses">Group By clauses
-The SQL++ `GROUP BY` clause generalizes standard SQL's `Group By` semantics, but remains backward compatible to standard SQL Group By aggregations. 
+The SQL++ `GROUP BY` clause generalizes standard SQL's `Group By` semantics, but remains backward compatible to standard SQL's `GROUP BY` aggregations. 
 
 ### <a id="Group_variables">Group variables
 In a `GROUP BY` clause, in addition to binding variables for grouping keys, SQL++ also allows a user to define a group variable.
@@ -732,9 +732,9 @@ It returns:
       { "g": [ { "fb_msg": { "message-id": 6, "author-id": 2, "in-response-to": 1, "sender-location": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" } }, { "fb_msg": { "message-id": 3, "author-id": 2, "in-response-to": 4, "sender-location": point("48.09,81.01"), "message": " like samsung the plan is amazing" } } ], "author-id": 2 }
     ]
 
-As we can see from the results, for each output group, the renamed variable `message`, `fb_msg`, becomes a field in the nested records that constitute the collection with field name `g`.
+As we can see from the results, for each output group, the renamed variable `message`, `fb_msg`, becomes a field in the nested records that constitute a collection with field name `g`.
 
-The group variable makes more complex, composable, nested subqueries over a group possible. The next example shows a case where there is subquery in the select clause to further process the resulting groups, which is denoted by the group variable `g`, from the Group By clause.
+The group variable makes more complex, composable, nested subqueries over a group possible. The next example shows a case where there is subquery in the select clause to further process the resulting groups, which is denoted by the group variable `g`, from the `GROUP BY` clause.
 
 #### Example
 
@@ -757,11 +757,11 @@ It returns:
     ]
 
 ### <a id="Implicit_group_key_variables">Implicit group key variables
-In the SQL++ syntax, group key variables are optional. If a group key variable is missing, the underlying compiler will generate a binding variable for that. The variable generation falls into three cases:
+In the SQL++ syntax, binding variables for `GROUP BY` key expressions are optional. If a group key variable is missing, the underlying compiler will generate a binding variable for that. The variable generation falls into three cases:
 
   * if the group by key expression is a variable reference expression, the generated variable has the same name as the referred variable;
-  * if the group by expression is a field access expression, the generated variable's name is the same as the string of last identifier in the expression;
-  * for all other cases, a compilation generates a unique variable, however, the user query cannot refer to this generated variable.
+  * if the group by expression is a field access expression, the generated variable's name is the same as the string of last identifier of the expression;
+  * for all other cases, the compiler generates a unique variable, however, the user query cannot refer to this generated variable.
 
 The next example demonstrates a query that do not provide binding variables for group key expressions.
 
@@ -785,8 +785,10 @@ It returns:
       { "$1": [ { "message": " like samsung the plan is amazing" }, { "message": " like t-mobile its platform is mind-blowing" } ], "author-id": 2 }
     ]
 
+For this query, according to the variable generation rules, the generated variable for group key expression `message.`\``author-id`\` is \``author-id`\`, which is referred in the `SELECT` clause.
+
 ### <a id="Implicit_group_variables">Implicit group variables
-The group variable is also optional. If a user query does not declare the group variable, the compiler will generate a group variable, which includes all binding variables defined in the `FROM` clause as renaming variables. However, after grouping, the user query cannot refer to the generated group variable, but can still refer to binding variables defined in the `FROM` clause just that those binding variables bind to a collection of values.
+The group variable is also optional. If a user query does not declare the group variable, the compiler will generate a unique group variable, which includes all binding variables defined in the `FROM` clause of the current enclosing `SELECT` statement as renaming variables. However, after grouping, the user query cannot refer to the generated group variable.
 
 #### Example
 
