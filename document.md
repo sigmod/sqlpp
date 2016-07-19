@@ -886,7 +886,7 @@ Note that `COUNT` is **not** a SQL++ aggregation function but a special syntatic
     FROM FacebookMessages msg
     GROUP BY msg.`author-id` AS uid GROUP AS `$2`(msg AS msg);
 
-The same rewriting applies to `SUM`, `MAX`, `MIN`, and `AVG` as well. Different from SQL++ aggregation functions, those special function symbols can only be used in the `SELECT` clause.
+The same rewriting applies to `SUM`, `MAX`, `MIN`, and `AVG` as well. Different from SQL++ aggregation functions, those special function symbols can only be used in the same way as how they can be used in standard SQL.
 
 ### <a id="SQL-92_compilant_gby">SQL-92 compilant Group By aggregations
 SQL++ provides full support for SQL-92 GROUP BY aggregation queries. The next query is such an example.
