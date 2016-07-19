@@ -196,7 +196,7 @@ Operators perform a specific operation on the input values or expressions. The s
 
     OperatorExpression ::= PathExpression
                            | Operator OperatorExpression
-                           | OperatorExpression Operator OperatorExpression
+                           | OperatorExpression Operator (OperatorExpression)?
 
 AsterixDB SQL++ provides a full set of operators that you can use within its statements. Here are the categories of operators:
 
@@ -238,9 +238,8 @@ Collection operators are used for membership tests (IN, NOT IN) or empty collect
 | EXISTS     |  Check whether a collection is not empty.    | SELECT * FROM TweetMessages tm <br>WHERE EXISTS tm.referedTopics; |
 | NOT EXISTS |  Check whether a collection is empty.        | SELECT * FROM TweetMessages tm <br>WHERE NOT EXISTS tm.referedTopics; |
 
-
 ### <a id="Comparison_operators">Comparison operators
-Comparison operators are used to compare values.
+Comparison operators are used to compare values. The following table enumerates all comparison operators.
 
 | Operator       |  Purpose                                   | Example    |
 |----------------|--------------------------------------------|------------|
@@ -258,6 +257,17 @@ Comparison operators are used to compare values.
 | >=             |  Greater than or equal to.                 | SELECT * FROM TweetMessages tm <br>WHERE tm.tweetid>=10; |
 | LIKE           |  Test if the left side matches a<br> pattern defined at the right<br> side. In the pattern,  "%" matches  <br>any string while "_" matches <br> any character. | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name LIKE "%Giesen%";|
 | NOT LIKE       |  Test if the left side does not <br>match a pattern defined at the right<br> side. In the pattern,  "%" matches <br>any string while "_" matches <br> any character. | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name NOT LIKE "%Giesen%";| 
+
+The following table summarizes how special value test operators work.
+
+| Operator | Non-NULL/Non-MISSING value | NULL | MISSING |
+|----------|----------------|------|---------|
+| IS NULL  | FALSE | TRUE | FALSE |
+| IS NOT NULL | TRUE | FALSE | TRUE |
+| IS MISSING  | FALSE | FALSE | TRUE |
+| IS NOT MISSING | TRUE | TRUE | FALSE |
+| IS UNKNOWN | FALSE | TRUE | TRUE |
+| IS NOT UNKNOWN | TRUE | FALSE | FALSE|
 
 ### <a id="Logical_operators">Logical operators
 Logical operators perform logical `inverse`, `and`, `or` operatorions for boolean values, `null` or `missing`.
