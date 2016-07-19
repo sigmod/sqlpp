@@ -194,7 +194,9 @@ The following examples illustrate field access for a record, index-based element
     
 Operators perform a specific operation on the input values or expressions. The syntax of `OperatorExpression` is as follows:
 
-    OperatorExpression ::= PathExpression | Operator OperatorExpression | OperatorExpression Operator OperatorExpression
+    OperatorExpression ::= PathExpression
+                           | Operator OperatorExpression
+                           | OperatorExpression Operator OperatorExpression
 
 AsterixDB SQL++ provides a full set of operators that you can use within its statements. Here are the categories of operators:
 
@@ -697,10 +699,10 @@ The left-outer join query can also be expressed using `LEFT OUTER UNNEST`:
 In general, all join queries could be expressed by `UNNEST` clauses and all left outer join queries could be expressed by `LEFT OUTER UNNESTs`.
 
 ## <a id="Group_By_clauses">Group By clauses
-The SQL++ `Group By` clause generalizes standard SQL's `Group By` semantics, but remains backward compatible to standard SQL Group By aggregations. 
+The SQL++ `GROUP BY` clause generalizes standard SQL's `Group By` semantics, but remains backward compatible to standard SQL Group By aggregations. 
 
 ### <a id="Group_variables">Group variables
-In a `Group By` clause, in addition to binding variables for grouping keys, SQL++ also allows a user to define a group variable.
+In a `GROUP BY` clause, in addition to binding variables for grouping keys, SQL++ also allows a user to define a group variable.
 After grouping, in-scope variables include grouping key binding variables as well as the group variable. The group variable binds to one collection for each group --- the collection contains nested records where each field results from a renamed variable defined in the parens after the group variable declaration:
 
     <GROUP> <AS> Variable ("(" Variable <AS> VariableReference ("," Variable <AS> VariableReference )* ")")?
@@ -969,6 +971,16 @@ It returns:
       { "user": { "id": 3, "alias": "Emory", "name": "EmoryUnk", "user-since": datetime("2012-07-10T10:10:00.000Z"), "friend-ids": {{ 1, 5, 8, 9 }}, "employment": [ { "organization-name": "geomedia", "start-date": date("2010-06-17"), "end-date": date("2010-01-26") } ] } }
     ]
 
+The query is equivalent to the following inlined form:
+
+    SELECT *
+    FROM FacebookUsers user
+    WHERE LEN(user.`friend-ids`) > ( 
+      				     SELECT ELEMENT AVG(LEN(user.`friend-ids`))
+                                     FROM FacebookUsers AS user
+                                   )[0];
+
+
 ## <a id="Subqueries">Subqueries
 In SQL++, an arbitrary subquery can appear at any place where an expression could appear. Different from SQL,  subqueries in `Projection`s or any boolean predicates are not restrained to return singleton, single-column relations, instead, they can return arbitrary collections. The following query is a variant of the prior group-by query example. Instead of listing all messages for every sender location, the query retrieves a list of the top three reply messages with smallest message-ids for each sender location.
 
@@ -1001,7 +1013,7 @@ The following matrix is a comparison cheating sheet for SQL++ and SQL-92.
 | Subqueries | Returns collections.  | The returned collection of records is casted into a scalar if a subquery presents is a projection expression or is used as one side of a comparison expression or as the input of a function call expression. |
 | Left outer join |  Fills `MISSINGs` for non-matches.  |   Fills `NULLs` for non-matches.    |
 | Aggregation functions |  Functional  |   Stateful   |
-| String literal | Double quotes and single quotes | Singe quotes |
+| String literal | Double quotes and single quotes | Single quotes |
 | Delimited identifiers | Backticks | Double quotes |
 
 For things beyond the cheating sheet,  SQL++ is SQL-92 compilant. Morever, SQL++ offers the following additional features beyond SQL-92 (a.k.a, the "++" part):
