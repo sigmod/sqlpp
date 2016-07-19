@@ -174,9 +174,9 @@ The following examples illustrate how to construct a new ordered list with 3 ite
 
 ### <a id="Path_expressions">Path expressions
 
-    ValueExpr ::= PrimaryExpr ( Field | Index )*
-    Field     ::= "." Identifier
-    Index     ::= "[" ( Expression | "?" ) "]"
+    PathExpression  ::= PrimaryExpression ( Field | Index )*
+    Field           ::= "." Identifier
+    Index           ::= "[" ( Expression | "?" ) "]"
 
 Components of complex types in ADM are accessed via path expressions. Path access can be applied to the result of an SQL++ expression that yields an instance of  a complex type, e.g., a record or list instance. For records, path access is based on field names. For ordered lists, path access is based on (zero-based) array-style indexes. SQL++ also supports an "I'm feeling lucky" style index accessor, [?], for selecting an arbitrary element from an ordered list. Attempts to access non-existent fields or out-of-bound list elements produce a missing.
 
@@ -192,7 +192,11 @@ The following examples illustrate field access for a record, index-based element
 
 ### <a id="Operator_expressions">Operator expressions
     
-Operators perform a specific operation on the input values or expressions. AsterixDB SQL++ provides a full set of operators that you can use within its statements. Here are the categories of operators:
+Operators perform a specific operation on the input values or expressions. The syntax of `OperatorExpression` is as follows:
+
+    OperatorExpression ::= PathExpression | Operator OperatorExpression | OperatorExpression Operator OperatorExpression
+
+AsterixDB SQL++ provides a full set of operators that you can use within its statements. Here are the categories of operators:
 
 * [Arithmetic operators](#Arithmetic_operators), to perform basic mathematical operations;
 * [Collection operators](#Collection_operators), to evaluate expressions on collections or objects;
