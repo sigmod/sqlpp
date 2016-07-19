@@ -36,7 +36,7 @@
     * [Multiple from terms](#Multiple_from_terms)
     * [Expressing joins using from terms](#Expressing_joins_using_from_terms)
     * [Implicit binding variables](#Implicit_binding_variables)
-  * [Join clauses](#Join clauses)
+  * [Join clauses](#Join_clauses)
     * [Inner joins](#Inner_joins)
     * [Left outer joins](#Left_outer_joins)
   * [Group By clauses](#Group_By_clauses)
@@ -45,11 +45,12 @@
     * [Implicit group variables](#Implicit_group_variables)
     * [Aggregation functions](#Aggregation_functions)
     * [SQL-92 aggregation functions](#SQL-92_aggregation_functions)
-    * [SQL-92 compilant Group By aggregations](#SQL-92_compilant_gby
+    * [SQL-92 compilant Group By aggregations](#SQL-92_compilant_gby)
     * [Column aliases](#Column_alias)
   * [Where clauases and Having clauses](#Where_having_clauses)
   * [Order By clauses](#Order_By_clauses)
   * [Limit clauses](#Limit_clauses)
+  * [With clauses](#With_clauses)
   * [SQL++ Vs. SQL-92](#Vs_SQL-92)
 * [4. DDL and DML Statements](#DDL_and_DML_Statements)
 
@@ -942,6 +943,27 @@ It returns:
       { "user": { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "user-since": datetime("2012-08-20T10:10:00.000Z"), "friend-ids": {{ 2, 3, 6, 10 }}, "employment": [ { "organization-name": "Codetechno", "start-date": date("2006-08-06") }, { "organization-name": "geomedia", "start-date": date("2010-06-17"), "end-date": date("2010-01-26") } ] } }
     ]
 
+## <a id="With_clauses">With clauses
+Like in standard SQL, `WITH` clauses are used to improve the modularity of a query.
+
+#### Example
+
+    WITH avg_friend_count AS
+    ( 
+      SELECT ELEMENT AVG(LEN(user.`friend-ids`))
+      FROM FacebookUsers AS user
+    )[0]
+
+    SELECT *
+    FROM FacebookUsers user
+    WHERE LEN(user.`friend-ids`) > avg_friend_count;
+
+It returns:
+
+    [
+      { "user": { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "user-since": datetime("2012-08-20T10:10:00.000Z"), "friend-ids": {{ 2, 3, 6, 10 }}, "employment": [ { "organization-name": "Codetechno", "start-date": date("2006-08-06") }, { "organization-name": "geomedia", "start-date": date("2010-06-17"), "end-date": date("2010-01-26") } ] } },
+      { "user": { "id": 3, "alias": "Emory", "name": "EmoryUnk", "user-since": datetime("2012-07-10T10:10:00.000Z"), "friend-ids": {{ 1, 5, 8, 9 }}, "employment": [ { "organization-name": "geomedia", "start-date": date("2010-06-17"), "end-date": date("2010-01-26") } ] } }
+    ]
 
 ## <a id="Subqueries">Subqueries
 In SQL++, an arbitrary subquery can appear at any place where an expression could appear. Different from SQL,  subqueries in `Projection`s or any boolean predicates are not restrained to return singleton, single-column relations, instead, they can return arbitrary collections. The following query is a variant of the prior group-by query example. Instead of listing all messages for every sender location, the query retrieves a list of the top three reply messages with smallest message-ids for each sender location.
