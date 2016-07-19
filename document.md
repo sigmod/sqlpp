@@ -468,13 +468,13 @@ It outputs:
 In the result, `$1` is the generated name for `substr(user.name, 1)`, while `alias` is the generated name for `substr(user.name, 1)`.
 
 ### <a id="Abbreviatory_field_access_expressions">Abbreviatory field access expressions
-Similar to standard SQL, field access expressions can be abbreviatory when there is no ambiguity. In the next example, variable `user` is the only possible variable reference for field `name` and `alias` and thus it can be omitted in the query.
+Similar to standard SQL, field access expressions can be abbreviatory when there is no ambiguity. In the next example, variable `user` is the only possible variable reference for field `id`, `name` and `alias` and thus it can be omitted in the query.
 
 #### Example
 
     SELECT substr(name, 1), alias
     FROM FacebookUsers user
-    WHERE user.id = 1;
+    WHERE id = 1;
 
 It outputs:
 
