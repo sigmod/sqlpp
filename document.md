@@ -1078,7 +1078,7 @@ In SQL++, an arbitrary subquery can appear at any place where an expression coul
       ) AS replies
     FROM FacebookMessages AS m
     GROUP BY m.`author-id`;
-```sql
+```
 
 It returns:
 
