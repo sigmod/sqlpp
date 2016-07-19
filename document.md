@@ -880,7 +880,7 @@ It returns:
       { "$1": 2, "uid": 2 }
     ]
 
-Note that `COUNT` is *not* SQL++ aggregation function but a special syntatic sugar function symbol from which the compiler rewrites to the following query:
+Note that `COUNT` is **not** a SQL++ aggregation function but a special syntatic sugar function symbol from which the compiler rewrites to the following query:
 
     SELECT uid, `COLL_SQL-COUNT`( (SELECT g.msg FROM `$2` AS g) )
     FROM FacebookMessages msg
