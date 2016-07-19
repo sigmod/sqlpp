@@ -812,14 +812,14 @@ It returns:
 
 In the query, in principle, `msg` is not a in-scope variable in the `SELECT` cluase, however, the query above can be seen as a syntatic sugar of the following query and hence can still be executed: 
 
-    SELECT uid, 
+    SELECT uid AS uid, 
            (
              SELECT msg.message
              FROM (SELECT ElEMENT g.msg FROM `$2` AS g) AS msg
              WHERE msg.`in-response-to` > 0
              ORDER BY msg.`message-id`
              LIMIT 2
-           )
+           ) AS `$1`
     FROM FacebookMessages msg
     GROUP BY msg.`author-id` AS uid GROUP AS `$2`(msg AS msg);
 
@@ -834,10 +834,10 @@ SQL++ aggregation functions take a collection as its input and output a scalar v
 | COLL_MIN  | returns NULL | returns NULL | returns NULL |
 | COLL_AVG  | returns NULL | returns NULL | returns NULL |
 | COLL_SQL-COUNT | not counted | not counted | 0 |
-| COLL_SQL-SUM   | ignores NULL | ignores NULL |  NULL |
-| COLL_SQL-MAX   | ignores NULL | ignores NULL | NULL |
-| COLL_SQL-MIN  | ignores NULL | ignores NULL | NULL |
-| COLL_SQL-AVG  | ignores NULL | ignores NULL | NULL |
+| COLL_SQL-SUM   | ignores NULL | ignores NULL | returns NULL |
+| COLL_SQL-MAX   | ignores NULL | ignores NULL | returns NULL |
+| COLL_SQL-MIN  | ignores NULL | ignores NULL | returns NULL |
+| COLL_SQL-AVG  | ignores NULL | ignores NULL | returns NULL |
 
 #### Example
 
@@ -853,7 +853,7 @@ It returns:
 
 #### Example
 
-    SELECT uid, COLL_COUNT(g)
+    SELECT uid AS uid, COLL_COUNT(g) AS `$1`
     FROM FacebookMessages message
     GROUP BY message.`author-id` AS uid GROUP AS g(message AS fb_msg);
     
@@ -880,9 +880,9 @@ It returns:
       { "$1": 2, "uid": 2 }
     ]
 
-Note that `COUNT` is **not** a SQL++ aggregation function but a special syntatic sugar function symbol from which the compiler rewrites to the following query:
+Note that `COUNT` is **not** a SQL++ builtin aggregation function but a special sugar function symbol from which the compiler rewrites to the following query:
 
-    SELECT uid, `COLL_SQL-COUNT`( (SELECT g.msg FROM `$2` AS g) )
+    SELECT uid AS uid, `COLL_SQL-COUNT`( (SELECT g.msg FROM `$2` AS g) ) AS `$1`
     FROM FacebookMessages msg
     GROUP BY msg.`author-id` AS uid GROUP AS `$2`(msg AS msg);
 
@@ -911,7 +911,7 @@ In principle, `msg` in the `SELECT` clause is sugarized as a collection (as desc
     GROUP BY msg.`author-id` AS `author-id` GROUP AS `$2`(msg AS msg);
 
 ### <a id="Column_alias">Column alias
-Some SQL vendors (e.g., [MySQL](http://dev.mysql.com/doc/refman/5.7/en/problems-with-alias.html)) allow the use of column alias in `Group By`, `Order By` and `Having` clauses.  AsterixDB SQL++ also allows that. 
+AsterixDB SQL++ also allows column alias to be used as `GROUP BY` keys or `ORDER BY` keys. 
 
 #### Example
 
@@ -1033,11 +1033,11 @@ The following matrix is a comparison cheating sheet for SQL++ and SQL-92.
 
 For things beyond the cheating sheet,  SQL++ is SQL-92 compilant. Morever, SQL++ offers the following additional features beyond SQL-92 (a.k.a, the "++" part):
 
-  * Fully composable, a subquery can iteratve over any immediate collection and present anywhere in a query;
+  * Fully composable and functional, a subquery can iteratve over any immediate collection and present anywhere in a query;
   * Schema-free, the query language does not assume the existence of a fixed schema for any data it processes;
   * Correlated from terms, a right-side from term expression can refer to variables defined by from terms on its left;
   * Powerful GROUP BY, in addition to a fixed set of aggregations as in standard SQL, groups created by the `GROUP BY` clause are directly usable in nested queries.
-  * Generalized select clause, a select clause can return any collections, while in SQL-92, a `SELECT` clause has to return a collection of records.
+  * Generalized SELECT clause, a select clause can return any collections, while in SQL-92, a `SELECT` clause has to return a collection of records.
 
 ## <a id="DDL_and_DML_Statements">3. DDL and DML Statements</a>
 
