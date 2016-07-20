@@ -19,7 +19,7 @@
   * [Conditional expressions](#Conditional_expressions)
   * [Quantified expressions](#Quantified_expressions)
 * [3. Queries](#Queries)
-  * [SELECT statements](#Select_statements)
+  * [SELECT statements](#SELECT_statements)
   * [SELECT clauses](#Select_clauses)
     * [Select element/value/raw](#Select_element)
     * [SQL-style select](#SQL_select)
@@ -51,6 +51,8 @@
   * [ORDER BY clauses](#Order_By_clauses)
   * [LIMIT clauses](#Limit_clauses)
   * [WITH clauses](#With_clauses)
+  * [LET clauses](#Let_clauses)
+  * [MISSING in query results](#Missing_in_query_results)
   * [SQL++ Vs. SQL-92](#Vs_SQL-92)
 * [4. DDL and DML Statements](#DDL_and_DML_Statements)
 
@@ -1038,7 +1040,7 @@ For things beyond the cheating sheet,  SQL++ is SQL-92 compilant. Morever, SQL++
   * Powerful GROUP BY, in addition to a fixed set of aggregations as in standard SQL, groups created by the `GROUP BY` clause are directly usable in nested queries.
   * Generalized SELECT clause, a select clause can return any collections, while in SQL-92, a `SELECT` clause has to return a collection of records.
 
-## <a id="DDL_and_DML_Statements">3. DDL and DML Statements</a>
+# <a id="DDL_and_DML_Statements">3. DDL and DML Statements</a>
 
     Statement ::= ( SingleStatement ( ";" )? )* <EOF>
     SingleStatement ::= DatabaseDeclaration
@@ -1051,32 +1053,21 @@ For things beyond the cheating sheet,  SQL++ is SQL-92 compilant. Morever, SQL++
                       | DeleteStatement
                       | Query ";"
 
-In addition to queries, SQL++ supports a variety of statements for data definition and manipulation purposes as well as controlling the context to be used in evaluating SQL++ expressions. SQL++ supports record-level ACID transactions that begin and terminate implicitly for each record inserted, deleted, or searched while a given SQL++ statement is being executed.
+In addition to queries, SQL++ supports a variety of statements for data definition and manipulation purposes as well as controlling the context to be used in evaluating SQL++ expressions. AsterixDB supports record-level ACID transactions that begin and terminate implicitly for each record inserted, deleted, or searched while a given SQL++ statement is being executed.
 
 This section details the statements supported in the SQL++ language.
 
-### Declarations
+## <a id="Declarations">Declarations
 
     DatbaseDeclaration ::= "USE" Identifier
 
-The world of data in an AsterixDB cluster is organized into data namespaces called databases. To set the default database for a series of statements, the use statement is provided.
+The world of data in an AsterixDB cluster is organized into data namespaces called database. To set the default database for a series of statements, the use statement is provided.
 
-As an example, the following statement sets the default database to be TinySocial.
+As an example, the following statement sets the default database to be "TinySocial".
 
-##### Example
+#### Example
 
     USE TinySocial;
-
-The set statement in SQL++ is used to control aspects of the expression evalation context for queries.
-
-    SetStatement ::= "SET" Identifier StringLiteral
-
-As an example, the following set statements request that Jaccard similarity with a similarity threshold 0.6 be used for set similarity matching when the ~= operator is used in a query expression.
-
-##### Example
-
-    SET simfunction "jaccard";
-    SET simthreshold "0.6f";
 
 When writing a complex SQL++ query, it can sometimes be helpful to define one or more
 auxilliary functions that each address a sub-piece of the overall query. The declare function statement supports the creation of such helper functions.
@@ -1086,13 +1077,13 @@ auxilliary functions that each address a sub-piece of the overall query. The dec
 
 The following is a very simple example of a temporary SQL++ function definition.
 
-##### Example
+#### Example
 
     DECLARE FUNCTION add(a, b) {
       a + b
     };
 
-### Lifecycle Management Statements
+## <a id="Life_cycle_management_statements">Lifecycle Management Statements
 
     CreateStatement ::= "CREATE" ( DatabaseSpecification
                                  | TypeSpecification
@@ -1113,7 +1104,7 @@ The create database statement is used to create new databases. To ease the autho
 
 The following example creates a database named TinySocial.
 
-##### Example
+#### Example
 
     CREATE DATABASE TinySocial;
 
@@ -1121,9 +1112,9 @@ The following example creates a database named TinySocial.
 
     TypeSpecification    ::= "TYPE" FunctionOrTypeName IfNotExists "AS" TypeExpr
     FunctionOrTypeName   ::= QualifiedName
-    IfNotExists          ::= ( "IF" "NOT" "EXISTS" )?
+    IfNotExists          ::= ( <IF> <NOT> <EXISTS> )?
     TypeExpr             ::= RecordTypeDef | TypeReference | OrderedListTypeDef | UnorderedListTypeDef
-    RecordTypeDef        ::= ( "CLOSED" | "OPEN" )? "{" ( RecordField ( "," RecordField )* )? "}"
+    RecordTypeDef        ::= ( <CLOSED> | <OPEN> )? "{" ( RecordField ( "," RecordField )* )? "}"
     RecordField          ::= Identifier ":" ( TypeExpr ) ( "?" )?
     NestedField          ::= Identifier ( "." Identifier )*
     IndexField           ::= NestedField ( ":" TypeReference )?
@@ -1135,7 +1126,7 @@ The create type statement is used to create a new named ADM datatype. This type 
 
 The following example creates a new ADM record type called FacebookUser type. Since it is closed, its instances will contain only what is specified in the type definition. The first four fields are traditional typed name/value pairs. The friend-ids field is an unordered list of 32-bit integers. The employment field is an ordered list of instances of another named record type, EmploymentType.
 
-##### Example
+#### Example
 
     CREATE TYPE FacebookUserType AS CLOSED {
       "id" :         int32,
@@ -1148,7 +1139,7 @@ The following example creates a new ADM record type called FacebookUser type. Si
 
 The next example creates a new ADM record type called FbUserType. Note that the type of the id field is UUID. You need to use this field type if you want to have this field be an autogenerated-PK field. Refer to the Tables section later for more details.
 
-##### Example
+#### Example
 
     CREATE TYPE FbUserType AS CLOSED {
       "id" :         uuid,
@@ -1158,16 +1149,22 @@ The next example creates a new ADM record type called FbUserType. Note that the 
 
 #### Tables
 
-    TableSpecification ::= "INTERNAL"? "table" QualifiedName "(" QualifiedName ")" IfNotExists PrimaryKey ( "ON" Identifier )? ( "HINTS" Properties )? ( "USING" "COMPACTION" "POLICY" CompactionPolicy ( Configuration )? )? ( "WITH FILTER ON" Identifier )? | "EXTERNAL" "TABLE" QualifiedName "(" QualifiedName ")" IfNotExists "USING" AdapterName Configuration ( "HINTS" Properties )? ( "USING" "COMPACTION" "POLICY" CompactionPolicy ( Configuration )? )?
+    TableSpecification ::= ( <INTERNAL> )? <TABLE> QualifiedName "(" QualifiedName ")" IfNotExists 
+                           PrimaryKey ( <ON> Identifier )? ( <HINTS> Properties )? 
+                           ( "USING" "COMPACTION" "POLICY" CompactionPolicy ( Configuration )? )?
+                           ( <WITH> <FILTER> <ON> Identifier )?
+                           |
+                           <EXTERNAL> <TABLE> QualifiedName "(" QualifiedName ")" IfNotExists <USING> AdapterName
+                           Configuration ( <HINTS> Properties )?
+                           ( <USING> <COMPACTION> <POLICY> CompactionPolicy ( Configuration )? )?
     AdapterName          ::= Identifier
     Configuration        ::= "(" ( KeyValuePair ( "," KeyValuePair )* )? ")"
     KeyValuePair         ::= "(" StringLiteral "=" StringLiteral ")"
     Properties           ::= ( "(" Property ( "," Property )* ")" )?
     Property             ::= Identifier "=" ( StringLiteral | IntegerLiteral )
     FunctionSignature    ::= FunctionOrTypeName "@" IntegerLiteral
-    PrimaryKey           ::= "PRIMARY" "KEY" NestedField ( "," NestedField )* ( "AUTOGENERATED")?
+    PrimaryKey           ::= <PRIMARY> <KEY> NestedField ( "," NestedField )* ( <AUTOGENERATED> )?
     CompactionPolicy     ::= Identifier
-    PrimaryKey           ::= "PRIMARY" "KEY" Identifier ( "," Identifier )* ( "AUTOGENERATED ")?
 
 The create table statement is used to create a new table. Tables are named, unordered collections of ADM record instances; they are where data lives persistently and are the targets for queries in AsterixDB. Tables are typed, and AsterixDB will ensure that their contents conform to their type definitions. An Internal table (the default) is a table that is stored in and managed by AsterixDB. It must have a specified unique primary key that can be used to partition data across nodes of an AsterixDB cluster. The primary key is also used in secondary indexes to uniquely identify the indexed primary data records. Random primary key (UUID) values can be auto-generated by declaring the field to be UUID and putting "AUTOGENERATED" after the "PRIMARY KEY" identifier. In this case, values for the auto-generated PK field should not be provided by the user since it will be auto-generated by AsterixDB. Optionally, a filter can be created on a field to further optimize range queries with predicates on the filter's field. (Refer to [Filter-Based LSM Index Acceleration](filters.html) for more information about filters.)
 
@@ -1178,17 +1175,19 @@ When creating a table, it is possible to choose a merge policy that controls whi
 The following example creates an internal table for storing FacefookUserType records.
 It specifies that their id field is their primary key.
 
-##### Example
+#### Example
     CREATE INTERNAL TABLE FacebookUsers(FacebookUserType) PRIMARY KEY id;
 
 The following example creates an internal table for storing FbUserType records. It specifies that their id field is their primary key. It also specifies that the id field is an auto-generated field, meaning that a randomly generated UUID value will be assigned to each record by the system. (A user should therefore not proivde a value for this field.) Note that the id field should be UUID.
 
-##### Example
+#### Example
+
     CREATE INTERNAL TABLE FbMsgs(FbUserType) PRIMARY KEY id AUTOGENERATED;
 
 The next example creates an external table for storing LineitemType records. The choice of the `hdfs` adapter means that its data will reside in HDFS. The create statement provides parameters used by the hdfs adapter: the URL and path needed to locate the data in HDFS and a description of the data format.
 
-##### Example
+#### Example
+
     CREATE EXTERNAL TABLE Lineitem('LineitemType) USING hdfs (
       ("hdfs"="hdfs://HOST:PORT"),
       ("path"="HDFS_PATH"),
@@ -1198,11 +1197,9 @@ The next example creates an external table for storing LineitemType records. The
 
 #### Indices
 
-    IndexSpecification ::= "INDEX" Identifier IfNotExists "ON" QualifiedName "(" ( IndexField ) ( "," IndexField )* ")" ( "type" IndexType )? ( "enforced" )?
-    IndexType          ::= "BTREE"
-                         | "RTREE"
-                         | "KEYWORD"
-                         | "NGRAM" "(" IntegerLiteral ")"
+    IndexSpecification ::= <INDEX> Identifier IfNotExists <ON> QualifiedName
+                           "(" ( IndexField ) ( "," IndexField )* ")" ( "type" IndexType )? ( <ENFORCED> )?
+    IndexType          ::= <BTREE> | <RTREE> | <KEYWORD> | <NGRAM> "(" IntegerLiteral ")"
 
 The create index statement creates a secondary index on one or more fields of a specified table. Supported index types include `BTREE` for totally ordered datatypes, `RTREE` for spatial data, and `KEYWORD` and `NGRAM` for textual (string) data. An index can be created on a nested field (or fields) by providing a valid path expression as an index field identifier.
 
@@ -1210,31 +1207,31 @@ An index field is not required to be part of the datatype associated with a tabl
 
 The following example creates a btree index called fbAuthorIdx on the author-id field of the FacebookMessages table. This index can be useful for accelerating exact-match queries, range search queries, and joins involving the author-id field.
 
-##### Example
+#### Example
 
     CREATE INDEX fbAuthorIdx ON FacebookMessages(author-id) TYPE BTREE;
 
 The following example creates an open btree index called fbSendTimeIdx on the open send-time field of the FacebookMessages table having datetime type. This index can be useful for accelerating exact-match queries, range search queries, and joins involving the send-time field.
 
-##### Example
+#### Example
 
     CREATE INDEX fbSendTimeIdx ON FacebookMessages(send-time:datetime) TYPE BTREE ENFORCED;
 
 The following example creates a btree index called twUserScrNameIdx on the screen-name field, which is a nested field of the user field in the TweetMessages table. This index can be useful for accelerating exact-match queries, range search queries, and joins involving the screen-name field.
 
-##### Example
+#### Example
 
     CREATE INDEX twUserScrNameIdx ON TweetMessages(user.screen-name) TYPE BTREE;
 
 The following example creates an rtree index called fbSenderLocIdx on the sender-location field of the FacebookMessages table. This index can be useful for accelerating queries that use the [`spatial-intersect` function](functions.html#spatial-intersect) in a predicate involving the sender-location field.
 
-##### Example
+#### Example
 
     CREATE INDEX fbSenderLocIndex ON FacebookMessages("sender-location") TYPE RTREE;
 
 The following example creates a 3-gram index called fbUserIdx on the name field of the FacebookUsers table. This index can be used to accelerate some similarity or substring maching queries on the name field. For details refer to the [document on similarity queries](similarity.html#NGram_Index).
 
-##### Example
+#### Example
 
     CREATE INDEX fbUserIdx ON FacebookUsers(name) TYPE NGRAM(3);
 
@@ -1285,7 +1282,7 @@ The following examples illustrate uses of the drop statement.
 
 ### Import/Export Statements
 
-    LoadStatement  ::= "LOAD" "TABLE" QualifiedName "USING" AdapterName Configuration ( "PRE-SORTED" )?
+    LoadStatement  ::= <LOAD> <TABLE> QualifiedName <USING> AdapterName Configuration ( <PRE-SORTED> )?
 
 The load statement is used to initially populate a table via bulk loading of data from an external file. An appropriate adapter must be selected to handle the nature of the desired external data. The load statement accepts the same adapters and the same parameters as external tables. (See the [guide to external data](externaldata.html) for more information on the available adapters.) If a table has an auto-generated primary key field, a file to be imported should not include that field in it.
 
@@ -1296,21 +1293,21 @@ The following example shows how to bulk load the FacebookUsers table from an ext
     LOAD TABLE FacebookUsers USING localfs
     (("path"="localhost:///Users/zuck/AsterixDB/load/fbu.adm"),("format"="adm"));
 
-### Modification Statements
+## <a id="Modification_statements">Modification statements
 
-#### Insert
+### <a id="Inserts">Inserts
 
-    InsertStatement ::= "INSERT" "INTO" "TABLE" QualifiedName Query
+    InsertStatement ::= <INSERT> <INTO> <TABLE> QualifiedName Query
 
 The SQL++ insert statement is used to insert data into a table. The data to be inserted comes from an SQL++ query expression. The expression can be as simple as a constant expression, or in general it can be any legal SQL++ query. Inserts in AsterixDB are processed transactionally, with the scope of each insert transaction being the insertion of a single object plus its affiliated secondary index entries (if any). If the query part of an insert returns a single object, then the insert statement itself will be a single, atomic transaction. If the query part returns multiple objects, then each object inserted will be handled independently as a tranaction. If a table has an auto-generated primary key field, an insert statement should not include a value for that field in it. (The system will automatically extend the provided record with this additional field and a corresponding value.)
 
 The following example illustrates a query-based insertion.
 
-##### Example
+#### Example
 
     INSERT INTO TABLE UsersCopy (FROM FacebookUsers user SELECT ELEMENT user)
 
-#### Delete
+### <a id="Deletes">Deletes
 
     DeleteStatement ::= <DELETE> <FROM> <TABLE> QualifiedName ( (<AS>)? Variable )? ( <WHERE> Expression )?
 
@@ -1318,13 +1315,14 @@ The SQL++ delete statement is used to delete data from a target table. The data 
 
 The following example illustrates a single-object deletion.
 
-##### Example
+#### Example
 
     DELETE FROM TABLE FacebookUsers user WHERE user.id = 8;
 
 We close this guide to SQL++ with one final example of a query expression.
 
-##### Example
+#### Example
 
-    FROM {{ "great", "brilliant", "awesome" }} AS praise
-    SELECT ELEMENT string-concat(["AsterixDB is ", praise])
+    FROM [ "great", "brilliant", "awesome" ] AS praise
+    SELECT ELEMENT `string-concat`(["AsterixDB is ", praise]);
+    
