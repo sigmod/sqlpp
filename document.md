@@ -54,7 +54,16 @@
   * [LET clauses](#Let_clauses)
   * [MISSING in query results](#Missing_in_query_results)
   * [SQL++ Vs. SQL-92](#Vs_SQL-92)
-* [4. DDL and DML Statements](#DDL_and_DML_Statements)
+* [4. DDL and DML statements](#DDL_and_DML_statements)
+  * [Declarations](#Declarations)
+  * [Lifecycle management statements](#Lifecycle_management_statements)
+    * [Databases](#Databases)
+    * [Tables](#Tables)
+    * [Types](#Types)
+    * [Functions](#Functions)
+  * [Modification statements](#Modification_statements)
+    * [Inserts](#Inserts)
+    * [Deletes](#Deletes)
 
 # <a id="Introduction">1. Introduction</a><font size="4">
 
@@ -1040,7 +1049,7 @@ For things beyond the cheating sheet,  SQL++ is SQL-92 compilant. Morever, SQL++
   * Powerful GROUP BY, in addition to a fixed set of aggregations as in standard SQL, groups created by the `GROUP BY` clause are directly usable in nested queries.
   * Generalized SELECT clause, a select clause can return any collections, while in SQL-92, a `SELECT` clause has to return a collection of records.
 
-# <a id="DDL_and_DML_Statements">3. DDL and DML Statements</a>
+# <a id="DDL_and_DML_statements">3. DDL and DML statements</a>
 
     Statement ::= ( SingleStatement ( ";" )? )* <EOF>
     SingleStatement ::= DatabaseDeclaration
@@ -1083,7 +1092,7 @@ The following is a very simple example of a temporary SQL++ function definition.
       a + b
     };
 
-## <a id="Life_cycle_management_statements">Lifecycle Management Statements
+## <a id="Life_cycle_management_statements">Lifecycle management statements
 
     CreateStatement ::= "CREATE" ( DatabaseSpecification
                                  | TypeSpecification
