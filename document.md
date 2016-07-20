@@ -19,7 +19,7 @@
   * [Conditional expressions](#Conditional_expressions)
   * [Quantified expressions](#Quantified_expressions)
 * [3. Queries](#Queries)
-  * [Select statements](#Select_statements)
+  * [SELECT statements](#Select_statements)
   * [SELECT clauses](#Select_clauses)
     * [Select element/value/raw](#Select_element)
     * [SQL-style select](#SQL_select)
@@ -338,7 +338,7 @@ A SQL++ query can be any legal SQL++ expression or Select statment. A query shou
 
     Query ::= (Expression | SelectStatement) ";"
 
-##  <a id="Select_statements">Select statements
+##  <a id="SELECT_statements">SELECT statements
 
 The following BNFs (Backus–Naur Forms) show the grammar of select statements in AsterixDB SQL++.
 
@@ -408,11 +408,10 @@ The following example shows a query that selects and returns one user from the t
 
 #### Example
 
-```sql
     SELECT ELEMENT user
     FROM FacebookUsers user
     WHERE user.id = 1;
-```
+
 It returns:
 
     [
@@ -422,11 +421,9 @@ It returns:
 ### <a id="SQL_select">SQL-style select
 In SQL++, all traditional SQL-style `SELECT` clauses are supported and can be expressed by `SELECT ELEMENT`.  For example, `SELECT exprA AS fieldA, exprB AS fieldB` is a syntactic suger of `SELECT ELEMENT { 'fieldA': expr1, 'fieldB': exprB }`. 
 
-```sql
     SELECT user.alias user_alias, user.name user_name
     FROM FacebookUsers user
     WHERE user.id = 1;
-```
     
 It returns:
 
@@ -439,10 +436,8 @@ In SQL++,  `SELECT *` returns a nested record for each input binding tuple, wher
 
 #### Example
 
-```sql   
     SELECT *
     FROM FacebookUsers user;
-```
 
 Since `user` is the only binding varibale generated in the from clause, it returns:
 
@@ -457,9 +452,7 @@ SQL++ `DISTINCT` keyword is used to eliminate duplicate items in results. The fo
 
 #### Example
 
-```sql
     SELECT DISTINCT * FROM [1, 2, 2, 3] AS foo;
-```
 
 It returns:
 
@@ -478,11 +471,9 @@ Similar to standard SQL, SQL++ supports unnamed projections, for which names are
 
 #### Example
 
-```sql
     SELECT substr(user.name, 1), user.alias
     FROM FacebookUsers user
     WHERE user.id = 1;
-```
     
 It outputs:
 
@@ -497,11 +488,9 @@ Similar to standard SQL, field access expressions can be abbreviatory when there
 
 #### Example
 
-```sql
     SELECT substr(name, 1), alias
     FROM FacebookUsers user
     WHERE id = 1;
-```
 
 It outputs:
 
@@ -517,12 +506,10 @@ The next example shows a query that retrieves the organizations that the selecte
 
 #### Example
 
-```sql
     SELECT user.id user_id, employment.`organization-name` org_name
     FROM FacebookUsers AS user
     UNNEST user.employment AS employment
     WHERE user.id = 1;
-```
 
 It returns:
 
@@ -536,12 +523,10 @@ Note that `UNNEST` has the "inner" semantics --- if a user does not have any emp
 ### <a id="Left_outer_unnests">Left outer unnests
 `LEFT OUTER UNNEST` has the "left outer" semantics. For example, field `foo` does not exist in the record for the user with id being 1, but the returned results still contain the user's id.
 
-```sql
     SELECT user.id user_id, employment.`organization-name` org_name
     FROM FacebookUsers AS user
     LEFT OUTER UNNEST user.foo AS employment
     WHERE user.id = 1;
-```
 
 It returns:
 
@@ -556,12 +541,10 @@ The next example shows a query that joins two tables, FacebookUsers and Facebook
 
 #### Example
 
-```sql
     SELECT user.name uname, message.message message
     FROM FacebookUsers user
     UNNEST FacebookMessages message
     WHERE message.`author-id` = user.id;
-```
 
 It returns:
 
@@ -577,7 +560,6 @@ It returns:
 
 Similarly, the above query can also be expressed as:
 
-```sql
     SELECT user.name uname, message.message message
     FROM FacebookUsers user 
     UNNEST (	 
@@ -585,7 +567,6 @@ Similarly, the above query can also be expressed as:
     	FROM FacebookMessages message
     	WHERE message.`author-id` = user.id
     ) AS message;
-```
 
 The query could read as "for each Facebook user, unnest the filtered `FacebookMessages` sub-collection with condition `message.`\``author-id`\``= user.id`". 
 
@@ -597,11 +578,9 @@ In SQL++, in addition to stored collections (i.e., tables), a `FROM` clause can 
 
 #### Example
 
-```sql
     SELECT ELEMENT foo
     FROM [1, 2, 2, 3] AS foo
     WHERE foo > 2;
-```
 
 It returns:
 
@@ -612,26 +591,21 @@ It returns:
 ### <a id="Multiple_from_terms">Multiple FROM terms
 SQL++ allows correlations among different `FROM` terms, i.e., a right side `FROM` binding expression can refer to variables defined on its left side. A equivalent query to the unnesting query above could be rewritten as:
 
-```sql
     SELECT user.id user_id, employment.`organization-name` org_name 
     FROM FacebookUsers AS user, user.employment AS employment
     WHERE user.id = 1;
-```
 
 In the query, the second from term `user.employment AS employment` refers the variable `user` which is defined on its left side. In general, query string like `expr1 AS v1 UNNEST expr2 AS v2` is equivalent to `expr1 AS v1, expr2 AS v2`.
 
 ### <a id="Expressing_joins_using_from_terms">Expressing joins using FROM terms
 Replacing `UNNEST` with `,` the same join intent of the `UNNEST`-based join queries described above (in [Expressing joins using unnests](#Expressing_joins_using_unnests)) could be expressed by:
 
-```sql
     SELECT user.name uname, message.message message
     FROM FacebookUsers user, FacebookMessages message
     WHERE message.`author-id` = user.id;
-```
 
 or
 
-```sql
     SELECT user.name uname, message.message message
     FROM FacebookUsers user, 
       (	 
@@ -639,7 +613,6 @@ or
     	FROM FacebookMessages message
     	WHERE message.`author-id` = user.id
       ) AS message;
-```
 
  Noet that the first alternative is one of the SQL-92 ways to express the join intent.
 
@@ -655,11 +628,9 @@ The next two examples demonstrate queries that do not provide binding variables 
 
 #### Example
 
-```sql
     SELECT FacebookUsers.name, FacebookMessages.message
     FROM FacebookUsers, FacebookMessages
     WHERE FacebookMessages.`author-id` = FacebookUsers.id;
-```
 
 It returns:
 
@@ -675,7 +646,6 @@ It returns:
 
 #### Example
 
-```sql
     SELECT FacebookUsers.name, FacebookMessages.message message
     FROM FacebookUsers, 
       (	 
@@ -683,7 +653,6 @@ It returns:
     	FROM FacebookMessages
     	WHERE FacebookMessages.`author-id` = FacebookUsers.id
       );
-```
 
 It will raise an error:
 
@@ -699,24 +668,20 @@ AsterixDB SQL++ supports both inner joins and left outer joins.
 ### <a id="Inner_joins">Inner joins
 Using join clause, the same join intent described above (in [Expressing joins using UNNESTs](#Expressing_joins_using_unnests) and [Expressing joins using FROM terms](#Expressing_joins_using_from_terms)) can be expressed as:
 
-```sql
     SELECT user.name uname, message.message message
     FROM FacebookUsers user
     JOIN FacebookMessages message
     ON message.`author-id` = user.id;
-```
 
 Note that all the five alternative queries discussed so far for the same join intent yeld equivalently efficeint query execution plans generated by the AsterixDB query optimizer. 
 
 ### <a id="Left_outer_joins">Left outer joins
 SQL++ supports left outer join. The following query is an example:
 
-```sql
     SELECT user.name uname, message.message message
     FROM FacebookUsers user
     LEFT OUTER JOIN FacebookMessages message
     ON message.`author-id` = user.id;
-```
 
 It returns
 
@@ -735,7 +700,6 @@ Note that for non-match left-side input tuples, SQL++ produces `MISSING` values 
 
 The left-outer join query can also be expressed using `LEFT OUTER UNNEST`:
 
-```sql
     SELECT user.name uname, message.message message
     FROM FacebookUsers user
     LEFT OUTER UNNEST (	 
@@ -743,7 +707,6 @@ The left-outer join query can also be expressed using `LEFT OUTER UNNEST`:
     	FROM FacebookMessages message
     	WHERE message.`author-id` = user.id
       ) AS message;
-```
 
 In general, all join queries could be expressed by `UNNEST` clauses and all left outer join queries could be expressed by `LEFT OUTER UNNESTs`.
 
@@ -758,11 +721,9 @@ After grouping, in-scope variables include grouping key binding variables as wel
 
 #### Example
 
-```sql
     SELECT *
     FROM FacebookMessages message
     GROUP BY message.`author-id` AS uid GROUP AS g(message AS fb_msg);
-```
 
 It returns:
 
@@ -777,7 +738,6 @@ The group variable makes more complex, composable, nested subqueries over a grou
 
 #### Example
 
-```sql
     SELECT uid, 
            (
              SELECT g.fb_msg.message
@@ -788,7 +748,6 @@ The group variable makes more complex, composable, nested subqueries over a grou
            )
     FROM FacebookMessages message
     GROUP BY message.`author-id` AS uid GROUP AS g(message AS fb_msg);
-```
 
 It returns:
 
@@ -808,7 +767,6 @@ The next example demonstrates a query that do not provide binding variables for 
 
 #### Example
 
-```sql
     SELECT `author-id`, 
            (
              SELECT g.fb_msg.message
@@ -819,7 +777,6 @@ The next example demonstrates a query that do not provide binding variables for 
            )
     FROM FacebookMessages message
     GROUP BY message.`author-id` GROUP AS g(message AS fb_msg);
-```
 
 It returns:
 
@@ -835,7 +792,6 @@ The group variable is also optional. If a user query does not declare the group 
 
 #### Example
 
-```sql
     SELECT uid, 
            (
              SELECT msg.message
@@ -846,7 +802,6 @@ The group variable is also optional. If a user query does not declare the group 
            )
     FROM FacebookMessages msg
     GROUP BY msg.`author-id` AS uid;
-```
 
 It returns:
 
@@ -857,7 +812,6 @@ It returns:
 
 In the query, in principle, `msg` is not a in-scope variable in the `SELECT` cluase, however, the query above can be seen as a syntatic sugar of the following query and hence can still be executed: 
 
-```sql
     SELECT uid AS uid, 
            (
              SELECT msg.message
@@ -868,7 +822,6 @@ In the query, in principle, `msg` is not a in-scope variable in the `SELECT` clu
            ) AS `$1`
     FROM FacebookMessages msg
     GROUP BY msg.`author-id` AS uid GROUP AS `$2`(msg AS msg);
-```
 
 ### <a id="Aggregation_functions">Aggregation functions
 SQL++ aggregation functions take a collection as its input and output a scalar value. Those functions are functional and can be invoked at any places where an expression is allowed. Here is the list of AsterixDB SQL++ builtin aggregation functions, w.r.t. how they handle `NULLs`/`MISSINGs` in the input collection or empty input collections:
@@ -888,13 +841,11 @@ SQL++ aggregation functions take a collection as its input and output a scalar v
 
 #### Example
 
-```sql
     COLL_AVG(
         (
           SELECT VALUE len(`friend-ids`) FROM FacebookUsers
         )
      );
-```
 
 It returns:
 
@@ -902,11 +853,9 @@ It returns:
 
 #### Example
 
-```sql
     SELECT uid AS uid, COLL_COUNT(g) AS `$1`
     FROM FacebookMessages message
     GROUP BY message.`author-id` AS uid GROUP AS g(message AS fb_msg);
-```
     
 It returns:
 
@@ -920,11 +869,10 @@ To be compatiable with standard SQL aggregation functions, SQL++ supports SQL-92
 
 #### Example
 
-```sql
     SELECT uid, COUNT(msg)
     FROM FacebookMessages msg
     GROUP BY msg.`author-id` AS uid;
-```
+
 It returns:
 
     [
@@ -934,11 +882,9 @@ It returns:
 
 Note that `COUNT` is **not** a SQL++ builtin aggregation function but a special sugar function symbol from which the compiler rewrites to the following query:
 
-```sql
     SELECT uid AS uid, `COLL_SQL-COUNT`( (SELECT g.msg FROM `$2` AS g) ) AS `$1`
     FROM FacebookMessages msg
     GROUP BY msg.`author-id` AS uid GROUP AS `$2`(msg AS msg);
-```
 
 The same rewriting applies to `SUM`, `MAX`, `MIN`, and `AVG` as well. Different from SQL++ aggregation functions, those special function symbols can only be used in the same way as how they can be used in standard SQL.
 
@@ -947,11 +893,9 @@ SQL++ provides full support for SQL-92 GROUP BY aggregation queries. The next qu
 
 #### Example
 
-```sql
     SELECT msg.`author-id`, COUNT(msg)
     FROM FacebookMessages msg
     GROUP BY msg.`author-id`;
-```
     
 It outputs:
 
@@ -962,22 +906,18 @@ It outputs:
 
 In principle, `msg` in the `SELECT` clause is sugarized as a collection (as described in [Implicit group variables](#Implicit_group_variables)), however, here since the projection `expression msg.`\``author-id`\` is idetical to a GROUP BY key expression, it is internally replaced by the generated group key variable.  This is the equivalent rewritten query internally generated by the compiler for the query above:
 
-```sql
     SELECT `author-id` AS `author-id`, COLL_COUNT( (SELECT g.msg FROM `$2` AS g) )
     FROM FacebookMessages msg
     GROUP BY msg.`author-id` AS `author-id` GROUP AS `$2`(msg AS msg);
-```
 
 ### <a id="Column_alias">Column alias
 AsterixDB SQL++ also allows column alias to be used as `GROUP BY` keys or `ORDER BY` keys. 
 
 #### Example
 
-```sql
     SELECT msg.`author-id` AS aid, COUNT(msg)
     FROM FacebookMessages msg
     GROUP BY aid;
-```
 
 It returns:
 
@@ -995,11 +935,9 @@ The following example returns all `FacebookUsers` ordered by their friend number
 
 #### Example
 
-```sql
       SELECT *
       FROM FacebookUsers AS user
       ORDER BY len(user.`friend-ids`) DESC;
-```
 
 It returns:
 
@@ -1014,12 +952,10 @@ Limit clause is used to bound the result set to a constant size. The use of the 
 
 #### Example
 
-```sql
       SELECT *
       FROM FacebookUsers AS user
       ORDER BY len(user.`friend-ids`) DESC
       LIMIT 1;
-```
 
 It returns:
 
@@ -1032,7 +968,6 @@ Like in standard SQL, `WITH` clauses are used to improve the modularity of a que
 
 #### Example
 
-```sql
     WITH avg_friend_count AS
     ( 
       SELECT ELEMENT AVG(LEN(user.`friend-ids`))
@@ -1042,7 +977,6 @@ Like in standard SQL, `WITH` clauses are used to improve the modularity of a que
     SELECT *
     FROM FacebookUsers user
     WHERE LEN(user.`friend-ids`) > avg_friend_count;
-```
 
 It returns:
 
@@ -1053,21 +987,18 @@ It returns:
 
 The query is equivalent to the following, more complex, inlined form:
 
-```sql
     SELECT *
     FROM FacebookUsers user
     WHERE LEN(user.`friend-ids`) > ( 
                                      SELECT ELEMENT AVG(LEN(user.`friend-ids`))
                                      FROM FacebookUsers AS user
                                    )[0];
-```
 
 ## <a id="Subqueries">Subqueries
 In SQL++, an arbitrary subquery can appear at any place where an expression could appear. Different from SQL,  subqueries in `Projection`s or any boolean predicates are not restrained to return singleton, single-column relations, instead, they can return arbitrary collections. The following query is a variant of the prior group-by query example. Instead of listing all messages for every sender location, the query retrieves a list of the top three reply messages with smallest message-ids for each sender location.
 
 ##### Example
 
-```sql
     SELECT m.`author-id`, 
       (
             SELECT ELEMENT m.message 
@@ -1078,7 +1009,6 @@ In SQL++, an arbitrary subquery can appear at any place where an expression coul
       ) AS replies
     FROM FacebookMessages AS m
     GROUP BY m.`author-id`;
-```
 
 It returns:
 
