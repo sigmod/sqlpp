@@ -111,6 +111,9 @@ The most basic building block for any SQL++ expression is PrimaryExpression. Thi
                      | <DIGITS> ( "." <DIGITS> )?
                      | "." <DIGITS>
 
+> TW: Is QuotedString a good name? Maybe 'DelimitedIdentifier'?
+> Also, we could move the QuotedString further down to its first use.
+
 Literals (constants) in SQL++ can be strings, integers, floating point values, double values, boolean constants, special constant values like `NULL` and `MISSING`. The `NULL` value is identifical to nulls in the relational query language SQL, which mean the value of a field is unknown. The `MISSING` value is only meaningful in the context of field accesses and it means a field does not exist in a record at all.
 
 The following are some simple examples of SQL++ literals.
@@ -142,7 +145,7 @@ A variable in SQL++ can be bound to any legal ADM value. A variable reference re
 
 An expression can be parenthesized, which usually is used for controlling the precedence order. In SQL++, a subquery is also an parenthesized expression.
 
-The following expression is evaluated to value 2.
+The following expression evaluates to the value 2.
 
 ##### Example
 
@@ -252,6 +255,9 @@ Collection operators are used for membership tests (IN, NOT IN) or empty collect
 ### <a id="Comparison_operators">Comparison operators
 Comparison operators are used to compare values. The following table enumerates all comparison operators.
 
+> TW: We'll need to explain NULL and MISSING somewhere?
+> Should that be here or should we inster a reference to the data model?
+
 | Operator       |  Purpose                                   | Example    |
 |----------------|--------------------------------------------|------------|
 | IS NULL        |  Test if a value is null.                  | SELECT * FROM TweetMessages tm <br>WHERE tm.user.name IS NULL; |
@@ -282,6 +288,8 @@ The following table summarizes how special value test operators work.
 
 ### <a id="Logical_operators">Logical operators
 Logical operators perform logical `inverse`, `and`, `or` operatorions for boolean values, `null` or `missing`.
+
+> TW: What is "inverse"? Is that the same as "not"?
 
 | Operator |  Purpose                                   | Example    |
 |----------|-----------------------------------------------------------------------------|------------|
@@ -318,8 +326,8 @@ The following table demonstrates the results of `NOT` on possible inputs.
     IfThenElse ::= <IF> "(" Expression ")" <THEN> Expression <ELSE> Expression
 
 A conditional expression is useful for choosing between two alternative values based on a
-boolean condition.  If its first (<IF>) expression is true, its second (<THEN>) expression's
-value is returned, and otherwise its third (<ELSE>) expression is returned.
+boolean condition.  If its first (`<IF>`) expression is true, its second (`<THEN>`) expression's
+value is returned, and otherwise its third (`<ELSE>`) expression is returned.
 
 The following example illustrates the form of a conditional expression.
 #### Example
@@ -353,46 +361,59 @@ A SQL++ query can be any legal SQL++ expression or Select statment. A query shou
 
 The following BNFs (Backus–Naur Forms) show the grammar of select statements in AsterixDB SQL++.
 
-    SelectStatement    ::=	( WithClause )? SelectSetOperation (OrderbyClause )? ( LimitClause )?
-    SelectSetOperation ::=	 SelectBlock ( (<UNION> | <INTERSECT> | <EXCEPT>)  ( <ALL>)? ( SelectBlock | Subquery ) )*
-    Subquery	       ::=	"(" SelectStatement ")"
+> TW: Shouldn't mention BNF here - we've already used it above.
+
+> TW: Should we replace SelectElement with SelectValue?
+
+    SelectStatement    ::= ( WithClause )?
+                           SelectSetOperation (OrderbyClause )? ( LimitClause )?
+    SelectSetOperation ::= SelectBlock ( (<UNION> | <INTERSECT> | <EXCEPT>)
+                                         (<ALL>)? ( SelectBlock | Subquery ) )*
+    Subquery           ::= "(" SelectStatement ")"
     
-    SelectBlock	       ::=	SelectClause ( FromClause ( WithClause )?)? (WhereClause )? 
-                            ( GroupbyClause ( LetClause )? ( HavingClause )? )? 
-                            |
-                            FromClause ( WithClause )? ( WhereClause )? ( GroupbyClause ( WithClause )? 
-                            ( HavingClause )? )? SelectClause 
-    
-    SelectClause       ::=	<SELECT> ( <ALL> | <DISTINCT> )? ( SelectRegular | SelectElement )
-    SelectRegular      ::=	Projection ( "," Projection )*
-    SelectElement      ::=	( <RAW> | <ELEMENT> | <VALUE> ) Expression
-    Projection	       ::=	( Expression ( <AS> )? Identifier | "*" )
+    SelectBlock        ::= SelectClause
+                           ( FromClause ( WithClause )?)?
+                           ( WhereClause )?
+                           ( GroupbyClause ( LetClause )? ( HavingClause )? )?
+                           |
+                           FromClause ( WithClause )?
+                           ( WhereClause )?
+                           ( GroupbyClause ( WithClause )? ( HavingClause )? )?
+                           SelectClause
+
+    SelectClause       ::= <SELECT> ( <ALL> | <DISTINCT> )? ( SelectRegular | SelectElement )
+    SelectRegular      ::= Projection ( "," Projection )*
+    SelectElement      ::= ( <RAW> | <ELEMENT> | <VALUE> ) Expression
+    Projection         ::= ( Expression ( <AS> )? Identifier | "*" )
   
-    FromClause	       ::=	<FROM> FromTerm ( "," FromTerm )*
-    FromTerm	       ::=	Expression (( <AS> )? Variable)? ( <AT> Variable )? 
-                            ( ( JoinType )? ( JoinClause | UnnestClause ) )*
-    
-    JoinClause	       ::=	<JOIN> Expression (( <AS> )? Variable)? (<AT> Variable)? <ON> Expression
-    UnnestClause       ::=	( <UNNEST> | <CORRELATE> | <FLATTEN> ) Expression ( <AS> )? Variable ( <AT> Variable )?
-    JoinType	       ::=	( <INNER> | <LEFT> ( <OUTER> )? )
-	
-    WithClause	       ::=	<WITH> WithElement ( "," WithElement )*
-    LetClause	       ::=	(<LET> | <LETTING>) LetElement ( "," LetElement )*
-    LetElement	       ::=	Variable "=" Expression
-    WithElement	       ::=	Variable <AS> Expression
+    FromClause         ::= <FROM> FromTerm ( "," FromTerm )*
+    FromTerm           ::= Expression (( <AS> )? Variable)? ( <AT> Variable )?
+                           ( ( JoinType )? ( JoinClause | UnnestClause ) )*
+
+    JoinClause         ::= <JOIN> Expression (( <AS> )? Variable)? (<AT> Variable)? <ON> Expression
+    UnnestClause       ::= ( <UNNEST> | <CORRELATE> | <FLATTEN> ) Expression
+                           ( <AS> )? Variable ( <AT> Variable )?
+    JoinType           ::= ( <INNER> | <LEFT> ( <OUTER> )? )
+
+    WithClause         ::= <WITH> WithElement ( "," WithElement )*
+    LetClause          ::= (<LET> | <LETTING>) LetElement ( "," LetElement )*
+    LetElement         ::= Variable "=" Expression
+    WithElement        ::= Variable <AS> Expression
   
-    WhereClause	       ::=	<WHERE> Expression
+    WhereClause        ::= <WHERE> Expression
     
-    GroupbyClause      ::=	<GROUP> <BY> ( Expression ( (<AS>)? Variable )? ( "," Expression ( (<AS>)? Variable )? )* 
-                            (<GROUP> <AS> Variable
-                              ("(" Variable <AS> VariableReference ("," Variable <AS> VariableReference )* ")")?
-                            )?
-    HavingClause       ::=	<HAVING> Expression
+    GroupbyClause      ::= <GROUP> <BY> ( Expression ( (<AS>)? Variable )? ( "," Expression ( (<AS>)? Variable )? )*
+                           ( <GROUP> <AS> Variable
+                             ("(" Variable <AS> VariableReference ("," Variable <AS> VariableReference )* ")")?
+                           )?
+    HavingClause       ::= <HAVING> Expression
     
-    OrderbyClause      ::=	<ORDER> <BY> Expression ( <ASC> | <DESC> )? ( "," Expression ( <ASC> | <DESC> )? )*
-    LimitClause	       ::=	<LIMIT> Expression ( <OFFSET> Expression )?
+    OrderbyClause      ::= <ORDER> <BY> Expression ( <ASC> | <DESC> )? ( "," Expression ( <ASC> | <DESC> )? )*
+    LimitClause        ::= <LIMIT> Expression ( <OFFSET> Expression )?
 
 In this section, we will use two stored collections (a.k.a. "tables" in the SQL-92 vocabulary), `FacebookUsers` and `FacebookMessages`, as running examples to explain select queries. The contents of the two example collections are shown as follows.
+
+> TW: move to Gleambook?
 
 `FacebookUsers` collection:
 
@@ -411,7 +432,7 @@ In this section, we will use two stored collections (a.k.a. "tables" in the SQL-
     {"message-id":11,"author-id":1,"in-response-to":1,"sender-location":point("38.97,77.49"),"message":" can't stand at&t its plan is terrible"}
 
 ## <a id="Select_clauses">SELECT clauses
-A `SELECT` clause always return a collection, no matter the enclosing select statement is a top-level query or a subquery.
+A `SELECT` clause always returns a collection - it does not matter if the enclosing select statement is a top-level query or a subquery.
 
 ### <a id="Select_element">Select element/value/raw
 `SELECT ELEMENT expression` returns a collection that consists of evaluation results of the expression, one per binding tuple. 
@@ -430,7 +451,7 @@ It returns:
     ]
 
 ### <a id="SQL_select">SQL-style select
-In SQL++, all traditional SQL-style `SELECT` clauses are supported and can be expressed by `SELECT ELEMENT`.  For example, `SELECT exprA AS fieldA, exprB AS fieldB` is a syntactic suger of `SELECT ELEMENT { 'fieldA': expr1, 'fieldB': exprB }`. 
+In SQL++, all traditional SQL-style `SELECT` clauses are supported and can be expressed by `SELECT ELEMENT`.  For example, `SELECT exprA AS fieldA, exprB AS fieldB` is syntactic sugar for `SELECT ELEMENT { 'fieldA': expr1, 'fieldB': exprB }`.
 
     SELECT user.alias user_alias, user.name user_name
     FROM FacebookUsers user
@@ -443,14 +464,14 @@ It returns:
     ]
 
 ### <a id="Select_star">Select *      
-In SQL++,  `SELECT *` returns a nested record for each input binding tuple, where each field in the record has its field name being the name of a binding variable generated by either the `FROM` clause or `GROUP BY` clause in the current enclosing select statement, and has its field value being the value of the binding variable.
+In SQL++, `SELECT *` returns a nested record for each input binding tuple, where each field in the record has its field name being the name of a binding variable generated by either the `FROM` clause or `GROUP BY` clause in the current enclosing select statement, and has its field value being the value of the binding variable.
 
 #### Example
 
     SELECT *
     FROM FacebookUsers user;
 
-Since `user` is the only binding varibale generated in the from clause, it returns:
+Since `user` is the only binding variable generated in the from clause, it returns:
 
     [
       { "user": { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "user-since": datetime("2012-08-20T10:10:00.000Z"), "friend-ids": {{ 2, 3, 6, 10 }}, "employment": [ { "organization-name": "Codetechno", "start-date": date("2006-08-06") }, { "organization-name": "geomedia", "start-date": date("2010-06-17"), "end-date": date("2010-01-26") } ] } },
@@ -459,7 +480,7 @@ Since `user` is the only binding varibale generated in the from clause, it retur
     ]
 
 ### <a id="Select_distinct">Select distinct
-SQL++ `DISTINCT` keyword is used to eliminate duplicate items in results. The following example shows how it works.
+SQL++'s `DISTINCT` keyword is used to eliminate duplicate items in results. The following example shows how it works.
 
 #### Example
 
@@ -478,7 +499,7 @@ Similar to standard SQL, SQL++ supports unnamed projections, for which names are
 
   * if the projection expression is a variable reference expression, the generated name is the same as the name of the variable;
   * if the projection expression is a field access expression, the generated name is same as the string of the last identifier in the expression;
-  * for all other cases, the underlying query processor will generate a unique name.
+  * for all other cases, the query processor will generate a unique name.
 
 #### Example
 
@@ -510,7 +531,7 @@ It outputs:
     ]
 
 ## <a id="Unnest_clauses">Unnest clauses
-For each input tuple, Unnest clause flatterns a expression that returns a collection into individual items and produces multiple tuples, each of which is the original input tuple augmented with a flattern item.
+For each input tuple, an Unnest clause flatterns an expression that returns a collection into individual items and produces multiple tuples, each of which is the original input tuple augmented with a flattened item.
 
 ### <a id="Inner_unnests">Inner unnests
 The next example shows a query that retrieves the organizations that the selected user has worked in, using the `UNNEST` clause to unnest the nested collection `employment` in the user's record.
@@ -550,6 +571,9 @@ Note that for the case that `user.foo` is an empty collection or a `MISSING` or 
 ### <a id="Expressing_joins_using_unnests">Expressing joins using unnests
 The next example shows a query that joins two tables, FacebookUsers and FacebookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be seen as "for each Facebook user, unnest the entire `FacebookMessages` collection and then filters the output with condition `message.`\``author-id`\``= user.id`".  Though the semantics sound like a nested loop join, the underlying AsterixDB query processor will generate a query plan using hash join to evaluate the query since the filtering condition is based on equality of fields from `FacebookUsers` and `FacebookMessages`.
 
+> TW: If this is the SQL++ description, we should probably not discuss the underlying
+> AsterixDB query processor ...
+
 #### Example
 
     SELECT user.name uname, message.message message
@@ -573,10 +597,10 @@ Similarly, the above query can also be expressed as:
 
     SELECT user.name uname, message.message message
     FROM FacebookUsers user 
-    UNNEST (	 
-    	SELECT ELEMENT message
-    	FROM FacebookMessages message
-    	WHERE message.`author-id` = user.id
+    UNNEST (
+        SELECT ELEMENT message
+        FROM FacebookMessages message
+        WHERE message.`author-id` = user.id
     ) AS message;
 
 The query could read as "for each Facebook user, unnest the filtered `FacebookMessages` sub-collection with condition `message.`\``author-id`\``= user.id`". 
@@ -585,7 +609,7 @@ The query could read as "for each Facebook user, unnest the filtered `FacebookMe
 A from clause is used for iterating over collections.
 
 ### <a id="Binding_expressions">Binding expressions
-In SQL++, in addition to stored collections (i.e., tables), a `FROM` clause can iterate over any intermeiate collection returned by any valid SQL++ expression.
+In SQL++, in addition to stored collections (i.e., tables), a `FROM` clause can iterate over any intermediate collection returned by any valid SQL++ expression.
 
 #### Example
 
@@ -606,7 +630,7 @@ SQL++ allows correlations among different `FROM` terms, i.e., a right side `FROM
     FROM FacebookUsers AS user, user.employment AS employment
     WHERE user.id = 1;
 
-In the query, the second from term `user.employment AS employment` refers the variable `user` which is defined on its left side. In general, query string like `expr1 AS v1 UNNEST expr2 AS v2` is equivalent to `expr1 AS v1, expr2 AS v2`.
+In the query, the second from term `user.employment AS employment` refers the variable `user` which is defined on its left side. In general, a query string like `expr1 AS v1 UNNEST expr2 AS v2` is equivalent to `expr1 AS v1, expr2 AS v2`.
 
 ### <a id="Expressing_joins_using_from_terms">Expressing joins using FROM terms
 Replacing `UNNEST` with `,` the same join intent of the `UNNEST`-based join queries described above (in [Expressing joins using unnests](#Expressing_joins_using_unnests)) could be expressed by:
@@ -619,13 +643,13 @@ or
 
     SELECT user.name uname, message.message message
     FROM FacebookUsers user, 
-      (	 
-    	SELECT ELEMENT message
-    	FROM FacebookMessages message
-    	WHERE message.`author-id` = user.id
+      (
+        SELECT ELEMENT message
+        FROM FacebookMessages message
+        WHERE message.`author-id` = user.id
       ) AS message;
 
- Noet that the first alternative is one of the SQL-92 ways to express the join intent.
+ Note that the first alternative is one of the SQL-92 ways to express the join intent.
 
 ### <a id="Implicit_binding_variables">Implicit binding variables
 
@@ -659,10 +683,10 @@ It returns:
 
     SELECT FacebookUsers.name, FacebookMessages.message message
     FROM FacebookUsers, 
-      (	 
-    	SELECT ELEMENT FacebookMessages
-    	FROM FacebookMessages
-    	WHERE FacebookMessages.`author-id` = FacebookUsers.id
+      (
+        SELECT ELEMENT FacebookMessages
+        FROM FacebookMessages
+        WHERE FacebookMessages.`author-id` = FacebookUsers.id
       );
 
 It will raise an error:
@@ -684,7 +708,9 @@ Using join clause, the same join intent described above (in [Expressing joins us
     JOIN FacebookMessages message
     ON message.`author-id` = user.id;
 
-Note that all the five alternative queries discussed so far for the same join intent yeld equivalently efficeint query execution plans generated by the AsterixDB query optimizer. 
+Note that all the five alternative queries discussed so far for the same join intent yield equivalently efficient query execution plans generated by the AsterixDB query optimizer.
+
+> TW: Again, I'm not sure that we should mention the query processor.
 
 ### <a id="Left_outer_joins">Left outer joins
 SQL++ supports left outer join. The following query is an example:
@@ -713,11 +739,13 @@ The left-outer join query can also be expressed using `LEFT OUTER UNNEST`:
 
     SELECT user.name uname, message.message message
     FROM FacebookUsers user
-    LEFT OUTER UNNEST (	 
-    	SELECT ELEMENT message
-    	FROM FacebookMessages message
-    	WHERE message.`author-id` = user.id
+    LEFT OUTER UNNEST (
+        SELECT ELEMENT message
+        FROM FacebookMessages message
+        WHERE message.`author-id` = user.id
       ) AS message;
+
+> TW: I think that different `message` aliases would be better here.
 
 In general, all join queries could be expressed by `UNNEST` clauses and all left outer join queries could be expressed by `LEFT OUTER UNNESTs`.
 
@@ -745,7 +773,7 @@ It returns:
 
 As we can see from the results, for each output group, the renamed variable `message`, `fb_msg`, becomes a field in the nested records that constitute a collection with field name `g`.
 
-The group variable makes more complex, composable, nested subqueries over a group possible. The next example shows a case where there is subquery in the select clause to further process the resulting groups, which is denoted by the group variable `g`, from the `GROUP BY` clause.
+The group variable makes more complex, composable, nested subqueries over a group possible. The next example shows a case where there is a subquery in the select clause to further process the resulting groups, which are denoted by the group variable `g`, from the `GROUP BY` clause.
 
 #### Example
 
@@ -774,7 +802,7 @@ In the SQL++ syntax, binding variables for `GROUP BY` key expressions are option
   * if the group by expression is a field access expression, the generated variable's name is the same as the string of last identifier of the expression;
   * for all other cases, the compiler generates a unique variable, however, the user query cannot refer to this generated variable.
 
-The next example demonstrates a query that do not provide binding variables for group key expressions.
+The next example demonstrates a query that does not provide binding variables for group key expressions.
 
 #### Example
 
@@ -821,7 +849,7 @@ It returns:
       { "$1": [ { "message": " like samsung the plan is amazing" }, { "message": " like t-mobile its platform is mind-blowing" } ], "uid": 2 }
     ]
 
-In the query, in principle, `msg` is not a in-scope variable in the `SELECT` cluase, however, the query above can be seen as a syntatic sugar of the following query and hence can still be executed: 
+In the query, in principle, `msg` is not a in-scope variable in the `SELECT` clause, however, the query above can be seen as a syntatic sugar of the following query and hence can still be executed:
 
     SELECT uid AS uid, 
            (
@@ -837,18 +865,21 @@ In the query, in principle, `msg` is not a in-scope variable in the `SELECT` clu
 ### <a id="Aggregation_functions">Aggregation functions
 SQL++ aggregation functions take a collection as its input and output a scalar value. Those functions are functional and can be invoked at any places where an expression is allowed. Here is the list of AsterixDB SQL++ builtin aggregation functions, w.r.t. how they handle `NULLs`/`MISSINGs` in the input collection or empty input collections:
 
-| Function   | NULL | MISSING |  Empty Collection |
-|------------|------|---------|-------------------|
-| COLL_COUNT | counted | counted | 0 |
-| COLL_SUM   | returns NULL | returns NULL | returns NULL |
-| COLL_MAX   | returns NULL | returns NULL | returns NULL |
-| COLL_MIN  | returns NULL | returns NULL | returns NULL |
-| COLL_AVG  | returns NULL | returns NULL | returns NULL |
-| COLL_SQL-COUNT | not counted | not counted | 0 |
-| COLL_SQL-SUM   | ignores NULL | ignores NULL | returns NULL |
-| COLL_SQL-MAX   | ignores NULL | ignores NULL | returns NULL |
-| COLL_SQL-MIN  | ignores NULL | ignores NULL | returns NULL |
-| COLL_SQL-AVG  | ignores NULL | ignores NULL | returns NULL |
+> TW: Hmm, should this document be about SQL++ or about AsterixDB or about both?
+> I may have been under a wrong assumption.
+
+| Function       | NULL         | MISSING      | Empty Collection |
+|----------------|--------------|--------------|------------------|
+| COLL_COUNT     | counted      | counted      | 0                |
+| COLL_SUM       | returns NULL | returns NULL | returns NULL     |
+| COLL_MAX       | returns NULL | returns NULL | returns NULL     |
+| COLL_MIN       | returns NULL | returns NULL | returns NULL     |
+| COLL_AVG       | returns NULL | returns NULL | returns NULL     |
+| COLL_SQL-COUNT | not counted  | not counted  | 0                |
+| COLL_SQL-SUM   | ignores NULL | ignores NULL | returns NULL     |
+| COLL_SQL-MAX   | ignores NULL | ignores NULL | returns NULL     |
+| COLL_SQL-MIN   | ignores NULL | ignores NULL | returns NULL     |
+| COLL_SQL-AVG   | ignores NULL | ignores NULL | returns NULL     |
 
 #### Example
 
@@ -856,7 +887,7 @@ SQL++ aggregation functions take a collection as its input and output a scalar v
         (
           SELECT VALUE len(`friend-ids`) FROM FacebookUsers
         )
-     );
+    );
 
 It returns:
 
@@ -867,6 +898,8 @@ It returns:
     SELECT uid AS uid, COLL_COUNT(g) AS `$1`
     FROM FacebookMessages message
     GROUP BY message.`author-id` AS uid GROUP AS g(message AS fb_msg);
+
+> TW: `AS $1` doens't look nice, should we choose a name or avoid the `AS`?
     
 It returns:
 
@@ -897,7 +930,9 @@ Note that `COUNT` is **not** a SQL++ builtin aggregation function but a special 
     FROM FacebookMessages msg
     GROUP BY msg.`author-id` AS uid GROUP AS `$2`(msg AS msg);
 
-The same rewriting applies to `SUM`, `MAX`, `MIN`, and `AVG` as well. Different from SQL++ aggregation functions, those special function symbols can only be used in the same way as how they can be used in standard SQL.
+> TW: We really need to do something about `COLL_SQL-COUNT`.
+
+The same rewriting applies to `SUM`, `MAX`, `MIN`, and `AVG` as well. In contrast to SQL++ aggregation functions, those special function symbols can only be used in the same way that they can be used in standard SQL.
 
 ### <a id="SQL-92_compilant_gby">SQL-92 compilant Group By aggregations
 SQL++ provides full support for SQL-92 GROUP BY aggregation queries. The next query is such an example.
@@ -915,14 +950,16 @@ It outputs:
       { "$1": 2, "author-id": 2 }
     ]
 
-In principle, `msg` in the `SELECT` clause is sugarized as a collection (as described in [Implicit group variables](#Implicit_group_variables)), however, here since the projection `expression msg.`\``author-id`\` is idetical to a GROUP BY key expression, it is internally replaced by the generated group key variable.  This is the equivalent rewritten query internally generated by the compiler for the query above:
+In principle, `msg` in the `SELECT` clause is sugarized as a collection (as described in [Implicit group variables](#Implicit_group_variables)). However, since the projection `expression msg.`\``author-id`\` is identical to a GROUP BY key expression here, it is internally replaced by the generated group key variable.  This is the equivalent rewritten query internally generated by the compiler for the query above:
 
     SELECT `author-id` AS `author-id`, COLL_COUNT( (SELECT g.msg FROM `$2` AS g) )
     FROM FacebookMessages msg
     GROUP BY msg.`author-id` AS `author-id` GROUP AS `$2`(msg AS msg);
 
-### <a id="Column_alias">Column alias
-AsterixDB SQL++ also allows column alias to be used as `GROUP BY` keys or `ORDER BY` keys. 
+### <a id="Column_aliases">Column aliases
+AsterixDB SQL++ also allows column aliases to be used as `GROUP BY` keys or `ORDER BY` keys.
+
+> TW: Mention AsterixDB here?
 
 #### Example
 
@@ -937,11 +974,11 @@ It returns:
       { "$1": 2, "aid": 2 }
     ]
 
-## <a id="Where_having_clauses">WHERE clauases and HAVING clauses
-Both `WHERE` clauses and `HAVING` clauses are used to filter input data based on a condition expression, where only tuples for which the condition expression evaluates to `TRUE` can be propgated. Note that if the condition expression evaluates to be `NULL` or `MISSING`, the input tuple will be disgarded.
+## <a id="Where_having_clauses">WHERE clauses and HAVING clauses
+Both `WHERE` clauses and `HAVING` clauses are used to filter input data based on a condition expression. Only tuples for which the condition expression evaluates to `TRUE` are propagated. Note that if the condition expression evaluates to be `NULL` or `MISSING`, the input tuple will be disgarded.
 
 ## <a id="Order_By_clauses">ORDER BY clauses
-`ORDER BY` clause is used to global sort data in either increasing order (i.e., `ASC`) or decreasing order (i.e., `DESC`). When ordering, `MISSING` and `NULL` is treated as being smaller than any other value if `MISSING` or `NULL`s are encountered in the ordering key(s), and `MISSING` is treated as smaller than `NULL`.
+The `ORDER BY` clause is used to globally sort data in either ascending order (i.e., `ASC`) or descending order (i.e., `DESC`). When ordering, `MISSING` and `NULL` is treated as being smaller than any other value if `MISSING` or `NULL`s are encountered in the ordering key(s), and `MISSING` is treated as smaller than `NULL`.
 The following example returns all `FacebookUsers` ordered by their friend numbers.
 
 #### Example
@@ -959,7 +996,7 @@ It returns:
     ]
 
 ## <a id="Limit_clauses">Limit clauses
-Limit clause is used to bound the result set to a constant size. The use of the `LIMIT` clause is illustrated in the next example.
+The `LIMIT` clause is used to limit the result set to a constant size. The use of the `LIMIT` clause is illustrated in the next example.
 
 #### Example
 
@@ -1006,7 +1043,7 @@ The query is equivalent to the following, more complex, inlined form:
                                    )[0];
 
 ## <a id="Subqueries">Subqueries
-In SQL++, an arbitrary subquery can appear at any place where an expression could appear. Different from SQL,  subqueries in `Projection`s or any boolean predicates are not restrained to return singleton, single-column relations, instead, they can return arbitrary collections. The following query is a variant of the prior group-by query example. Instead of listing all messages for every sender location, the query retrieves a list of the top three reply messages with smallest message-ids for each sender location.
+In SQL++, an arbitrary subquery can appear at any place where an expression could appear. Different from SQL, subqueries in a `Projection` or in any boolean predicate are not restrained to return singleton, single-column relations. Instead, they can return arbitrary collections. The following query is a variant of the prior group-by query example. Instead of listing all messages for every sender location, the query retrieves a list of the top three reply messages with smallest message-ids for each sender location.
 
 ##### Example
 
@@ -1028,22 +1065,22 @@ It returns:
       { "replies": [ " like samsung the plan is amazing", " like t-mobile its platform is mind-blowing" ], "author-id": 2 }
     ]
 
-Note that, a subquery, like a top-level `SELECT` statment, always returns a collection, regardless of where it is and its result is never automatically casted into a scalar.
+Note that a subquery, like a top-level `SELECT` statment, always returns a collection, regardless of where it is and its result is never automatically cast into a scalar.
 
 ## <a id="Vs_SQL-92">SQL++ Vs. SQL-92
-The following matrix is a comparison cheating sheet for SQL++ and SQL-92.
+The following matrix is a comparison cheat sheet for SQL++ and SQL-92.
 
 | Features |  SQL++ | SQL-92 |
 |----------|--------|--------|
 | Select * | Returns nested records. | Returns flattern concatenated records. |
-| Subqueries | Returns collections.  | The returned collection of records is casted into a scalar if a subquery presents is a projection expression or is used as one side of a comparison expression or as the input of a function call expression. |
+| Subqueries | Returns collections.  | The returned collection of records is cast into a scalar if a subquery presents is a projection expression or is used as one side of a comparison expression or as the input of a function call expression. |
 | Left outer join |  Fills `MISSINGs` for non-matches.  |   Fills `NULLs` for non-matches.    |
 | String literal | Double quotes and single quotes | Single quotes |
 | Delimited identifiers | Backticks | Double quotes |
 
-For things beyond the cheating sheet,  SQL++ is SQL-92 compilant. Morever, SQL++ offers the following additional features beyond SQL-92 (a.k.a. the "++" part):
+For things beyond the cheat sheet, SQL++ is SQL-92 compilant. Morever, SQL++ offers the following additional features beyond SQL-92 (a.k.a. the "++" part):
 
-  * Fully composable and functional, a subquery can iteratve over any immediate collection and present anywhere in a query;
+  * Fully composable and functional, a subquery can iterate over any immediate collection and be present anywhere in a query;
   * Schema-free, the query language does not assume the existence of a fixed schema for any data it processes;
   * Correlated from terms, a right-side from term expression can refer to variables defined by from terms on its left;
   * Powerful GROUP BY, in addition to a fixed set of aggregations as in standard SQL, groups created by the `GROUP BY` clause are directly usable in nested queries.
@@ -1064,13 +1101,15 @@ For things beyond the cheating sheet,  SQL++ is SQL-92 compilant. Morever, SQL++
 
 In addition to queries, SQL++ supports a variety of statements for data definition and manipulation purposes as well as controlling the context to be used in evaluating SQL++ expressions. AsterixDB supports record-level ACID transactions that begin and terminate implicitly for each record inserted, deleted, or searched while a given SQL++ statement is being executed.
 
+> TW: AsterixDB?
+
 This section details the statements supported in the SQL++ language.
 
 ## <a id="Declarations">Declarations
 
-    DatbaseDeclaration ::= "USE" Identifier
+    DatabaseDeclaration ::= "USE" Identifier
 
-The world of data in an AsterixDB cluster is organized into data namespaces called database. To set the default database for a series of statements, the use statement is provided.
+The world of data in an AsterixDB cluster is organized into data namespaces called databases. To set the default database for a series of statements, the use statement is provided.
 
 As an example, the following statement sets the default database to be "TinySocial".
 
@@ -1131,6 +1170,8 @@ The following example creates a database named TinySocial.
     OrderedListTypeDef   ::= "[" ( TypeExpr ) "]"
     UnorderedListTypeDef ::= "{{" ( TypeExpr ) "}}"
 
+> TW: How should we refer to the data model? "Asterix Data Model" seems system specific.
+
 The create type statement is used to create a new named ADM datatype. This type can then be used to create tables or utilized when defining one or more other ADM datatypes. Much more information about the Asterix Data Model (ADM) is available in the [data model reference guide](datamodel.html) to ADM. A new type can be a record type, a renaming of another type, an ordered list type, or an unordered list type. A record type can be defined as being either open or closed. Instances of a closed record type are not permitted to contain fields other than those specified in the create type statement. Instances of an open record type may carry additional fields, and open is the default for a new type (if neither option is specified).
 
 The following example creates a new ADM record type called FacebookUser type. Since it is closed, its instances will contain only what is specified in the type definition. The first four fields are traditional typed name/value pairs. The friend-ids field is an unordered list of 32-bit integers. The employment field is an ordered list of instances of another named record type, EmploymentType.
@@ -1175,7 +1216,13 @@ The next example creates a new ADM record type called FbUserType. Note that the 
     PrimaryKey           ::= <PRIMARY> <KEY> NestedField ( "," NestedField )* ( <AUTOGENERATED> )?
     CompactionPolicy     ::= Identifier
 
+> TW: Again, a lot of AsterixDB in the following paragraph.
+> Also, while I'm sure that this was always like this, the separation of `Configuration`
+> from `Properties` looks pretty confusing ...
+
 The create table statement is used to create a new table. Tables are named, unordered collections of ADM record instances; they are where data lives persistently and are the targets for queries in AsterixDB. Tables are typed, and AsterixDB will ensure that their contents conform to their type definitions. An Internal table (the default) is a table that is stored in and managed by AsterixDB. It must have a specified unique primary key that can be used to partition data across nodes of an AsterixDB cluster. The primary key is also used in secondary indexes to uniquely identify the indexed primary data records. Random primary key (UUID) values can be auto-generated by declaring the field to be UUID and putting "AUTOGENERATED" after the "PRIMARY KEY" identifier. In this case, values for the auto-generated PK field should not be provided by the user since it will be auto-generated by AsterixDB. Optionally, a filter can be created on a field to further optimize range queries with predicates on the filter's field. (Refer to [Filter-Based LSM Index Acceleration](filters.html) for more information about filters.)
+
+> TW: "The Filter-Based LSM Index Acceleration" seems to be quite system specific ...
 
 An External table is stored outside of AsterixDB (currently tables in HDFS or on the local filesystem(s) of the cluster's nodes are supported). External table support allows SQL++ queries to treat external data as though it were stored in AsterixDB, making it possible to query "legacy" file data (e.g., Hive data) without having to physically import it into AsterixDB. For an external table, an appropriate adapter must be selected to handle the nature of the desired external data. (See the [guide to external data](externaldata.html) for more information on the available adapters.)
 
@@ -1207,7 +1254,8 @@ The next example creates an external table for storing LineitemType records. The
 #### Indices
 
     IndexSpecification ::= <INDEX> Identifier IfNotExists <ON> QualifiedName
-                           "(" ( IndexField ) ( "," IndexField )* ")" ( "type" IndexType )? ( <ENFORCED> )?
+                           "(" ( IndexField ) ( "," IndexField )* ")" ( "type" IndexType )?
+                           ( <ENFORCED> )?
     IndexType          ::= <BTREE> | <RTREE> | <KEYWORD> | <NGRAM> "(" IntegerLiteral ")"
 
 The create index statement creates a secondary index on one or more fields of a specified table. Supported index types include `BTREE` for totally ordered datatypes, `RTREE` for spatial data, and `KEYWORD` and `NGRAM` for textual (string) data. An index can be created on a nested field (or fields) by providing a valid path expression as an index field identifier.
@@ -1308,6 +1356,9 @@ The following example shows how to bulk load the FacebookUsers table from an ext
 
     InsertStatement ::= <INSERT> <INTO> <TABLE> QualifiedName Query
 
+> TW: AsterixDB-specifc transactions semantics ...
+> Also, do we also support `UPSERT`?
+
 The SQL++ insert statement is used to insert data into a table. The data to be inserted comes from an SQL++ query expression. The expression can be as simple as a constant expression, or in general it can be any legal SQL++ query. Inserts in AsterixDB are processed transactionally, with the scope of each insert transaction being the insertion of a single object plus its affiliated secondary index entries (if any). If the query part of an insert returns a single object, then the insert statement itself will be a single, atomic transaction. If the query part returns multiple objects, then each object inserted will be handled independently as a tranaction. If a table has an auto-generated primary key field, an insert statement should not include a value for that field in it. (The system will automatically extend the provided record with this additional field and a corresponding value.)
 
 The following example illustrates a query-based insertion.
@@ -1327,6 +1378,9 @@ The following example illustrates a single-object deletion.
 #### Example
 
     DELETE FROM TABLE FacebookUsers user WHERE user.id = 8;
+
+> TW: I think that we now also support this without the `user` variable, right?
+> If so, that'd be a good example to have.
 
 We close this guide to SQL++ with one final example of a query expression.
 
