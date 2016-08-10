@@ -323,9 +323,9 @@ The following table demonstrates the results of `NOT` on possible inputs.
 
 ### <a id="Case_expressions">Case expressions
 
-    CaseExpression ::= <CASE> SimpleCaseExpression | SearchedCaseExpression ( <ELSE> Expression )? <END>
-    SimpleCaseExpression ::= Expression ( <WHEN> Expression <THEN> Expression )+
-    SearchedCaseExpression ::= ( <WHEN> Expression <THEN> Expression )+
+    CaseExpression ::= SimpleCaseExpression | SearchedCaseExpression
+    SimpleCaseExpression ::= <CASE> Expression ( <WHEN> Expression <THEN> Expression )+ ( <ELSE> Expression )? <END>
+    SearchedCaseExpression ::= <CASE> ( <WHEN> Expression <THEN> Expression )+ ( <ELSE> Expression )? <END>
 
 In a simple CASE expression, AsterixDB searches for the first `WHEN` ... `THEN` pair in which the `WHEN` expression is equal to the expression following `CASE` and returns the expression following `THEN`. If none of the `WHEN` ... `THEN` pairs meet this condition, and an `ELSE` branch exists, then AsterixDB returns the `ELSE` expression. Otherwise, AsterixDB returns `null`. 
 
