@@ -16,7 +16,7 @@
     * [Collection operators](#Collection_operators)
     * [Comparison operators](#Comparison_operators)
     * [Logical operators](#Logical_operators)
-  * [Conditional expressions](#Conditional_expressions)
+  * [Conditional expressions](#Case_expressions)
   * [Quantified expressions](#Quantified_expressions)
 * [3. Queries](#Queries)
   * [SELECT statements](#SELECT_statements)
@@ -73,7 +73,7 @@ New AsterixDB users are encouraged to read and work through the (friendlier) gui
 
 # <a id="Expressions">Expressions
 
-    Expression ::= OperatorExpression | ConditionExpression | QuantifiedExpression
+    Expression ::= OperatorExpression | CaseExpression | QuantifiedExpression
 
 Each SQL++ expression returns zero or more Asterix Data Model (ADM) instances. There are three major kinds of expressions in SQL++. At the topmost level, an SQL++ expression can be an OperatorExpression (similar to a mathematical expression), an ConditionalExpression (to choose between alternative values), or a QuantifiedExpression (which yields a boolean value). Each will be detailed as we explore the full SQL++ grammar.
 
@@ -321,18 +321,20 @@ The following table demonstrates the results of `NOT` on possible inputs.
 | NULL | NULL |
 | MISSING | MISSING | 
 
-### <a id="Conditional_expressions">Conditional expressions
+### <a id="Case_expressions">Case expressions
 
-    IfThenElse ::= <IF> "(" Expression ")" <THEN> Expression <ELSE> Expression
+    CaseExpression ::= <CASE> SimpleCaseExpression | SearchedCaseExpression ( <ELSE> Expression )? <END>
+    SimpleCaseExpression ::= Expression ( <WHEN> Expression <THEN> Expression )+
+    SearchedCaseExpression ::= ( <WHEN> Expression <THEN> Expression )+
 
-A conditional expression is useful for choosing between two alternative values based on a
-boolean condition.  If its first (`<IF>`) expression is true, its second (`<THEN>`) expression's
-value is returned, and otherwise its third (`<ELSE>`) expression is returned.
+In a simple CASE expression, AsterixDB searches for the first `WHEN` ... `THEN` pair in which the `WHEN` expression is equal to the expression following `CASE` and returns the expression following `THEN`. If none of the `WHEN` ... `THEN` pairs meet this condition, and an `ELSE` branch exists, then AsterixDB returns the `ELSE` expression. Otherwise, AsterixDB returns `null`. 
 
-The following example illustrates the form of a conditional expression.
+In a searched CASE expression, AsterixDB searches from left to right until it finds a `WHEN` expression that is evaluated to `true`, and then returns its corresponding `THEN` expression. If no condition is found to be `true`, and an `ELSE` branch exists, AsterixDB returns the `ELSE` expression. Otherwise, AsterixDB returns null.
+
+The following example illustrates the form of a case expression.
 #### Example
 
-    IF (2 < 3) THEN "yes" ELSE "no"
+    CASE (2 < 3) THEN "yes" ELSE "no"
 
 ### <a id="Quantified_expressions">Quantified expressions
 
