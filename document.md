@@ -75,7 +75,7 @@ New AsterixDB users are encouraged to read and work through the (friendlier) gui
 
     Expression ::= OperatorExpression | CaseExpression | QuantifiedExpression
 
-Each SQL++ expression returns zero or more Asterix Data Model (ADM) instances. There are three major kinds of expressions in SQL++. At the topmost level, an SQL++ expression can be an OperatorExpression (similar to a mathematical expression), an ConditionalExpression (to choose between alternative values), or a QuantifiedExpression (which yields a boolean value). Each will be detailed as we explore the full SQL++ grammar.
+Each SQL++ expression returns zero or more Asterix Data Model (ADM) instances. There are three major kinds of expressions in SQL++. At the topmost level, an SQL++ expression can be an OperatorExpression (similar to a mathematical expression), an CaseExpression (to choose between alternative values), or a QuantifiedExpression (which yields a boolean value). Each will be detailed as we explore the full SQL++ grammar.
 
 ## <a id="Primary_expressions">Primary Expressions
 
