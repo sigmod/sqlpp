@@ -369,8 +369,7 @@ The following BNFs (Backus–Naur Forms) show the grammar of select statements i
 
     SelectStatement    ::= ( WithClause )?
                            SelectSetOperation (OrderbyClause )? ( LimitClause )?
-    SelectSetOperation ::= SelectBlock ( (<UNION> | <INTERSECT> | <EXCEPT>)
-                                         (<ALL>)? ( SelectBlock | Subquery ) )*
+    SelectSetOperation ::= SelectBlock <UNION> <ALL> ( SelectBlock | Subquery ) )*
     Subquery           ::= "(" SelectStatement ")"
     
     SelectBlock        ::= SelectClause
