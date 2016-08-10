@@ -16,7 +16,7 @@
     * [Collection operators](#Collection_operators)
     * [Comparison operators](#Comparison_operators)
     * [Logical operators](#Logical_operators)
-  * [Conditional expressions](#Case_expressions)
+  * [Case expressions](#Case_expressions)
   * [Quantified expressions](#Quantified_expressions)
 * [3. Queries](#Queries)
   * [SELECT statements](#SELECT_statements)
@@ -329,12 +329,12 @@ The following table demonstrates the results of `NOT` on possible inputs.
 
 In a simple CASE expression, AsterixDB searches for the first `WHEN` ... `THEN` pair in which the `WHEN` expression is equal to the expression following `CASE` and returns the expression following `THEN`. If none of the `WHEN` ... `THEN` pairs meet this condition, and an `ELSE` branch exists, then AsterixDB returns the `ELSE` expression. Otherwise, AsterixDB returns `null`. 
 
-In a searched CASE expression, AsterixDB searches from left to right until it finds a `WHEN` expression that is evaluated to `true`, and then returns its corresponding `THEN` expression. If no condition is found to be `true`, and an `ELSE` branch exists, AsterixDB returns the `ELSE` expression. Otherwise, AsterixDB returns null.
+In a searched CASE expression, AsterixDB searches from left to right until it finds a `WHEN` expression that is evaluated to `true`, and then returns its corresponding `THEN` expression. If no condition is found to be `true`, and an `ELSE` branch exists, AsterixDB returns the `ELSE` expression. Otherwise, AsterixDB returns `null`.
 
 The following example illustrates the form of a case expression.
 #### Example
 
-    CASE (2 < 3) THEN "yes" ELSE "no"
+    CASE (2 < 3) WHEN true THEN "yes" ELSE "no"
 
 ### <a id="Quantified_expressions">Quantified expressions
 
