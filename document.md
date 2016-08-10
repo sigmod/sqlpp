@@ -132,9 +132,6 @@ Different from standard SQL, double quotes play the same role as single quotes a
     <LETTER>    ::= ["A" - "Z", "a" - "z"]
     DelimitedIdentifier   ::= "\`" (<ESCAPE_APOS> | ~["\'"])* "\`"
 
-> TW: Is QuotedString a good name? Maybe 'DelimitedIdentifier'? [MC: Agreed and done above.]
-> Also, we could move the QuotedString further down to its first use. [MC: Done.]
-
 A variable in SQL++ can be bound to any legal ADM value. A variable reference refers to the value to which an in-scope variable is bound. (E.g., a variable binding may originate from one of the `FROM`, `WITH` or `LET` clauses of a `SELECT` statement or from an input parameter in the context of a function body.) Backticks, e.g., \`id\`, are used for delimited identifiers. Delimiting is needed when a variable's desired name clashes with a SQL++ keyword or includes characters not allowed in regular identifiers.
 
 #### Examples
@@ -272,10 +269,6 @@ Comparison operators are used to compare values. The comparison operators fall i
 
 The following table enumerates all of SQL++'s comparison operators. 
 
-> TW: We'll need to explain NULL and MISSING somewhere?
-> Should that be here or should we insert a reference to the data model?
-> MC: Done (above), see what you think.
-
 | Operator       |  Purpose                                   | Example    |
 |----------------|--------------------------------------------|------------|
 | IS NULL        |  Test if a value is NULL                       | SELECT * FROM ChirpMessages cm <br>WHERE cm.user.name IS NULL; |
@@ -306,9 +299,6 @@ The following table summarizes how the missing value comparison operators work.
 
 ### <a id="Logical_operators">Logical operators
 Logical operators perform logical `NOT`, `AND`, and `OR` operations over Boolean values (`TRUE` and `FALSE`) plus `NULL` and `MISSING`.
-
-> TW: What is "inverse"? Is that the same as "not"?
-> MC: Assuming so. (Eradicated!)
 
 | Operator |  Purpose                                   | Example    |
 |----------|-----------------------------------------------------------------------------|------------|
@@ -433,11 +423,9 @@ The following shows the (rich) grammar for the `SELECT` statement in SQL++.
 
 In this section, we will make use of two stored collections of records (datasets in ADM parlance), `GleambookUsers` and `GleambookMessages`, in a series of running examples to explain `SELECT` queries. The contents of the example collections are as follows:
 
-> TW: Move to Gleambook? MC: Done (keeping Yingyi's selected subset thereof below).
-
 `GleambookUsers` collection:
 
-    {"id":1,"alias":"Margarita","name":"MargaritaStoddard","nickname":"Mags","userSince":datetime("2012-08-20T10:10:00"),"friendIds":{{2,3,6,10}},"employment":[{"organizationName":"Codetechno","startDate":date("2006-08-06")}],"gender":"F"}
+    {"id":1,"alias":"Margarita","name":"MargaritaStoddard","nickname":"Mags","userSince":datetime("2012-08-20T10:10:00"),"friendIds":{{2,3,6,10}},"employment":[{"organizationName":"Codetechno","start-date":date("2006-08-06")},{"organizationName":"geomedia","start-date":date("2010-06-17"),"end-date":date("2010-01-26")}],"gender":"F"}
     {"id":2,"alias":"Isbel","name":"IsbelDull","nickname":"Izzy","userSince":datetime("2011-01-22T10:10:00"),"friendIds":{{1,4}},"employment":[{"organizationName":"Hexviafind","startDate":date("2010-04-27")}]}
     {"id":3,"alias":"Emory","name":"EmoryUnk","userSince":datetime("2012-07-10T10:10:00"),"friendIds":{{1,5,8,9}},"employment":[{"organizationName":"geomedia","startDate":date("2010-06-17"),"endDate":date("2010-01-26")}]}
 
@@ -564,87 +552,85 @@ Outputs:
     ]
 
 ## <a id="Unnest_clauses">`UNNEST` Clause
-For each input tuple, an `UNNEST` clause flattens an expression that returns a collection into individual items, producing multiple tuples, each of which is the expression's original input tuple augmented with a flattened item from the collection.
+For each of its input tuples, the `UNNEST` clause flattens a collection-valued expression into individual items, producing multiple tuples, each of which is one of the expression's original input tuples augmented with a flattened item from its collection.
 
-> MC: STOPPED HERE FOR THE MOMENT....
-
-### <a id="Inner_unnests">Inner unnests
-The next example shows a query that retrieves the organizations that the selected user has worked in, using the `UNNEST` clause to unnest the nested collection `employment` in the user's record.
+### <a id="Inner_unnests">Inner `UNNEST`
+The following example is a query that retrieves the names of the organizations that a selected user has worked for. It uses the `UNNEST` clause to unnest the nested collection `employment` in the user's record.
 
 #### Example
 
-    SELECT user.id user_id, employment.`organization-name` org_name
-    FROM GleambookUsers AS user
-    UNNEST user.employment AS employment
-    WHERE user.id = 1;
+    SELECT u.id AS userId, e.organizationName AS orgName
+    FROM GleambookUsers u
+    UNNEST u.employment e
+    WHERE u.id = 1;
 
-It returns:
-
-    [
-      { "user_id": 1, "org_name": "Codetechno" },
-      { "user_id": 1, "org_name": "geomedia" }
-    ]
-
-Note that `UNNEST` has the "inner" semantics --- if a user does not have any employment history, no tuple corresponding to the user will be emitted in the result.
-
-### <a id="Left_outer_unnests">Left outer unnests
-`LEFT OUTER UNNEST` has the "left outer" semantics. For example, field `foo` does not exist in the record for the user with id being 1, but the returned results still contain the user's id.
-
-    SELECT user.id user_id, employment.`organization-name` org_name
-    FROM GleambookUsers AS user
-    LEFT OUTER UNNEST user.foo AS employment
-    WHERE user.id = 1;
-
-It returns:
+This query returns:
 
     [
-      { "user_id": 1 }
+      { "userId": 1, "orgName": "Codetechno" }
+      { "userId": 1, "orgName": "geomedia" }
     ]
 
-Note that for the case that `user.foo` is an empty collection or a `MISSING` or a `NULL`, there is no corresponding value for variable `employment` for a input tuple, therefore a `MISSING` value is generated for that such that the input tuple can be propagated.
+Note that `UNNEST` has SQL's inner join semantics --- that is, if a user has no employment history, no tuple corresponding to that user will be emitted in the result.
 
-### <a id="Expressing_joins_using_unnests">Expressing joins using unnests
-The next example shows a query that joins two data sets, GleambookUsers and GleambookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be seen as "for each Gleambook user, unnest the entire `GleambookMessages` collection and then filters the output with condition `message.`\``author-id`\``= user.id`".  Though the semantics sound like a nested loop join, the underlying AsterixDB query processor will generate a query plan using hash join to evaluate the query since the filtering condition is based on equality of fields from `GleambookUsers` and `GleambookMessages`.
-
-> TW: If this is the SQL++ description, we should probably not discuss the underlying
-> AsterixDB query processor ...
+### <a id="Left_outer_unnests">Left outer `UNNEST`
+As an alternative, the `LEFT OUTER UNNEST` clause offers SQL's left outer join semantics. For example, no collection-valued field named `hobbies` exists in the record for the user whose id is 1, but the following query's result still includes user 1.
 
 #### Example
 
-    SELECT user.name uname, message.message message
-    FROM GleambookUsers user
-    UNNEST GleambookMessages message
-    WHERE message.`author-id` = user.id;
+    SELECT u.id AS userId, h.hobbyName AS hobby
+    FROM GleambookUsers u
+    LEFT OUTER UNNEST u.hobbies h
+    WHERE u.id = 1;
 
-It returns:
+Returns:
 
     [
-      { "uname": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" },
-      { "uname": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" },
-      { "uname": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" },
-      { "uname": "MargaritaStoddard", "message": " like verizon the 3G is awesome:)" },
-      { "uname": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" },
-      { "uname": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" },
+      { "userId": 1 }
+    ]
+
+Note that if `u.hobbies` is an empty collection or leads to a `MISSING` (as above) or `NULL` value for a given input tuple, there is no corresponding binding value for variable `h` for an input tuple. A `MISSING` value will be generated for `h` so that the input tuple can still be propagated.
+
+### <a id="Expressing_joins_using_unnests">Expressing joins using `UNNEST`
+The SQL++ `UNNEST` clause is similar to SQL's `JOIN` clause except that it allows its right argument to be correlated to its left argument, as in the examples above --- i.e., think "correlated cross-product".
+The next example shows this via a query that joins two data sets, GleambookUsers and GleambookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be thought of as saying "for each Gleambook user, unnest the `GleambookMessages` collection and filter the output with the condition `message.authorId = user.id`".
+
+#### Example
+
+    SELECT u.name AS uname, m.message AS message
+    FROM GleambookUsers u
+    UNNEST GleambookMessages m
+    WHERE m.authorId = u.id;
+
+This returns:
+
+    [
+      { "uname": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" }
+      { "uname": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" }
+      { "uname": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" }
+      { "uname": "MargaritaStoddard", "message": " like verizon the 3G is awesome:)" }
+      { "uname": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" }
+      { "uname": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" }
       { "uname": "IsbelDull", "message": " like samsung the plan is amazing" }
     ]  
 
-Similarly, the above query can also be expressed as:
+Similarly, the above query can also be expressed as the `UNNEST`ing of a correlated SQL++ subquery:
 
-    SELECT user.name uname, message.message message
-    FROM GleambookUsers user 
+#### Example
+
+    SELECT u.name AS uname, m.message AS message
+    FROM GleambookUsers u
     UNNEST (
-        SELECT VALUE message
-        FROM GleambookMessages message
-        WHERE message.`author-id` = user.id
-    ) AS message;
-
-The query could read as "for each Gleambook user, unnest the filtered `GleambookMessages` sub-collection with condition `message.`\``author-id`\``= user.id`". 
+        SELECT VALUE msg
+        FROM GleambookMessages msg
+        WHERE msg.authorId = u.id
+    ) AS m;
 
 ## <a id="From_clauses">FROM clauses
-A from clause is used for iterating over collections.
+A `FROM` clause is used for enumerating (i.e., conceptually iterating over) the contents of collections, as in SQL.
 
 ### <a id="Binding_expressions">Binding expressions
-In SQL++, in addition to stored collections, a `FROM` clause can iterate over any intermediate collection returned by any valid SQL++ expression.
+In SQL++, in addition to stored collections, a `FROM` clause can iterate over any intermediate collection returned by a valid SQL++ expression.
 
 #### Example
 
@@ -652,123 +638,123 @@ In SQL++, in addition to stored collections, a `FROM` clause can iterate over an
     FROM [1, 2, 2, 3] AS foo
     WHERE foo > 2;
 
-It returns:
+Returns:
 
     [
       3
     ]
 
 ### <a id="Multiple_from_terms">Multiple FROM terms
-SQL++ allows correlations among different `FROM` terms, i.e., a right side `FROM` binding expression can refer to variables defined on its left side. A equivalent query to the unnesting query above could be rewritten as:
+SQL++ permits correlations among `FROM` terms. Specifically, a `FROM` binding expression can refer to variables defined to its left in the given `FROM` clause. Thus, the first unnesting example above could also be expressed as follows:
 
-    SELECT user.id user_id, employment.`organization-name` org_name 
-    FROM GleambookUsers AS user, user.employment AS employment
-    WHERE user.id = 1;
+#### Example
 
-In the query, the second from term `user.employment AS employment` refers the variable `user` which is defined on its left side. In general, a query string like `expr1 AS v1 UNNEST expr2 AS v2` is equivalent to `expr1 AS v1, expr2 AS v2`.
+    SELECT u.id AS userId, e.organizationName AS orgName
+    FROM GleambookUsers u, u.employment e
+    WHERE u.id = 1;
+
+In this query, the second `FROM` term refers to the variable `u` defined to its left. In general, a SQL++ query fragment like `FROM expr1 AS v1 UNNEST expr2 AS v2` is equivalent to `FROM expr1 AS v1, expr2 AS v2`
 
 ### <a id="Expressing_joins_using_from_terms">Expressing joins using FROM terms
-Replacing `UNNEST` with `,` the same join intent of the `UNNEST`-based join queries described above (in [Expressing joins using unnests](#Expressing_joins_using_unnests)) could be expressed by:
+Similarly, the join intentions of the other `UNNEST`-based join examples above could be expressed as:
 
-    SELECT user.name uname, message.message message
-    FROM GleambookUsers user, GleambookMessages message
-    WHERE message.`author-id` = user.id;
+#### Example
 
-or
+    SELECT u.name AS uname, m.message AS message
+    FROM GleambookUsers u, GleambookMessages m
+    WHERE m.authorId = u.id;
 
-    SELECT user.name uname, message.message message
-    FROM GleambookUsers user, 
+#### Example
+
+    SELECT u.name AS uname, m.message AS message
+    FROM GleambookUsers u,
       (
-        SELECT VALUE message
-        FROM GleambookMessages message
-        WHERE message.`author-id` = user.id
-      ) AS message;
+        SELECT VALUE msg
+        FROM GleambookMessages msg
+        WHERE msg.authorId = u.id
+      ) AS m;
 
- Note that the first alternative is one of the SQL-92 ways to express the join intent.
+Note that the first alternative is one of the SQL-92 approaches to expressing a join.
 
 ### <a id="Implicit_binding_variables">Implicit binding variables
 
-Similar to standard SQL, SQL++ supports implicit `FROM` binding variables (i.e., aliases), for which a binding variable is generated. The variable generation falls into three cases:
+Similar to standard SQL, SQL++ supports implicit `FROM` binding variables (i.e., aliases), for which a binding variable is generated. SQL++ variable generation falls into three cases:
 
-  * if the binding expression is a variable reference expression, the generated variable has the same name as the referred variable;
-  * if the binding expression is a field access expression, the generated variable's name is the same as the string of last identifier in the expression;
-  * for all other cases, a compilation error will be raised.
+  * If the binding expression is a variable reference expression, the generated variable's name will be the name of the referenced variable itself.
+  * If the binding expression is a field access expression, the generated variable's name will be the last identifier in the expression.
+  * For all other cases, a compilation error will be raised.
 
-The next two examples demonstrate queries that do not provide binding variables for `FROM` clauses.
+The next two examples show queries that do not provide binding variables in their `FROM` clauses.
 
 #### Example
 
     SELECT GleambookUsers.name, GleambookMessages.message
     FROM GleambookUsers, GleambookMessages
-    WHERE GleambookMessages.`author-id` = GleambookUsers.id;
+    WHERE GleambookMessages.authorId = GleambookUsers.id;
 
-It returns:
+Returns:
 
-    [ 
-      { "name": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" },
-      { "name": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" },
-      { "name": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" },
-      { "name": "MargaritaStoddard", "message": " like verizon the 3G is awesome:)" },
-      { "name": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" },
-      { "name": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" },
+    [
+      { "name": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" }
+      { "name": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" }
+      { "name": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" }
+      { "name": "MargaritaStoddard", "message": " like verizon the 3G is awesome:)" }
+      { "name": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" }
+      { "name": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" }
       { "name": "IsbelDull", "message": " like samsung the plan is amazing" }
     ]
 
 #### Example
 
-    SELECT GleambookUsers.name, GleambookMessages.message message
+    SELECT GleambookUsers.name, GleambookMessages.message
     FROM GleambookUsers, 
       (
         SELECT VALUE GleambookMessages
         FROM GleambookMessages
-        WHERE GleambookMessages.`author-id` = GleambookUsers.id
+        WHERE GleambookMessages.authorId = GleambookUsers.id
       );
 
-It will raise an error:
+Returns:
 
-     Error: Need an alias for the enclosed expression:
-     (select element $GleambookMessages
-      from $GleambookMessages as $GleambookMessages
-      where ($GleambookMessages."author-id" = $GleambookUsers.id)
-     )
+    Error: Need an alias for the enclosed expression:
+    (select element $GleambookMessages
+        from $GleambookMessages as $GleambookMessages
+        where ($GleambookMessages.authorId = $GleambookUsers.id)
+    )
 
 ## <a id="Join_clauses">JOIN clauses
-AsterixDB SQL++ supports both inner joins and left outer joins.
+AsterixDB SQL++ supports both inner joins and left outer joins from standard SQL.
 
 ### <a id="Inner_joins">Inner joins
-Using join clause, the same join intent described above (in [Expressing joins using UNNESTs](#Expressing_joins_using_unnests) and [Expressing joins using FROM terms](#Expressing_joins_using_from_terms)) can be expressed as:
+Using a `JOIN` clause, the inner join intent from the preceeding examples can also be expressed as follows:
 
-    SELECT user.name uname, message.message message
-    FROM GleambookUsers user
-    JOIN GleambookMessages message
-    ON message.`author-id` = user.id;
+#### Example
 
-Note that all the five alternative queries discussed so far for the same join intent yield equivalently efficient query execution plans generated by the AsterixDB query optimizer.
-
-> TW: Again, I'm not sure that we should mention the query processor.
+    SELECT u.name uname, m.message message
+    FROM GleambookUsers u JOIN GleambookMessages m ON m.authorId = u.id;
 
 ### <a id="Left_outer_joins">Left outer joins
-SQL++ supports left outer join. The following query is an example:
+SQL++ supports SQL's notion of left outer join. The following query is an example:
 
     SELECT user.name uname, message.message message
     FROM GleambookUsers user
     LEFT OUTER JOIN GleambookMessages message
     ON message.`author-id` = user.id;
 
-It returns
+Returns:
 
     [ 
-      { "uname": "MargaritaStoddard", "message": " like verizon the 3G is awesome:)" },
-      { "uname": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" },
-      { "uname": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" },
-      { "uname": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" },
-      { "uname": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" },
-      { "uname": "IsbelDull", "message": " like samsung the plan is amazing" },
-      { "uname": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" },
+      { "uname": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" }
+      { "uname": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" }
+      { "uname": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" }
+      { "uname": "MargaritaStoddard", "message": " like verizon the 3G is awesome:)" }
+      { "uname": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" }
+      { "uname": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" }
+      { "uname": "IsbelDull", "message": " like samsung the plan is amazing" }
       { "uname": "EmoryUnk" }
     ]
    
-Note that for non-match left-side input tuples, SQL++ produces `MISSING` values for the right-side binding variables. That explains why the last record in the result does not have a `message` field. This is different from standard SQL that fills `NULL`s for the right-side of non-matches. The reason is that for non-matches in the join results, the fields from the right-side are "not there" (a.k.a. `MISSING`) instead of "being there" but "unknown" (i.e., `NULL`).
+For non-matching left-side tuples, SQL++ produces `MISSING` values for the right-side binding variables. That is why the last record in the result above does not have a `message` field. Note that this is slightly different from standard SQL, which instead fills in `NULL` values for right-side fields. The reason for the difference is that, for non-matches in the join results, SQL++ views the fields from the right-side as "not there" (a.k.a. `MISSING`) instead of "there but unknown" (i.e., `NULL`).
 
 The left-outer join query can also be expressed using `LEFT OUTER UNNEST`:
 
