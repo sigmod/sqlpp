@@ -653,7 +653,6 @@ SQL++ permits correlations among `FROM` terms. Specifically, a `FROM` binding ex
     FROM GleambookUsers u, u.employment e
     WHERE u.id = 1;
 
-In this query, the second `FROM` term refers to the variable `u` defined to its left. In general, a SQL++ query fragment like `FROM expr1 AS v1 UNNEST expr2 AS v2` is equivalent to `FROM expr1 AS v1, expr2 AS v2`
 
 ### <a id="Expressing_joins_using_from_terms">Expressing joins using FROM terms
 Similarly, the join intentions of the other `UNNEST`-based join examples above could be expressed as:
@@ -730,16 +729,14 @@ Using a `JOIN` clause, the inner join intent from the preceeding examples can al
 
 #### Example
 
-    SELECT u.name uname, m.message message
+    SELECT u.name AS uname, m.message AS message
     FROM GleambookUsers u JOIN GleambookMessages m ON m.authorId = u.id;
 
 ### <a id="Left_outer_joins">Left outer joins
 SQL++ supports SQL's notion of left outer join. The following query is an example:
 
-    SELECT user.name uname, message.message message
-    FROM GleambookUsers user
-    LEFT OUTER JOIN GleambookMessages message
-    ON message.`author-id` = user.id;
+    SELECT u.name AS uname, m.message AS message
+    FROM GleambookUsers u LEFT OUTER JOIN GleambookMessages m ON m.authorId = u.id;
 
 Returns:
 
@@ -754,28 +751,28 @@ Returns:
       { "uname": "EmoryUnk" }
     ]
    
-For non-matching left-side tuples, SQL++ produces `MISSING` values for the right-side binding variables. That is why the last record in the result above does not have a `message` field. Note that this is slightly different from standard SQL, which instead fills in `NULL` values for right-side fields. The reason for the difference is that, for non-matches in the join results, SQL++ views the fields from the right-side as "not there" (a.k.a. `MISSING`) instead of "there but unknown" (i.e., `NULL`).
+For non-matching left-side tuples, SQL++ produces `MISSING` values for the right-side binding variables; that is why the last record in the above result doesn't have a `message` field. Note that this is slightly different from standard SQL, which instead would fill in `NULL` values for the right-side fields. The reason for this difference is that, for non-matches in its join results, SQL++ views fields from the right-side as being "not there" (a.k.a. `MISSING`) instead of as being "there but unknown" (i.e., `NULL`).
 
 The left-outer join query can also be expressed using `LEFT OUTER UNNEST`:
 
-    SELECT user.name uname, message.message message
-    FROM GleambookUsers user
+    SELECT u.name AS uname, m.message AS message
+    FROM GleambookUsers u
     LEFT OUTER UNNEST (
         SELECT VALUE message
         FROM GleambookMessages message
-        WHERE message.`author-id` = user.id
-      ) AS message;
+        WHERE message.authorId = u.id
+      ) m;
 
-> TW: I think that different `message` aliases would be better here.
+In general, in SQL++, SQL-style join queries can also be expressed by `UNNEST` clauses and left outer join queries can be expressed by `LEFT OUTER UNNESTs`.
 
-In general, all join queries could be expressed by `UNNEST` clauses and all left outer join queries could be expressed by `LEFT OUTER UNNESTs`.
+> MC: Made it to the end of joins and unnesting, finally!
 
-## <a id="Group_By_clauses">Group By clauses
-The SQL++ `GROUP BY` clause generalizes standard SQL's `Group By` semantics, but remains backward compatible to standard SQL's `GROUP BY` aggregations. 
+## <a id="Group_By_clauses">`GROUP BY` clauses
+The SQL++ `GROUP BY` clause generalizes standard SQL's grouping and aggregation semantics, but it also retains backward compatibility with standard SQL's `GROUP BY` and aggregation features.
 
 ### <a id="Group_variables">Group variables
 In a `GROUP BY` clause, in addition to binding variables for grouping keys, SQL++ also allows a user to define a group variable.
-After grouping, in-scope variables include grouping key binding variables as well as the group variable. The group variable binds to one collection for each group --- the collection contains nested records where each field results from a renamed variable defined in the parens after the group variable declaration:
+After grouping, the in-scope variables include the group key binding variables as well as the group variable. The group variable binds to one collection for each group. This collection contains nested records in which each record field is the result of a renamed variable defined in the parenthesis that follow the group variable's declaration:
 
     <GROUP> <AS> Variable ("(" Variable <AS> VariableReference ("," Variable <AS> VariableReference )* ")")?
 
@@ -783,13 +780,13 @@ After grouping, in-scope variables include grouping key binding variables as wel
 
     SELECT *
     FROM GleambookMessages message
-    GROUP BY message.`author-id` AS uid GROUP AS g(message AS gb_msg);
+    GROUP BY message.authorId AS uid GROUP AS g(message AS gb_msg);
 
-It returns:
+This query returns:
 
     [
-      { "g": [ { "gb_msg": { "message-id": 11, "author-id": 1, "in-response-to": 1, "sender-location": point("38.97,77.49"), "message": " can't stand at&t its plan is terrible" } }, { "gb_msg": { "message-id": 2, "author-id": 1, "in-response-to": 4, "sender-location": point("41.66,80.87"), "message": " dislike iphone its touch-screen is horrible" } }, { "gb_msg": { "message-id": 4, "author-id": 1, "in-response-to": 2, "sender-location": point("37.73,97.04"), "message": " can't stand at&t the network is horrible:(" } }, { "gb_msg": { "message-id": 8, "author-id": 1, "in-response-to": 11, "sender-location": point("40.33,80.87"), "message": " like verizon the 3G is awesome:)" } }, { "gb_msg": { "message-id": 10, "author-id": 1, "in-response-to": 12, "sender-location": point("42.5,70.01"), "message": " can't stand motorola the touch-screen is terrible" } } ], "author-id": 1 }, 
-      { "g": [ { "gb_msg": { "message-id": 6, "author-id": 2, "in-response-to": 1, "sender-location": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" } }, { "gb_msg": { "message-id": 3, "author-id": 2, "in-response-to": 4, "sender-location": point("48.09,81.01"), "message": " like samsung the plan is amazing" } } ], "author-id": 2 }
+       { "uid": 1, "g": [ { "gb_msg": { "messageId": 11, "authorId": 1, "inResponseTo": 1, "senderLocation": point("38.97,77.49"), "message": " can't stand at&t its plan is terrible" } }, { "gb_msg": { "messageId": 2, "authorId": 1, "inResponseTo": 4, "senderLocation": point("41.66,80.87"), "message": " dislike iphone its touch-screen is horrible" } }, { "gb_msg": { "messageId": 4, "authorId": 1, "inResponseTo": 2, "senderLocation": point("37.73,97.04"), "message": " can't stand at&t the network is horrible:(" } }, { "gb_msg": { "messageId": 8, "authorId": 1, "inResponseTo": 11, "senderLocation": point("40.33,80.87"), "message": " like verizon the 3G is awesome:)" } }, { "gb_msg": { "messageId": 10, "authorId": 1, "inResponseTo": 12, "senderLocation": point("42.5,70.01"), "message": " can't stand motorola the touch-screen is terrible" } } ] },
+       { "uid": 2, "g": [ { "gb_msg": { "messageId": 6, "authorId": 2, "inResponseTo": 1, "senderLocation": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" } }, { "gb_msg": { "messageId": 3, "authorId": 2, "inResponseTo": 4, "senderLocation": point("48.09,81.01"), "message": " like samsung the plan is amazing" } } ] }
     ]
 
 As we can see from the results, for each output group, the renamed variable `message`, `gb_msg`, becomes a field in the nested records that constitute a collection with field name `g`.
