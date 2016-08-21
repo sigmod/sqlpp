@@ -57,19 +57,20 @@
 * [4. DDL and DML statements](#DDL_and_DML_statements)
   * [Declarations](#Declarations)
   * [Lifecycle management statements](#Lifecycle_management_statements)
-    * [Databases](#Databases)
-    * [Tables](#Tables)
+    * [Dataverses](#Dataverses)
+    * [Datasets](#Datasets)
     * [Types](#Types)
     * [Functions](#Functions)
   * [Modification statements](#Modification_statements)
     * [Inserts](#Inserts)
+    * [Upserts](#Upserts)
     * [Deletes](#Deletes)
 
 # <a id="Introduction">1. Introduction</a><font size="4">
 
-This document is intended as a reference guide to the full syntax and semantics of the SQL++ Query Language, a SQL-inspired language for working with Apache AsterixDB. SQL++ has much in common with SQL, but there are also differences due to the data model that the language is designed to serve. (SQL was designed in the 1970's for interacting with the flat, schema-ified world of relational databases, while SQL++ is designed for the nested, schema-less/schema-optional world of modern NoSQL systems.) In particular, SQL++ in the context of AsterixDB is aimed at working with the Asterix Data Model (ADM), which (roughly speaking) is a data model aimed at a superset of JSON.
+This document is intended as a reference guide to the full syntax and semantics of the SQL++ Query Language, a SQL-inspired language for working with semistructured data. SQL++ has much in common with SQL, but there are also differences due to the data model that the language is designed to serve. (SQL was designed in the 1970's for interacting with the flat, schema-ified world of relational databases, while SQL++ is designed for the nested, schema-less/schema-optional world of modern NoSQL systems.) In particular, SQL++ in the context of Apache AsterixDB is intended for working with the Asterix Data Model (ADM), which is a data model aimed at a superset of JSON with an enriched and flexible type system.
 
-New AsterixDB users are encouraged to read and work through the (friendlier) guide "AsterixDB 101: An ADM and SQL++ Primer" before attempting to make use of this document. In addition, readers are advised to read and understand the Asterix Data Model (ADM) reference guide since a basic understanding of ADM concepts is a prerequisite to understanding SQL++. In what follows, we detail the features of the SQL++ language in a grammar-guided manner: we list and briefly explain each of the productions in the SQL++ grammar, offering examples for clarity in cases where doing so seems needed or helpful.
+New AsterixDB users are encouraged to read and work through the (friendlier) guide "AsterixDB 101: An ADM and SQL++ Primer" before attempting to make use of this document. In addition, readers are advised to read and understand the Asterix Data Model (ADM) reference guide since a basic understanding of ADM concepts is a prerequisite to understanding SQL++. In what follows, we detail the features of the SQL++ language in a grammar-guided manner: we list and briefly explain each of the productions in the SQL++ grammar, offering examples (and results) for clarity.
 
 # <a id="Expressions">2. Expressions
 
@@ -117,7 +118,7 @@ Literals (constants) in SQL++ can be strings, integers, floating point values, d
 
 The following are some simple examples of SQL++ literals.
 
-#### Examples
+##### Examples
 
     'a string'
     "test string"
@@ -134,7 +135,7 @@ Different from standard SQL, double quotes play the same role as single quotes a
 
 A variable in SQL++ can be bound to any legal ADM value. A variable reference refers to the value to which an in-scope variable is bound. (E.g., a variable binding may originate from one of the `FROM`, `WITH` or `LET` clauses of a `SELECT` statement or from an input parameter in the context of a function body.) Backticks, e.g., \`id\`, are used for delimited identifiers. Delimiting is needed when a variable's desired name clashes with a SQL++ keyword or includes characters not allowed in regular identifiers.
 
-#### Examples
+##### Examples
 
     tweet
     id
@@ -161,7 +162,7 @@ Functions are included in SQL++, like most languages, as a way to package useful
 
 The following example is a (built-in) function call expression whose value is 8.
 
-#### Example
+##### Example
 
     length('a string')
 
@@ -177,7 +178,7 @@ A major feature of SQL++ is its ability to construct new ADM data instances. Thi
 
 The following examples illustrate how to construct a new ordered list with 3 items, a new record with 2 fields, and a new unordered list with 4 items, respectively. List elements can be homogeneous (as in the first example), which is the common case, or they may be heterogeneous (as in the third example). The data values and field name values used to construct lists and records in constructors are all simply SQL++ expressions. Thus, the list elements, field names, and field values used in constructors can be simple literals or they can come from query variable references or even arbitrarily complex SQL++ expressions (subqueries).
 
-#### Examples
+##### Examples
 
     [ 'a', 'b', 'c' ]
 
@@ -198,7 +199,7 @@ Components of complex types in ADM are accessed via path expressions. Path acces
 
 The following examples illustrate field access for a record, index-based element access for an ordered list, and also a composition thereof.
 
-#### Examples
+##### Examples
 
     ({"name": "MyABCs", "list": [ "a", "b", "c"]}).list
 
@@ -260,7 +261,7 @@ Collection operators are used for membership tests (IN, NOT IN) or empty collect
 ### <a id="Comparison_operators">Comparison operators
 Comparison operators are used to compare values. The comparison operators fall into one of two sub-categories: missing value comparisons and regular value comparisons. SQL++ (and JSON) has two ways of representing missing information in a record - the presence of the field with a NULL for its value (as in SQL), and the absence of the field (which JSON permits). For example, the first of the following records represents Jack, whose friend is Jill. In the other examples, Jake is friendless a la SQL, with a friend field that is NULL, while Joe is friendless in a more natural (for JSON) way, i.e., by not having a friend field.
 
-#### Examples
+##### Examples
 {"name": "Jack", "friend": "Jill"}
 
 {"name": "Jake", "friend": NULL}
@@ -341,7 +342,7 @@ In a simple `CASE` expression, the query evaluator searches for the first `WHEN`
 In a searched CASE expression, the query evaluator searches from left to right until it finds a `WHEN` expression that is evaluated to `TRUE`, and then returns its corresponding `THEN` expression. If no condition is found to be `TRUE`, and an `ELSE` branch exists, it returns the `ELSE` expression. Otherwise, it returns `NULL`.
 
 The following example illustrates the form of a case expression.
-#### Example
+##### Example
 
     CASE (2 < 3) WHEN true THEN "yes" ELSE "no" END
 
@@ -445,7 +446,7 @@ The `SELECT VALUE` clause in SQL++ returns a collection that contains the result
 For historical reasons SQL++ also allows the keywords `ELEMENT` or `RAW` to be used in place of `VALUE` (not recommended).
 The following example shows a query that selects one user from the GleambookUsers collection.
 
-#### Example
+##### Example
 
     SELECT VALUE user
     FROM GleambookUsers user
@@ -463,7 +464,7 @@ In SQL++, the traditional SQL-style `SELECT` syntax is also supported.
 This syntax can also be reformulated in a `SELECT VALUE` based manner in SQL++.
 (E.g., `SELECT expA AS fldA, expB AS fldB` is syntactic sugar for `SELECT VALUE { 'fldA': expA, 'fldB': expB }`.)
 
-#### Example
+##### Example
     SELECT user.alias user_alias, user.name user_name
     FROM GleambookUsers user
     WHERE user.id = 1;
@@ -477,7 +478,7 @@ Returns:
 ### <a id="Select_star">SELECT *      
 In SQL++, `SELECT *` returns a record with a nested field for each input tuple. Each field has as its field name the name of a binding variable generated by either the `FROM` clause or `GROUP BY` clause in the current enclosing `SELECT` statement, and its field is the value of that binding variable.
 
-#### Example
+##### Example
 
     SELECT *
     FROM GleambookUsers user;
@@ -493,7 +494,7 @@ Since `user` is the only binding variable generated in the `FROM` clause, this q
 ### <a id="Select_distinct">SELECT DISTINCT
 SQL++'s `DISTINCT` keyword is used to eliminate duplicate items in results. The following example shows how it works.
 
-#### Example
+##### Example
 
     SELECT DISTINCT * FROM [1, 2, 2, 3] AS foo;
 
@@ -505,7 +506,7 @@ This query returns:
       { "foo": 3 }
     ]
 
-#### Example
+##### Example
 
     SELECT DISTINCT VALUE foo FROM [1, 2, 2, 3] AS foo;
 
@@ -521,7 +522,7 @@ Name generation has three cases:
   * If a projection expression is a field access expression, its generated name is the last identifier in the expression.
   * For all other cases, the query processor will generate a unique name.
 
-#### Example
+##### Example
 
     SELECT substr(user.name, 10), user.alias
     FROM GleambookUsers user
@@ -538,7 +539,7 @@ In the result, `$1` is the generated name for `substr(user.name, 1)`, while `ali
 ### <a id="Abbreviatory_field_access_expressions">Abbreviated Field Access Expressions
 As in standard SQL, SQL++ field access expressions can be abbreviated (not recommended) when there is no ambiguity. In the next example, the variable `user` is the only possible variable reference for fields `id`, `name` and `alias` and thus could be omitted in the query.
 
-#### Example
+##### Example
 
     SELECT substr(name, 10) AS lname, alias
     FROM GleambookUsers user
@@ -556,7 +557,7 @@ For each of its input tuples, the `UNNEST` clause flattens a collection-valued e
 ### <a id="Inner_unnests">Inner UNNEST
 The following example is a query that retrieves the names of the organizations that a selected user has worked for. It uses the `UNNEST` clause to unnest the nested collection `employment` in the user's record.
 
-#### Example
+##### Example
 
     SELECT u.id AS userId, e.organizationName AS orgName
     FROM GleambookUsers u
@@ -575,7 +576,7 @@ Note that `UNNEST` has SQL's inner join semantics --- that is, if a user has no 
 ### <a id="Left_outer_unnests">Left outer UNNEST
 As an alternative, the `LEFT OUTER UNNEST` clause offers SQL's left outer join semantics. For example, no collection-valued field named `hobbies` exists in the record for the user whose id is 1, but the following query's result still includes user 1.
 
-#### Example
+##### Example
 
     SELECT u.id AS userId, h.hobbyName AS hobby
     FROM GleambookUsers u
@@ -594,7 +595,7 @@ Note that if `u.hobbies` is an empty collection or leads to a `MISSING` (as abov
 The SQL++ `UNNEST` clause is similar to SQL's `JOIN` clause except that it allows its right argument to be correlated to its left argument, as in the examples above --- i.e., think "correlated cross-product".
 The next example shows this via a query that joins two data sets, GleambookUsers and GleambookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be thought of as saying "for each Gleambook user, unnest the `GleambookMessages` collection and filter the output with the condition `message.authorId = user.id`".
 
-#### Example
+##### Example
 
     SELECT u.name AS uname, m.message AS message
     FROM GleambookUsers u
@@ -615,7 +616,7 @@ This returns:
 
 Similarly, the above query can also be expressed as the `UNNEST`ing of a correlated SQL++ subquery:
 
-#### Example
+##### Example
 
     SELECT u.name AS uname, m.message AS message
     FROM GleambookUsers u
@@ -631,7 +632,7 @@ A `FROM` clause is used for enumerating (i.e., conceptually iterating over) the 
 ### <a id="Binding_expressions">Binding expressions
 In SQL++, in addition to stored collections, a `FROM` clause can iterate over any intermediate collection returned by a valid SQL++ expression.
 
-#### Example
+##### Example
 
     SELECT VALUE foo
     FROM [1, 2, 2, 3] AS foo
@@ -646,7 +647,7 @@ Returns:
 ### <a id="Multiple_from_terms">Multiple FROM terms
 SQL++ permits correlations among `FROM` terms. Specifically, a `FROM` binding expression can refer to variables defined to its left in the given `FROM` clause. Thus, the first unnesting example above could also be expressed as follows:
 
-#### Example
+##### Example
 
     SELECT u.id AS userId, e.organizationName AS orgName
     FROM GleambookUsers u, u.employment e
@@ -656,13 +657,13 @@ SQL++ permits correlations among `FROM` terms. Specifically, a `FROM` binding ex
 ### <a id="Expressing_joins_using_from_terms">Expressing joins using FROM terms
 Similarly, the join intentions of the other `UNNEST`-based join examples above could be expressed as:
 
-#### Example
+##### Example
 
     SELECT u.name AS uname, m.message AS message
     FROM GleambookUsers u, GleambookMessages m
     WHERE m.authorId = u.id;
 
-#### Example
+##### Example
 
     SELECT u.name AS uname, m.message AS message
     FROM GleambookUsers u,
@@ -684,7 +685,7 @@ Similar to standard SQL, SQL++ supports implicit `FROM` binding variables (i.e.,
 
 The next two examples show queries that do not provide binding variables in their `FROM` clauses.
 
-#### Example
+##### Example
 
     SELECT GleambookUsers.name, GleambookMessages.message
     FROM GleambookUsers, GleambookMessages
@@ -702,7 +703,7 @@ Returns:
       { "name": "IsbelDull", "message": " like samsung the plan is amazing" }
     ]
 
-#### Example
+##### Example
 
     SELECT GleambookUsers.name, GleambookMessages.message
     FROM GleambookUsers, 
@@ -726,7 +727,7 @@ The join clause in SQL++ supports both inner joins and left outer joins from sta
 ### <a id="Inner_joins">Inner joins
 Using a `JOIN` clause, the inner join intent from the preceeding examples can also be expressed as follows:
 
-#### Example
+##### Example
 
     SELECT u.name AS uname, m.message AS message
     FROM GleambookUsers u JOIN GleambookMessages m ON m.authorId = u.id;
@@ -773,7 +774,7 @@ After grouping, then, the query's in-scope variables include the grouping key's 
 
     <GROUP> <AS> Variable ("(" Variable <AS> VariableReference ("," Variable <AS> VariableReference )* ")")?
 
-#### Example
+##### Example
 
     SELECT *
     FROM GleambookMessages message
@@ -803,7 +804,7 @@ the "extra wrapping" of each message as the `msg` field of a record.
 (That wrapping is useful in more complex cases, but is essentially just in the way here.)
 We can use a subquery in the `SELECT` clase to tunnel through the extra nesting and produce the desired result.
 
-#### Example
+##### Example
 
     SELECT uid, (SELECT VALUE m.msg FROM msgs m) AS msgs
     FROM GleambookMessages message
@@ -821,7 +822,7 @@ This variant of the example query returns:
 
 Because this is a fairly common case, a third variant with output identical to the second variant is also possible:
 
-#### Example
+##### Example
 
     SELECT uid, msg AS msgs
     FROM GleambookMessages message
@@ -834,7 +835,7 @@ implicitly rewritten into the second variant's `SELECT VALUE` subquery.
 The next example shows a more interesting case involving the use of a subquery in the `SELECT` list.
 Here the subquery further processes the groups.
 
-#### Example
+##### Example
 
     SELECT uid,
            (SELECT VALUE m.msg
@@ -864,7 +865,7 @@ Automatic grouping key variable naming falls into three cases in SQL++, much lik
 
 The next example illustrates a query that doesn't provide binding variables for its grouping key expressions.
 
-#### Example
+##### Example
 
     SELECT authorId,
            (SELECT VALUE m.msg
@@ -893,7 +894,7 @@ the query compiler will generate a unique group variable whose fields include al
 binding variables defined in the `FROM` clause of the current enclosing `SELECT` statement.
 (In this case the user's query will not be able to refer to the generated group variable.)
 
-#### Example
+##### Example
 
     SELECT uid,
            (SELECT m.message
@@ -954,7 +955,7 @@ This is because SQL++ offers two versions of each -- one that handles `UNKNOWN` 
 strict fashion, where unknown values in the input result in unknown values in the output -- and one that
 handles them in the ad hoc "just ignore the unknown values" fashion that the SQL standard chose to adopt.
 
-#### Example
+##### Example
 
     COLL_AVG(
         (
@@ -966,7 +967,7 @@ This example returns:
 
     3.3333333333333335
 
-#### Example
+##### Example
 
     SELECT uid AS uid, COLL_COUNT(grp) AS msgCnt
     FROM GleambookMessages message
@@ -991,7 +992,7 @@ The SQL++ compiler rewrites queries that utilize these function symbols into SQL
 use the SQL++ collection aggregate functions. The following example uses the SQL-92 syntax approach
 to compute a result that is identical to that of the more explicit SQL++ example above:
 
-#### Example
+##### Example
 
     SELECT uid, COUNT(msg) AS msgCnt
     FROM GleambookMessages msg
@@ -1017,7 +1018,7 @@ can only be used in the same way they are in standard SQL (i.e., with the same r
 SQL++ provides full support for SQL-92 `GROUP BY` aggregation queries.
 The following query is such an example:
 
-#### Example
+##### Example
 
     SELECT msg.authorId, COUNT(msg)
     FROM GleambookMessages msg
@@ -1043,7 +1044,7 @@ The following is the equivalent rewritten query that will be generated by the co
 ### <a id="Column_aliases">Column aliases
 SQL++ also allows column aliases to be used as `GROUP BY` keys or `ORDER BY` keys.
 
-#### Example
+##### Example
 
     SELECT msg.authorId AS aid, COUNT(msg)
     FROM GleambookMessages msg
@@ -1067,7 +1068,7 @@ During ordering, `MISSING` and `NULL` are treated as being smaller than any othe
 in the ordering key(s). `MISSING` is treated as smaller than `NULL` if both occur in the data being sorted.
 The following example returns all `GleambookUsers` ordered by their friend numbers.
 
-#### Example
+##### Example
 
       SELECT VALUE user
       FROM GleambookUsers AS user
@@ -1085,7 +1086,7 @@ This query returns:
 The `LIMIT` clause is used to limit the result set to a specified constant size.
 The use of the `LIMIT` clause is illustrated in the next example.
 
-#### Example
+##### Example
 
       SELECT VALUE user
       FROM GleambookUsers AS user
@@ -1102,7 +1103,7 @@ This query returns:
 As in standard SQL, `WITH` clauses are available to improve the modularity of a query.
 The next query shows an example.
 
-#### Example
+##### Example
 
     WITH avgFriendCount AS ( 
       SELECT VALUE AVG(LEN(user.friendIds))
@@ -1206,63 +1207,86 @@ Morever, SQL++ offers the following additional features beyond SQL-92 (hence the
                       | DeleteStatement
                       | Query ";"
 
-In addition to queries, SQL++ supports a variety of statements for data definition and manipulation purposes as well as controlling the context to be used in evaluating SQL++ expressions. AsterixDB supports record-level ACID transactions that begin and terminate implicitly for each record inserted, deleted, or searched while a given SQL++ statement is being executed.
+In addition to queries, the AsterixDB implementation of SQL++ supports statements for data definition and
+manipulation purposes as well as controlling the context to be used in evaluating SQL++ expressions.
+This section details the DDL and DML statements supported in the SQL++ language as realized in Apache AsterixDB.
 
 > TW: AsterixDB?
 > MC: Good question here - I eradicated the preceding references except in the Intro, which needs a rewrite, but here it is really still about AsterixDB, I think?  (Since most of these statements will be hidden in the Couchbase case?)
-
-This section details the DDL and DML statements supported in the SQL++ language.
 
 ## <a id="Declarations">Declarations
 
     DatabaseDeclaration ::= "USE" Identifier
 
-The world of data in an AsterixDB cluster is organized into data namespaces called databases. To set the default database for a series of statements, the use statement is provided.
+The world of data in an AsterixDB instance is organized into data namespaces called **dataverses**.
+To set the default dataverse for a series of statements, the USE statement is provided in SQL++.
 
-As an example, the following statement sets the default database to be "TinySocial".
+As an example, the following statement sets the default dataverse to be "TinySocial".
 
-#### Example
+##### Example
 
     USE TinySocial;
 
-When writing a complex SQL++ query, it can sometimes be helpful to define one or more
-auxilliary functions that each address a sub-piece of the overall query. The declare function statement supports the creation of such helper functions.
+When writing a complex SQL++ query, it can sometimes be helpful to define one or more auxilliary functions
+that each address a sub-piece of the overall query.
+The declare function statement supports the creation of such helper functions.
+In general, the function body (expression) can be any legal SQL++ query expression.
 
     FunctionDeclaration  ::= "DECLARE" "FUNCTION" Identifier ParameterList "{" Expression "}"
     ParameterList        ::= "(" ( <VARIABLE> ( "," <VARIABLE> )* )? ")"
 
-The following is a very simple example of a temporary SQL++ function definition.
+The following is a simple example of a temporary SQL++ function definition and its use.
 
-#### Example
+##### Example
 
-    DECLARE FUNCTION add(a, b) {
-      a + b
-    };
+    DECLARE FUNCTION friendInfo(userId) {
+        (SELECT u.id, u.name, len(u.friendIds) AS friendCount
+         FROM GleambookUsers u
+         WHERE u.id = userId)[0]
+     };
+
+    SELECT VALUE friendInfo(2);
+
+For our sample data set, this returns:
+
+    [
+      { "id": 2, "name": "IsbelDull", "friendCount": 2 }
+
+    ]
 
 ## <a id="Life_cycle_management_statements">Lifecycle management statements
 
     CreateStatement ::= "CREATE" ( DatabaseSpecification
                                  | TypeSpecification
-                                 | TableSpecification
+                                 | DatasetSpecification
                                  | IndexSpecification
                                  | FunctionSpecification )
 
     QualifiedName       ::= Identifier ( "." Identifier )?
     DoubleQualifiedName ::= Identifier "." Identifier ( "." Identifier )?
 
-The create statement in SQL++ is used for creating persistent artifacts in the context of database. It can be used to create new databases, datatypes, stored collections, indexes, and user-defined SQL++ functions.
+The CREATE statement in SQL++ is used for creating dataverses as well as other persistent artifacts in a dataverse.
+It can be used to create new dataverses, datatypes, datasets, indexes, and user-defined SQL++ functions.
 
 #### Databases
 
-    DatabaseSpecification ::= "DATABASE" Identifier IfNotExists ( "WITH" "FORMAT" StringLiteral )?
+    DatabaseSpecification ::= "DATAVERSE" Identifier IfNotExists ( "WITH" "FORMAT" StringLiteral )?
 
-The create database statement is used to create new databases. To ease the authoring of reusable SQL++ scripts, its optional IfNotExists clause allows creation to be requested either unconditionally or only if the database does not already exist. If this clause is absent, an error will be returned if the specified database already exists. The `WITH FORMAT` clause is a placeholder for future functionality that can safely be ignored.
+The CREATE DATAVERSE statement is used to create new dataverses.
+To ease the authoring of reusable SQL++ scripts, an optional IF NOT EXISTS clause is included to allow
+creation to be requested either unconditionally or only if the dataverse does not already exist.
+If this clause is absent, an error is returned if a dataverse with the indicated name already exists.
+(Note: The `WITH FORMAT` clause in the syntax above is a placeholder for possible `future functionality
+that can safely be ignored here.)
 
-The following example creates a database named TinySocial.
+> MC: Should we get rid of WITH FORMAT? (I think we should - here and in the system - if we ever do it
+I would actually expect it to be more fine-grained than the dataverse level.)
 
-#### Example
+The following example creates a new dataverse named TinySocial if one does not already exist.
 
-    CREATE DATABASE TinySocial;
+##### Example
+
+    CREATE DATAVERSE TinySocial IF NOT EXISTS;
 
 #### Types
 
@@ -1279,42 +1303,61 @@ The following example creates a database named TinySocial.
     UnorderedListTypeDef ::= "{{" ( TypeExpr ) "}}"
 
 > TW: How should we refer to the data model? "Asterix Data Model" seems system specific.
+> MC: Agreed that this is an issue. Let's first decide and I can handle the issue in a later pass.
 
-The create type statement is used to create a new named ADM datatype. This type can then be used to create stored collections or utilized when defining one or more other ADM datatypes. Much more information about the Asterix Data Model (ADM) is available in the [data model reference guide](datamodel.html) to ADM. A new type can be a record type, a renaming of another type, an ordered list type, or an unordered list type. A record type can be defined as being either open or closed. Instances of a closed record type are not permitted to contain fields other than those specified in the create type statement. Instances of an open record type may carry additional fields, and open is the default for a new type (if neither option is specified).
+The CREATE TYPE statement is used to create a new named ADM datatype.
+This type can then be used to create stored collections or utilized when defining one or more other ADM datatypes.
+Much more information about the Asterix Data Model (ADM) is available in the [data model reference guide](datamodel.html) to ADM.
+A new type can be a record type, a renaming of another type, an ordered list type, or an unordered list type.
+A record type can be defined as being either open or closed.
+Instances of a closed record type are not permitted to contain fields other than those specified in the create type statement.
+Instances of an open record type may carry additional fields, and open is the default for new types if neither option is specified.
 
-The following example creates a new ADM record type called GleambookUser type. Since it is closed, its instances will contain only what is specified in the type definition. The first four fields are traditional typed name/value pairs. The friend-ids field is an unordered list of 32-bit integers. The employment field is an ordered list of instances of another named record type, EmploymentType.
+> MC: I had forgotten about options other than using CREATE TYPE to introduce new record types! (Are all of the other AS TypeExpr possibilities actually well-tested?)
 
-#### Example
+The following example creates a new ADM record type called GleambookUser type.
+Since it is defined as (defaulting to) being an open type,
+instances will be permitted to contain more than what is specified in the type definition.
+The first four fields are essentially traditional typed name/value pairs (much like SQL fields).
+The friendIds field is an unordered list of integers.
+The employment field is an ordered list of instances of another named record type, EmploymentType.
 
-    CREATE TYPE GleambookUserType AS CLOSED {
-      "id" :         int32,
-      "alias" :      string,
-      "name" :       string,
-      "user-since" : datetime,
-      "friend-ids" : {{ int32 }},
-      "employment" : [ EmploymentType ]
-    }
+##### Example
 
-The next example creates a new ADM record type called FbUserType. Note that the type of the id field is UUID. You need to use this field type if you want to have this field be an autogenerated-PK field. Refer to the Tables section later for more details.
+    CREATE TYPE GleambookUserType AS {
+      id:         int,
+      alias:      string,
+      name:       string,
+      userSince: datetime,
+      friendIds: {{ int }},
+      employment: [ EmploymentType ]
+    };
 
-#### Example
+The next example creates a new ADM record type, closed this time, called MyUserTupleType.
+Instances of this closed type will not be permitted to have extra fields,
+although the alias field is marked as optional and may thus be NULL or MISSING in legal instances of the type.
+Note that the type of the id field in the example is UUID.
+This field type can be used if you want to have this field be an autogenerated-PK field.
+(Refer to the Datasets section later for more details on such fields.)
 
-    CREATE TYPE FbUserType AS CLOSED {
-      "id" :         uuid,
-      "alias" :      string,
-      "name" :       string
-    }
+##### Example
 
-#### Tables
+    CREATE TYPE MyUserTupleType AS CLOSED {
+      id:         uuid,
+      alias:      string?,
+      name:       string
+    };
 
-    TableSpecification ::= ( <INTERNAL> )? <TABLE> QualifiedName "(" QualifiedName ")" IfNotExists 
-                           PrimaryKey ( <ON> Identifier )? ( <HINTS> Properties )? 
-                           ( "USING" "COMPACTION" "POLICY" CompactionPolicy ( Configuration )? )?
-                           ( <WITH> <FILTER> <ON> Identifier )?
-                           |
-                           <EXTERNAL> <TABLE> QualifiedName "(" QualifiedName ")" IfNotExists <USING> AdapterName
-                           Configuration ( <HINTS> Properties )?
-                           ( <USING> <COMPACTION> <POLICY> CompactionPolicy ( Configuration )? )?
+#### Datasets
+
+    DatasetSpecification ::= ( <INTERNAL> )? <DATASET> QualifiedName "(" QualifiedName ")" IfNotExists 
+                               PrimaryKey ( <ON> Identifier )? ( <HINTS> Properties )? 
+                               ( "USING" "COMPACTION" "POLICY" CompactionPolicy ( Configuration )? )?
+                               ( <WITH> <FILTER> <ON> Identifier )?
+                              |
+                               <EXTERNAL> <DATASET> QualifiedName "(" QualifiedName ")" IfNotExists <USING> AdapterName
+                               Configuration ( <HINTS> Properties )?
+                               ( <USING> <COMPACTION> <POLICY> CompactionPolicy ( Configuration )? )?
     AdapterName          ::= Identifier
     Configuration        ::= "(" ( KeyValuePair ( "," KeyValuePair )* )? ")"
     KeyValuePair         ::= "(" StringLiteral "=" StringLiteral ")"
@@ -1327,80 +1370,142 @@ The next example creates a new ADM record type called FbUserType. Note that the 
 > TW: Again, a lot of AsterixDB in the following paragraph.
 > Also, while I'm sure that this was always like this, the separation of `Configuration`
 > from `Properties` looks pretty confusing ...
+> MC: Not sure what we should do about all this, actually! (I don't disagree. New JSON syntax coming, too?)
 
-The create table statement is used to create a new table. Tables are named, unordered collections of ADM record instances; they are where data lives persistently and are the targets for queries in AsterixDB. Tables are typed, and AsterixDB will ensure that their contents conform to their type definitions. An Internal table (the default) is a table that is stored in and managed by AsterixDB. It must have a specified unique primary key that can be used to partition data across nodes of an AsterixDB cluster. The primary key is also used in secondary indexes to uniquely identify the indexed primary data records. Random primary key (UUID) values can be auto-generated by declaring the field to be UUID and putting "AUTOGENERATED" after the "PRIMARY KEY" identifier. In this case, values for the auto-generated PK field should not be provided by the user since it will be auto-generated by AsterixDB. Optionally, a filter can be created on a field to further optimize range queries with predicates on the filter's field. (Refer to [Filter-Based LSM Index Acceleration](filters.html) for more information about filters.)
+The CREATE DATASET statement is used to create a new dataset.
+Datasets are named, unordered collections of ADM record type instances;
+they are where data lives persistently and are the usual targets for SQL++ queries.
+Datasets are typed, and the system ensures that their contents conform to their type definitions.
+An Internal dataset (the default kind) is a dataset whose content lives within and is managed by the system.
+It is required to have a specified unique primary key field which uniquely identifies the contained records.
+(The primary key is also used in secondary indexes to identify the indexed primary data records.)
+
+Internal datasets contain several advanced options that can be specified when appropriate.
+One such option is that random primary key (UUID) values can be auto-generated by declaring the field to be UUID and putting "AUTOGENERATED" after the "PRIMARY KEY" identifier.
+In this case, unlike other non-optional fields, a value for the auto-generated PK field should not be provided at insertion time by the user since each record's primary key field value will be auto-generated by the system.
 
 > TW: "The Filter-Based LSM Index Acceleration" seems to be quite system specific ...
+> MC: Indeed, but that is always inescapable in DDL reference manuals, no? (We have to decide what to say where. :-))
 
-An External stored collection is stored outside of AsterixDB (currently tables in HDFS or on the local filesystem(s) of the cluster's nodes are supported). External table support allows SQL++ queries to treat external data as though it were stored in AsterixDB, making it possible to query "legacy" file data (e.g., Hive data) without having to physically import it into AsterixDB. For an external table, an appropriate adapter must be selected to handle the nature of the desired external data. (See the [guide to external data](externaldata.html) for more information on the available adapters.)
+Another advanced option, when creating an Internal dataset, is to specify the merge policy to control which of the
+underlying LSM storage components to be merged.
+(AsterixDB supports Log-Structured Merge tree based physical storage for Internal datasets.)
+Apache AsterixDB currently supports four different component merging policies that can be chosen per dataset:
+no-merge, constant, prefix, and correlated-prefix.
+The no-merge policy simply never merges disk components.
+The constant policy merges disk components when the number of components reaches a constant number k that can be configured by the user.
+The prefix policy relies on both component sizes and the number of components to decide which components to merge.
+It works by first trying to identify the smallest ordered (oldest to newest) sequence of components such that the sequence does not contain a single component that exceeds some threshold size M and that either the sum of the component's sizes exceeds M or the number of components in the sequence exceeds another threshold C.
+If such a sequence exists, the components in the sequence are merged together to form a single component.
+Finally, the correlated-prefix policy is similar to the prefix policy, but it delegates the decision of merging the disk components of all the indexes in a dataset to the primary index.
+When the correlated-prefix policy decides that the primary index needs to be merged (using the same decision criteria as for the prefix policy), then it will issue successive merge requests on behalf of all other indexes associated with the same dataset.
+The default policy for AsterixDB is the prefix policy except when there is a filter on a dataset, where the preferred policy for filters is the correlated-prefix.
 
-When creating a stored collection, it is possible to choose a merge policy that controls which of the underlaying LSM storage components to be merged.  Currently, AsterixDB provides four different merge policies that can be configured per table: no-merge, constant, prefix, and correlated-prefix. The no-merge policy simply never merges disk components. While the constant policy merges disk components when the number of components reaches some constant number k, which can be configured by the user. The prefix policy relies on component sizes and the number of components to decide which components to merge. Specifically, it works by first trying to identify the smallest ordered (oldest to newest) sequence of components such that the sequence does not contain a single component that exceeds some threshold size M and that either the sum of the component's sizes exceeds M or the number of components in the sequence exceeds another threshold C. If such a sequence of components exists, then each of the components in the sequence are merged together to form a single component. Finally, the correlated-prefix is similar to the prefix policy but it delegates the decision of merging the disk components of all the indexes in a table to the primary index. When the policy decides that the primary index needs to be merged (using the same decision criteria as for the prefix policy), then it will issue successive merge requests on behalf of all other indexes associated with the same table. The default policy for AsterixDB is the prefix policy except when there is a filter on a table, where the preferred policy for filters is the correlated-prefix.
+Another advanced option shown in the syntax above, related to performance and mentioned above, is that a **filter** can optionally be created on a field to further optimize range queries with predicates on the filter's field.
+Filters allow some range queries to avoid searching all LSM components when the query conditions match the filter.
+(Refer to [Filter-Based LSM Index Acceleration](filters.html) for more information about filters.)
 
-The following example creates an internal table for storing FacefookUserType records.
+An External dataset, in contrast to an Internal dataset, has data stored outside of the system's control.
+Files living in HDFS or in the local filesystem(s) of a cluster's nodes are currently supported in AsterixDB.
+External dataset support allows SQL++ queries to treat foreign data as though it were stored in the system,
+making it possible to query "legacy" file data (e.g., Hive data) without having to physically import it.
+When defining an External dataset, an appropriate adapter type must be selected for the desired external data.
+(See the [Guide to External Data](externaldata.html) for more information on the available adapters.)
+
+The following example creates an Internal dataset for storing FacefookUserType records.
 It specifies that their id field is their primary key.
 
-#### Example
-    CREATE INTERNAL TABLE GleambookUsers(GleambookUserType) PRIMARY KEY id;
+##### Example
 
-The following example creates an internal table for storing FbUserType records. It specifies that their id field is their primary key. It also specifies that the id field is an auto-generated field, meaning that a randomly generated UUID value will be assigned to each record by the system. (A user should therefore not proivde a value for this field.) Note that the id field should be UUID.
+    CREATE INTERNAL DATASET GleambookUsers(GleambookUserType) PRIMARY KEY id;
 
-#### Example
+The next example creates another Internal dataset (the default kind when no dataset kind is specified) for storing MyUserTupleType records.
+It specifies that the id field should be used as the primary key for the dataset.
+It also specifies that the id field is an auto-generated field,
+meaning that a randomly generated UUID value should be assigned to each incoming record by the system.
+(A user should therefore not attempt to provide a value for this field.)
+Note that the id field's declared type must be UUID in this case.
 
-    CREATE INTERNAL TABLE FbMsgs(FbUserType) PRIMARY KEY id AUTOGENERATED;
+##### Example
 
-The next example creates an external table for storing LineitemType records. The choice of the `hdfs` adapter means that its data will reside in HDFS. The create statement provides parameters used by the hdfs adapter: the URL and path needed to locate the data in HDFS and a description of the data format.
+    CREATE DATASET MyUsers(MyUserTupleType) PRIMARY KEY id AUTOGENERATED;
 
-#### Example
+The next example creates an External dataset for querying LineItemType records.
+The choice of the `hdfs` adapter means that this dataset's data actually resides in HDFS.
+The example CREATE statement also provides parameters used by the hdfs adapter:
+the URL and path needed to locate the data in HDFS and a description of the data format.
 
-    CREATE EXTERNAL TABLE Lineitem('LineitemType) USING hdfs (
+##### Example
+
+    CREATE EXTERNAL DATASET LineItem(LineItemType) USING hdfs (
       ("hdfs"="hdfs://HOST:PORT"),
       ("path"="HDFS_PATH"),
       ("input-format"="text-input-format"),
       ("format"="delimited-text"),
       ("delimiter"="|"));
 
+
+
 #### Indices
 
     IndexSpecification ::= <INDEX> Identifier IfNotExists <ON> QualifiedName
-                           "(" ( IndexField ) ( "," IndexField )* ")" ( "type" IndexType )?
+                           "(" ( IndexField ) ( "," IndexField )* ")" ( "type" IndexType "?")?
                            ( <ENFORCED> )?
     IndexType          ::= <BTREE> | <RTREE> | <KEYWORD> | <NGRAM> "(" IntegerLiteral ")"
 
-The create index statement creates a secondary index on one or more fields of a specified table. Supported index types include `BTREE` for totally ordered datatypes, `RTREE` for spatial data, and `KEYWORD` and `NGRAM` for textual (string) data. An index can be created on a nested field (or fields) by providing a valid path expression as an index field identifier.
+The CREATE INDEX statement creates a secondary index on one or more fields of a specified dataset.
+Supported index types include `BTREE` for totally ordered datatypes, `RTREE` for spatial data,
+and `KEYWORD` and `NGRAM` for textual (string) data.
+An index can be created on a nested field (or fields) by providing a valid path expression as an index field identifier.
 
-An index field is not required to be part of the datatype associated with a table if that datatype is declared as open and the field's type is provided along with its type and the `ENFORCED` keyword is specified in the end of index definition. `ENFORCING` an open field will introduce a check that will make sure that the actual type of an indexed field (if the field exists in the record) always matches this specified (open) field type.
+An indexed field is not required to be part of the datatype associated with a dataset if the dataset's datatype
+is declared as open **and** if the field's type is provided along with its name and if the `ENFORCED` keyword is
+specified at the end of the index definition.
+`ENFORCING` an open field introduces a check that makes sure that the actual type of the indexed field
+(if the optional field exists in the record) always matches this specified (open) field type.
 
-The following example creates a btree index called gbAuthorIdx on the author-id field of the GleambookMessages table. This index can be useful for accelerating exact-match queries, range search queries, and joins involving the author-id field.
+*Editor's note: The ? shown above after the type is intended to be mandatory, and we need to make that happen.*
 
-#### Example
+The following example creates a btree index called gbAuthorIdx on the authorId field of the GleambookMessages dataset.
+This index can be useful for accelerating exact-match queries, range search queries, and joins involving the author-id
+field.
 
-    CREATE INDEX gbAuthorIdx ON GleambookMessages(author-id) TYPE BTREE;
+##### Example
 
-The following example creates an open btree index called gbSendTimeIdx on the open send-time field of the GleambookMessages table having datetime type. This index can be useful for accelerating exact-match queries, range search queries, and joins involving the send-time field.
+    CREATE INDEX gbAuthorIdx ON GleambookMessages(authorId) TYPE BTREE;
 
-#### Example
+The following example creates an open btree index called gbSendTimeIdx on the (non-predeclared) sendTime field of the GleambookMessages dataset having datetime type.
+This index can be useful for accelerating exact-match queries, range search queries, and joins involving the sendTime field.
 
-    CREATE INDEX gbSendTimeIdx ON GleambookMessages(send-time:datetime) TYPE BTREE ENFORCED;
+##### Example
 
-The following example creates a btree index called twUserScrNameIdx on the screen-name field, which is a nested field of the user field in the ChirpMessages table. This index can be useful for accelerating exact-match queries, range search queries, and joins involving the screen-name field.
+    CREATE INDEX gbSendTimeIdx ON GleambookMessages(sendTime: datetime?) TYPE BTREE ENFORCED;
 
-#### Example
+> MC: The above works in my branch (with ? mandatory) but not in the main branch. We need to change that. :-)
 
-    CREATE INDEX twUserScrNameIdx ON ChirpMessages(user.screen-name) TYPE BTREE;
+The following example creates a btree index called crpUserScrNameIdx on screenName,
+a nested field residing within a record-valued user field in the ChirpMessages dataset.
+This index can be useful for accelerating exact-match queries, range search queries,
+and joins involving the nested screenName field.
+Such nested fields must be singular, i.e., one cannot index through (or on) a list-valued field.
 
-The following example creates an rtree index called gbSenderLocIdx on the sender-location field of the GleambookMessages table. This index can be useful for accelerating queries that use the [`spatial-intersect` function](functions.html#spatial-intersect) in a predicate involving the sender-location field.
+##### Example
 
-#### Example
+    CREATE INDEX crpUserScrNameIdx ON ChirpMessages(user.screenName) TYPE BTREE;
+
+The following example creates an rtree index called gbSenderLocIdx on the sender-location field of the GleambookMessages dataset. This index can be useful for accelerating queries that use the [`spatial-intersect` function](functions.html#spatial-intersect) in a predicate involving the sender-location field.
+
+##### Example
 
     CREATE INDEX gbSenderLocIndex ON GleambookMessages("sender-location") TYPE RTREE;
 
-The following example creates a 3-gram index called fbUserIdx on the name field of the GleambookUsers table. This index can be used to accelerate some similarity or substring maching queries on the name field. For details refer to the [document on similarity queries](similarity.html#NGram_Index).
+The following example creates a 3-gram index called fbUserIdx on the name field of the GleambookUsers dataset. This index can be used to accelerate some similarity or substring maching queries on the name field. For details refer to the document on [similarity queries](similarity.html#NGram_Index).
 
-#### Example
+##### Example
 
     CREATE INDEX fbUserIdx ON GleambookUsers(name) TYPE NGRAM(3);
 
-The following example creates a keyword index called fbMessageIdx on the message field of the GleambookMessages table. This keyword index can be used to optimize queries with token-based similarity predicates on the message field. For details refer to the [document on similarity queries](similarity.html#Keyword_Index).
+The following example creates a keyword index called fbMessageIdx on the message field of the GleambookMessages dataset. This keyword index can be used to optimize queries with token-based similarity predicates on the message field. For details refer to the document on [similarity queries](similarity.html#Keyword_Index).
 
 ##### Example
 
@@ -1408,92 +1513,136 @@ The following example creates a keyword index called fbMessageIdx on the message
 
 #### Functions
 
-The create function statement creates a named function that can then be used and reused in SQL++ queries. The body of a function can be any SQL++ expression involving the function's parameters.
+The create function statement creates a **named** function that can then be used and reused in SQL++ queries.
+The body of a function can be any SQL++ expression involving the function's parameters.
 
     FunctionSpecification ::= "FUNCTION" FunctionOrTypeName IfNotExists ParameterList "{" Expression "}"
 
-The following is a very simple example of a create function statement. It differs from the declare function example shown previously in that it results in a function that is persistently registered by name in the specified database.
+The following is an example of a CREATE FUNCTION statement which is similar to our earlier DECLARE FUNCTION example.
+It differs from that example in that it results in a function that is persistently registered by name in the specified dataverse (the current dataverse being used, if not otherwise specified).
 
 ##### Example
 
-    CREATE FUNCTION add(a, b) {
-      a + b
-    };
+    CREATE FUNCTION friendInfo(userId) {
+        (SELECT u.id, u.name, len(u.friendIds) AS friendCount
+         FROM GleambookUsers u
+         WHERE u.id = userId)[0]
+     };
 
 #### Removal
 
-    DropStatement       ::= "DROP" ( "DATABASE" Identifier IfExists
+    DropStatement       ::= "DROP" ( "DATAVERSE" Identifier IfExists
                                    | "TYPE" FunctionOrTypeName IfExists
-                                   | "TABLE" QualifiedName IfExists
+                                   | "DATASET" QualifiedName IfExists
                                    | "INDEX" DoubleQualifiedName IfExists
                                    | "FUNCTION" FunctionSignature IfExists )
     IfExists            ::= ( "IF" "EXISTS" )?
 
-The drop statement in SQL++ is the inverse of the create statement. It can be used to drop databases, datatypes, tables, indexes, and functions.
+The DROP statement in SQL++ is the inverse of the CREATE statement. It can be used to drop dataverses, datatypes, datasets, indexes, and functions.
 
-The following examples illustrate uses of the drop statement.
+The following examples illustrate some uses of the DROP statement.
 
 ##### Example
 
-    DROP TABLE GleambookUsers IF EXISTS;
+    DROP DATASET GleambookUsers IF EXISTS;
 
-    DROP INDEX gbSenderLocIndex;
+    DROP INDEX GleambookMessages.gbSenderLocIndex;
 
-    DROP TYPE GleambookUserType;
+    DROP TYPE TinySocial2.GleambookUserType;
 
-    DROP DATABASE TinySocial;
+    DROP FUNCTION friendInfo@1;
 
-    DROP FUNCTION add;
+    DROP DATAVERSE TinySocial;
+
+When an artifact is dropped, it will be droppped from the current dataverse if none is specified
+(see the DROP DATASET example above) or from the specified dataverse (see the DROP TYPE example above)
+if one is specified by fully qualifying the artifact name in the DROP statement.
+When specifying an index to drop, the index name must be qualified by the dataset that it indexes.
+When specifying a function to drop, since SQL++ allows functions to be overloaded by their number of arguments,
+the identifying name of the function to be dropped must explicitly include that information.
+(`friendInfo@1` above denotes the 1-argument function named friendInfo in the current dataverse.)
 
 ### Import/Export Statements
 
-    LoadStatement  ::= <LOAD> <TABLE> QualifiedName <USING> AdapterName Configuration ( <PRE-SORTED> )?
+    LoadStatement  ::= <LOAD> <DATASET> QualifiedName <USING> AdapterName Configuration ( <PRE-SORTED> )?
 
-The load statement is used to initially populate a table via bulk loading of data from an external file. An appropriate adapter must be selected to handle the nature of the desired external data. The load statement accepts the same adapters and the same parameters as external tables. (See the [guide to external data](externaldata.html) for more information on the available adapters.) If a table has an auto-generated primary key field, a file to be imported should not include that field in it.
+The LOAD statement is used to initially populate a dataset via bulk loading of data from an external file.
+An appropriate adapter must be selected to handle the nature of the desired external data.
+The LOAD statement accepts the same adapters and the same parameters as discussed earlier for External datasets.
+(See the [guide to external data](externaldata.html) for more information on the available adapters.)
+If a dataset has an auto-generated primary key field, the file to be imported should not include that field in it.
 
-The following example shows how to bulk load the GleambookUsers table from an external file containing data that has been prepared in ADM format.
+The following example shows how to bulk load the GleambookUsers dataset from an external file containing data that has been prepared in ADM format.
 
 ##### Example
 
-    LOAD TABLE GleambookUsers USING localfs
-    (("path"="localhost:///Users/zuck/AsterixDB/load/fbu.adm"),("format"="adm"));
+     LOAD DATASET GleambookUsers USING localfs
+        (("path"="127.0.0.1:///Users/bignosqlfan/tinysocialnew/gbu.adm"),("format"="adm"));
 
 ## <a id="Modification_statements">Modification statements
 
-### <a id="Inserts">Inserts
+### <a id="Inserts">INSERTs
 
-    InsertStatement ::= <INSERT> <INTO> <TABLE> QualifiedName Query
+    InsertStatement ::= <INSERT> <INTO> QualifiedName Query
 
 > TW: AsterixDB-specifc transactions semantics ...
 > Also, do we also support `UPSERT`?
+> MC: Yes to both. :-) Whoops. Wait, maybe not. We do have upsert in AQL, but not in SQL++ today, it seems. I'll document it anyway...? :-)
 
-The SQL++ insert statement is used to insert data into a table. The data to be inserted comes from a SQL++ query expression. The expression can be as simple as a constant expression, or in general it can be any legal SQL++ query. Inserts in AsterixDB are processed transactionally, with the scope of each insert transaction being the insertion of a single object plus its affiliated secondary index entries (if any). If the query part of an insert returns a single object, then the insert statement itself will be a single, atomic transaction. If the query part returns multiple objects, then each object inserted will be handled independently as a tranaction. If a table has an auto-generated primary key field, an insert statement should not include a value for that field in it. (The system will automatically extend the provided record with this additional field and a corresponding value.)
+The SQL++ INSERT statement is used to insert new data into a dataset.
+The data to be inserted comes from a SQL++ query expression.
+This expression can be as simple as a constant expression, or in general it can be any legal SQL++ query.
+If the target dataset has an auto-generated primary key field, the insert statement should not include a
+value for that field in it.
+(The system will automatically extend the provided record with this additional field and a corresponding value.)
+Insertion will fail if the dataset already has data with the primary key value(s) being inserted.
 
+In AsterixDB, inserts are processed transactionally.
+The transactional scope of each insert transaction is the insertion of a single object plus its affiliated secondary index entries (if any).
+If the query part of an insert returns a single object, then the INSERT statement will be a single, atomic transaction.
+If the query part returns multiple objects, each object being inserted will be treated as a separate tranaction.
 The following example illustrates a query-based insertion.
 
-#### Example
+##### Example
 
-    INSERT INTO TABLE UsersCopy (FROM GleambookUsers user SELECT VALUE user)
+    INSERT INTO UsersCopy (SELECT VALUE user FROM GleambookUsers user)
 
-### <a id="Deletes">Deletes
+### <a id="Upserts">UPSERTs
 
-    DeleteStatement ::= <DELETE> <FROM> <TABLE> QualifiedName ( (<AS>)? Variable )? ( <WHERE> Expression )?
+    UpsertStatement ::= <UPSERT> <INTO> QualifiedName Query
 
-The SQL++ delete statement is used to delete data from a target table. The data to be deleted is identified by a boolean expression involving the variable bound to the target table in the delete statement. Deletes in AsterixDB are processed transactionally, with the scope of each delete transaction being the deletion of a single object plus its affiliated secondary index entries (if any). If the boolean expression for a delete identifies a single object, then the delete statement itself will be a single, atomic transaction. If the expression identifies multiple objects, then each object deleted will be handled independently as a transaction.
+The SQL++ UPSERT statement syntactically mirrors the INSERT statement discussed above.
+The difference lies in its semantics, which for UPSERT are "add or replace" instead of the INSERT "add if not present, else error" semantics.
+Whereas an INSERT can fail if another object already exists with the specified key, the analogous UPSERT will replace the previous object's value with that of the new object in such cases.
 
-The following example illustrates a single-object deletion.
+The following example illustrates a query-based upsert operation.
 
-#### Example
+##### Example
 
-    DELETE FROM TABLE GleambookUsers user WHERE user.id = 8;
+    UPSERT INTO UsersCopy (SELECT VALUE user FROM GleambookUsers user)
 
-> TW: I think that we now also support this without the `user` variable, right?
-> If so, that'd be a good example to have.
+*Editor's note: Upserts currently work in AQL but are apparently disabled at the moment in SQL++.
+(@Yingyi, is that indeed the case?)*
 
-We close this guide to SQL++ with one final example of a query expression.
+### <a id="Deletes">DELETEs
 
-#### Example
+    DeleteStatement ::= <DELETE> <FROM> QualifiedName ( (<AS>)? Variable )? ( <WHERE> Expression )?
 
-    FROM [ "great", "brilliant", "awesome" ] AS praise
-    SELECT VALUE `string-concat`(["AsterixDB is ", praise]);
-    
+The SQL++ DELETE statement is used to delete data from a target dataset.
+The data to be deleted is identified by a boolean expression involving the variable bound to the target dataset in the DELETE statement.
+
+Deletes in AsterixDB are processed transactionally.
+The transactional scope of each delete transaction is the deletion of a single object plus its affiliated secondary index entries (if any).
+If the boolean expression for a delete identifies a single object, then the DELETE statement itself will be a single, atomic transaction.
+If the expression identifies multiple objects, then each object deleted will be handled as a separate transaction.
+
+The following examples illustrate single-object deletions.
+
+##### Example
+
+    DELETE FROM GleambookUsers user WHERE user.id = 8;
+
+##### Example
+
+    DELETE FROM GleambookUsers WHERE id = 5;
+
