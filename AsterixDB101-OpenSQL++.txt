@@ -1,0 +1,286 @@
+
+//————————————————————————————————————————————————————
+
+// NOTE: Need to revise with finalized SQL++ function names!
+
+DROP DATAVERSE TinySocial IF EXISTS;
+CREATE DATAVERSE TinySocial;
+USE TinySocial;
+
+CREATE TYPE ChirpUserType AS {
+    screenName: string
+//  lang: string,
+//  friendsCount: int,
+//  statusesCount: int,
+//  name: string,
+//  followersCount: int
+};
+
+CREATE TYPE ChirpMessageType AS {
+    chirpId: string
+//  user: ChirpUserType,
+//  senderLocation: point?,
+//  sendTime: datetime,
+//  referredTopics: {{ string }},
+//  messageText: string
+};
+
+CREATE TYPE EmploymentType AS {
+    organizationName: string,
+    startDate: date,
+    endDate: date?
+};
+
+CREATE TYPE GleambookUserType AS {
+    id: int
+//  alias: string,
+//  name: string,
+//  userSince: datetime,
+//  friendIds: {{ int }},
+//  employment: [EmploymentType]
+};
+
+CREATE TYPE GleambookMessageType AS {
+    messageId: int
+//  authorId: int,
+//  inResponseTo: int?,
+//  senderLocation: point?,
+//  message: string
+};
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+CREATE DATASET GleambookUsers(GleambookUserType)
+PRIMARY KEY id;
+
+CREATE DATASET GleambookMessages(GleambookMessageType)
+PRIMARY KEY messageId;
+
+CREATE DATASET ChirpUsers(ChirpUserType)
+PRIMARY KEY screenName;
+
+CREATE DATASET ChirpMessages(ChirpMessageType)
+PRIMARY KEY chirpId
+hints(cardinality=100);
+
+CREATE INDEX gbUserSinceIdx on GleambookUsers(userSince: datetime?) ENFORCED;
+CREATE INDEX gbAuthorIdx on GleambookMessages(authorId: int?) TYPE btree ENFORCED;
+CREATE INDEX gbSenderLocIndex on GleambookMessages(senderLocation: point?) TYPE rtree ENFORCED;
+CREATE INDEX gbMessageIdx on GleambookMessages(message: string?) TYPE keyword ENFORCED;
+
+SELECT VALUE ds FROM `Metadata.Dataset` ds;
+SELECT VALUE ix FROM `Metadata.Index` ix;
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+LOAD DATASET GleambookUsers USING localfs
+(("path"="127.0.0.1:///Users/mikejcarey/tinysocialnew/gbu.adm"),("format"="adm"));
+
+LOAD DATASET GleambookMessages USING localfs
+(("path"="127.0.0.1:///Users/mikejcarey/tinysocialnew/gbm.adm"),("format"="adm"));
+
+LOAD DATASET ChirpUsers USING localfs
+(("path"="127.0.0.1:///Users/mikejcarey/tinysocialnew/chu.adm"),("format"="adm"));
+
+LOAD DATASET ChirpMessages USING localfs
+(("path"="127.0.0.1:///Users/mikejcarey/tinysocialnew/chm.adm"),("format"="adm"));
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SELECT VALUE user
+FROM GleambookUsers user
+WHERE user.id = 8;
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SELECT VALUE user
+FROM GleambookUsers user
+WHERE user.id >= 2 AND user.id <= 4;
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SELECT VALUE user
+FROM GleambookUsers user
+WHERE user.userSince >= datetime('2010-07-22T00:00:00')
+  AND user.userSince <= datetime('2012-07-29T23:59:59');
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SELECT user.name AS uname, msg.message AS message
+FROM GleambookUsers user, GleambookMessages msg
+WHERE msg.authorId = user.id;
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SELECT *
+FROM GleambookUsers user, GleambookMessages msg
+WHERE msg.authorId = user.id;
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SELECT user.name AS uname, msg.message AS message
+FROM GleambookUsers user, GleambookMessages msg
+WHERE msg.authorId /*+ indexnl */ = user.id;
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SELECT user.name AS uname,
+       (SELECT VALUE msg.message
+        FROM GleambookMessages msg
+        WHERE msg.authorId = user.id) AS messages
+FROM GleambookUsers user;
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SELECT cm1.messageText AS message,
+       (SELECT VALUE cm2.messageText
+	FROM ChirpMessages cm2
+	WHERE `spatial-distance`(cm1.senderLocation, cm2.senderLocation) <= 1
+          AND cm2.chirpId < cm1.chirpId) AS nearbyMessages
+FROM ChirpMessages cm1;
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SET simfunction "edit-distance";
+SET simthreshold "3";
+
+SELECT gbu.id AS id, gbu.name AS name,
+       (SELECT cm.user.screenName AS chirpScreenname,
+        cm.user.name AS chirpName
+        FROM ChirpMessages cm
+        WHERE cm.user.name ~= gbu.name) AS similarUsers
+FROM GleambookUsers gbu;
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SELECT VALUE gbu
+FROM GleambookUsers gbu
+WHERE (SOME e IN gbu.employment SATISFIES e.endDate IS UNKNOWN);
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SELECT VALUE gbu
+FROM GleambookUsers gbu
+WHERE (EVERY e IN gbu.employment SATISFIES e.endDate IS NOT UNKNOWN);
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SELECT VALUE count(gbu)
+FROM GleambookUsers gbu;
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SELECT uid AS user, count(cm) AS count
+FROM ChirpMessages cm
+GROUP BY cm.user.screenName AS uid;
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SELECT uid AS user, count(cm) AS count
+FROM ChirpMessages cm
+ /*+ hash*/
+GROUP BY cm.user.screenName AS uid;
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+SELECT uid AS user, c AS count
+FROM ChirpMessages cm
+GROUP BY cm.user.screenName AS uid
+WITH c AS count(cm)
+ORDER BY c DESC
+LIMIT 3;
+
+//————————————————————————————————————————————————————
+   
+USE TinySocial;
+   
+SET simfunction "jaccard";
+SET simthreshold "0.3";
+   
+SELECT cm1 AS chirp,
+       (SELECT VALUE cm2.chirpId
+        FROM ChirpMessages cm2
+        WHERE cm2.referredTopics ~= cm1.referredTopics
+          AND cm2.chirpId > cm1.chirpId) AS similarChirps
+FROM ChirpMessages cm1;
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+INSERT INTO ChirpMessages
+(
+   {"chirpId": "13",
+    "user":
+        {"screenName": "NathanGiesen@211",
+         "lang": "en",
+         "friendsCount": 39345,
+         "statusesCount": 479,
+         "name": "Nathan Giesen",
+         "followersCount": 49420
+        },
+    "senderLocation": point("47.44,80.65"),
+    "sendTime": datetime("2008-04-26T10:10:35"),
+    "referredTopics": {{"chirping"}},
+    "messageText": "chirpy chirp, my fellow chirpers!"
+   }
+);
+
+SELECT VALUE cm FROM ChirpMessages cm;
+
+//————————————————————————————————————————————————————
+
+USE TinySocial;
+
+DELETE FROM ChirpMessages cm WHERE cm.chirpId = "13";
+
+SELECT VALUE cm FROM ChirpMessages cm;
+
+//————————————————————————————————————————————————————
+//
+// *** Post-101 data reduction for SQL++ reference manual ***
+//
+
+USE TinySocial;
+
+DELETE FROM GleambookUsers gu WHERE gu.id  > 3;
+DELETE FROM GleambookMessages gm WHERE gm.authorId > 2;
+
+SELECT * FROM GleambookUsers gu ORDER BY gu.id;
+SELECT * FROM GleambookMessages gm ORDER BY gm.messageId;
+
+//————————————————————————————————————————————————————
