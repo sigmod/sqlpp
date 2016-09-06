@@ -294,8 +294,8 @@ The following table summarizes how the missing value comparison operators work.
 
 | Operator | Non-NULL/Non-MISSING value | NULL | MISSING |
 |----------|----------------|------|---------|
-| IS NULL  | FALSE | TRUE | FALSE |
-| IS NOT NULL | TRUE | FALSE | TRUE |
+| IS NULL  | FALSE | TRUE | MISSING |
+| IS NOT NULL | TRUE | FALSE | MISSING |
 | IS MISSING  | FALSE | FALSE | TRUE |
 | IS NOT MISSING | TRUE | TRUE | FALSE |
 | IS UNKNOWN | FALSE | TRUE | TRUE |
