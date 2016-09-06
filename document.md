@@ -52,6 +52,7 @@
   * [LIMIT clauses](#Limit_clauses)
   * [WITH clauses](#With_clauses)
   * [LET clauses](#Let_clauses)
+  * [UNION ALL](#Union_all)
   * [MISSING in query results](#Missing_in_query_results)
   * [SQL++ Vs. SQL-92](#Vs_SQL-92)
 * [4. DDL and DML statements](#DDL_and_DML_statements)
@@ -1177,6 +1178,26 @@ This query is equivalent to the following query that does not use the `LET` clau
                    WHERE m.authorId = u.id
     );
 
+## <a id="Union_all">UNION ALL
+UNION ALL can be used to combine two input streams. Similar to SQL, there is no ordering guarantee on the output stream. However, different from SQL, SQL++ does not inspect what the data looks like on each input stream and allows heterogenity on the output stream and does not enforce schema change on any input streams. The following query is an example:
+
+    SELECT u.name AS uname
+    FROM GleambookUsers u
+    WHERE u.id = 2
+    UNION ALL
+    SELECT VALUE m.message 
+    FROM GleambookMessages m
+    WHERE authorId=2;
+
+This query returns:
+
+    [
+      " like t-mobile its platform is mind-blowing"
+      " like samsung the plan is amazing"
+      { "uname": "IsbelDull" }
+    ]
+
+##### Example
 
 ## <a id="Subqueries">Subqueries
 In SQL++, an arbitrary subquery can appear anywhere that an expression can appear.
