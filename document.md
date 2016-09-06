@@ -1158,7 +1158,14 @@ Similar to `WITH` clauses, `Let` clauses can be useful when a (complex) expressi
                    WHERE m.authorId = u.id )
     WHERE EXISTS messages;
 
-The query lists `GleambookUsers` that have posted `GleambookMessages` and shows all authored messages for each listed user. The query is equivalent to the following query that does not use the `LET` clause:
+This query lists `GleambookUsers` that have posted `GleambookMessages` and shows all authored messages for each listed user. It returns:
+
+    [
+      { "messages": [ { "messageId": 8, "authorId": 1, "inResponseTo": 11, "senderLocation": point("40.33,80.87"), "message": " like verizon the 3G is awesome:)" }, { "messageId": 10, "authorId": 1, "inResponseTo": 12, "senderLocation": point("42.5,70.01"), "message": " can't stand motorola the touch-screen is terrible" }, { "messageId": 11, "authorId": 1, "inResponseTo": 1, "senderLocation": point("38.97,77.49"), "message": " can't stand at&t its plan is terrible" }, { "messageId": 2, "authorId": 1, "inResponseTo": 4, "senderLocation": point("41.66,80.87"), "message": " dislike iphone its touch-screen is horrible" }, { "messageId": 4, "authorId": 1, "inResponseTo": 2, "senderLocation": point("37.73,97.04"), "message": " can't stand at&t the network is horrible:(" } ], "uname": "MargaritaStoddard" }
+      { "messages": [ { "messageId": 6, "authorId": 2, "inResponseTo": 1, "senderLocation": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" }, { "messageId": 3, "authorId": 2, "inResponseTo": 4, "senderLocation": point("48.09,81.01"), "message": " like samsung the plan is amazing" } ], "uname": "IsbelDull" }
+    ]
+
+This query is equivalent to the following query that does not use the `LET` clause:
 
     SELECT u.name AS uname, ( SELECT VALUE m
                               FROM GleambookMessages m
