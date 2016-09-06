@@ -1148,7 +1148,7 @@ a list-valued query expression's result; this is needed above, even though the r
 element, to "de-listify" the list and obtain the desired scalar for the comparison.
 
 ## <a id="Let_clauses">LET clauses
-Similar to `WITH` clauses, `Let` clauses can be useful when a (complex) expression is used several times in a query. The next query shows an example.
+Similar to `WITH` clauses, `LET` clauses can be useful when a (complex) expression is used several times in a query, such that the query can be more concise. The next query shows an example.
 
 ##### Example
 
