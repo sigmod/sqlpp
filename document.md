@@ -1146,8 +1146,30 @@ not desirable. Thus, in the queries above, the use of "[0]" extracts the first (
 a list-valued query expression's result; this is needed above, even though the result is a list of one
 element, to "de-listify" the list and obtain the desired scalar for the comparison.
 
-## <a id="Let clauses">Let clauses
-Similar to WITH clauses, Let clauses
+## <a id="Let_clauses">LET clauses
+Similar to `WITH` clauses, `Let` clauses can be useful when a (complex) expression is used several times in a query. The next query shows an example.
+
+##### Example
+
+    SELECT u.name AS uname, messages AS messages
+    FROM GleambookUsers u
+    LET messages = ( SELECT VALUE m
+                   FROM GleambookMessages m
+                   WHERE m.authorId = u.id )
+    WHERE EXISTS messages;
+
+The query lists `GleambookUsers` that have posted `GleambookMessages` and shows all authored messages for each listed user. The query is equivalent to the following query that does not use the `LET` clause:
+
+    SELECT u.name AS uname, ( SELECT VALUE m
+                              FROM GleambookMessages m
+                              WHERE m.authorId = u.id
+                            ) AS messages
+    FROM GleambookUsers u
+    WHERE EXISTS ( SELECT VALUE m
+                   FROM GleambookMessages m
+                   WHERE m.authorId = u.id
+    );
+
 
 ## <a id="Subqueries">Subqueries
 In SQL++, an arbitrary subquery can appear anywhere that an expression can appear.
@@ -1197,8 +1219,6 @@ Morever, SQL++ offers the following additional features beyond SQL-92 (hence the
   * Correlated FROM terms: A right-side FROM term expression can refer to variables defined by FROM terms on its left.
   * Powerful GROUP BY: In addition to a set of aggregate functions as in standard SQL, the groups created by the `GROUP BY` clause are directly usable in nested queries and/or to obtain nested results.
   * Generalized SELECT clause: A SELECT clause can return any type of collection, while in SQL-92, a `SELECT` clause has to return a (homogeneous) collection of records.
-
-> MC: Made it to the end of querying, finally!
 
 # <a id="DDL_and_DML_statements">4. DDL and DML statements</a>
 
