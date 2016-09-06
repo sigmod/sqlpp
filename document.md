@@ -230,16 +230,16 @@ The following table summarizes the precedence order (from higher to lower) of th
 | ^                                                                           |  exponentiation  |
 | *, /                                                                        |  multiplication, division |
 | +, -                                                                        |  addition, subtraction  |
+| ||                                                                          |  string concatenation |
 | IS NULL, IS NOT NULL, IS MISSING, IS NOT MISSING, <br>IS UNKNOWN, IS NOT UNKNOWN| unknown value comparison |
+| BETWEEN, NOT BETWEEN                                                        | range comparison |
 | =, !=, <, >, <=, >=, LIKE, NOT LIKE, IN, NOT IN                             | comparison  |
 | NOT                                                                         | logical negation |
 | AND                                                                         | conjunction |
 | OR                                                                          | disjunction |
 
-> MC: I messed with the table above, which was way (way) off, so someone (Yingyi :-)) should check my work!
-
 ### <a id="Arithmetic_operators">Arithmetic operators
-Arithemtic operators are used to exponentiate, negate, add, subtract, multiply, and divide numeric values.
+Arithemtic operators are used to exponentiate, add, subtract, multiply, and divide numeric values, or concatenate string values.
  
 | Operator |  Purpose                                                                       | Example    |
 |----------|--------------------------------------------------------------------------------|------------|
@@ -247,6 +247,7 @@ Arithemtic operators are used to exponentiate, negate, add, subtract, multiply, 
 | +, -     |  As binary operators, they add or subtract                                     | SELECT VALUE 1 + 2; |
 | *, /     |  Multiply, divide                                                              | SELECT VALUE 4 / 2.0; |
 | ^        |  Exponentiation                                                                | SELECT VALUE 2^3;       |
+| ||       |  String concatenation                                                          | SELECT VALUE "ab"||"c"||"d";       |
 
 ### <a id="Collection_operators">Collection operators
 Collection operators are used for membership tests (IN, NOT IN) or empty collection tests (EXISTS, NOT EXISTS).
@@ -278,6 +279,7 @@ The following table enumerates all of SQL++'s comparison operators.
 | IS NOT MISSING |  Test if a value is not MISSING                | SELECT * FROM ChirpMessages cm <br>WHERE cm.user.name IS NOT MISSING;|
 | IS UNKNOWN     |  Test if a value is NULL or MISSING            | SELECT * FROM ChirpMessages cm <br>WHERE cm.user.name IS UNKNOWN; | 
 | IS NOT UNKNOWN |  Test if a value is neither NULL nor MISSING   | SELECT * FROM ChirpMessages cm <br>WHERE cm.user.name IS NOT UNKNOWN;| 
+| BETWEEN        |  Test if a value is between a start value and <br>a end value. The comparison is inclusive <br>to both start and end values. |  SELECT * FROM ChirpMessages cm <br>WHERE cm.chirpId BETWEEN 10 AND 20;|
 | =              |  Equality test                                 | SELECT * FROM ChirpMessages cm <br>WHERE cm.chirpId=10; |
 | !=             |  Inequality test                               | SELECT * FROM ChirpMessages cm <br>WHERE cm.chirpId!=10;|
 | <              |  Less than                                     | SELECT * FROM ChirpMessages cm <br>WHERE cm.chirpId<10; |
