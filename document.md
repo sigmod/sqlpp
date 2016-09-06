@@ -490,8 +490,8 @@ In SQL++, `SELECT *` returns a record with a nested field for each input tuple. 
 Since `user` is the only binding variable generated in the `FROM` clause, this query returns:
 
     [
-      { "user": { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "userSince": datetime("2012-08-20T10:10:00.000Z"), "friendIds": {{ 2, 3, 6, 10 }}, "employment": [ { "organizationName": "Codetechno", "startDate": date("2006-08-06") }, { "organizationName": "geomedia", "startDate": date("2010-06-17"), "endDate": date("2010-01-26") } ], "nickname": "Mags", "gender": "F" } }
-      { "user": { "id": 2, "alias": "Isbel", "name": "IsbelDull", "userSince": datetime("2011-01-22T10:10:00.000Z"), "friendIds": {{ 1, 4 }}, "employment": [ { "organizationName": "Hexviafind", "startDate": date("2010-04-27") } ], "nickname": "Izzy" } }
+      { "user": { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "userSince": datetime("2012-08-20T10:10:00.000Z"), "friendIds": {{ 2, 3, 6, 10 }}, "employment": [ { "organizationName": "Codetechno", "startDate": date("2006-08-06") }, { "organizationName": "geomedia", "startDate": date("2010-06-17"), "endDate": date("2010-01-26") } ], "nickname": "Mags", "gender": "F" } },
+      { "user": { "id": 2, "alias": "Isbel", "name": "IsbelDull", "userSince": datetime("2011-01-22T10:10:00.000Z"), "friendIds": {{ 1, 4 }}, "employment": [ { "organizationName": "Hexviafind", "startDate": date("2010-04-27") } ], "nickname": "Izzy" } },
       { "user": { "id": 3, "alias": "Emory", "name": "EmoryUnk", "userSince": datetime("2012-07-10T10:10:00.000Z"), "friendIds": {{ 1, 5, 8, 9 }}, "employment": [ { "organizationName": "geomedia", "startDate": date("2010-06-17"), "endDate": date("2010-01-26") } ] } }
     ]
 
@@ -571,7 +571,7 @@ The following example is a query that retrieves the names of the organizations t
 This query returns:
 
     [
-      { "userId": 1, "orgName": "Codetechno" }
+      { "userId": 1, "orgName": "Codetechno" },
       { "userId": 1, "orgName": "geomedia" }
     ]
 
@@ -609,12 +609,12 @@ The next example shows this via a query that joins two data sets, GleambookUsers
 This returns:
 
     [
-      { "uname": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" }
-      { "uname": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" }
-      { "uname": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" }
-      { "uname": "MargaritaStoddard", "message": " like verizon the 3G is awesome:)" }
-      { "uname": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" }
-      { "uname": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" }
+      { "uname": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" },
+      { "uname": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" },
+      { "uname": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" },
+      { "uname": "MargaritaStoddard", "message": " like verizon the 3G is awesome:)" },
+      { "uname": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" },
+      { "uname": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" },
       { "uname": "IsbelDull", "message": " like samsung the plan is amazing" }
     ]  
 
@@ -698,12 +698,12 @@ The next two examples show queries that do not provide binding variables in thei
 Returns:
 
     [
-      { "name": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" }
-      { "name": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" }
-      { "name": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" }
-      { "name": "MargaritaStoddard", "message": " like verizon the 3G is awesome:)" }
-      { "name": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" }
-      { "name": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" }
+      { "name": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" },
+      { "name": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" },
+      { "name": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" },
+      { "name": "MargaritaStoddard", "message": " like verizon the 3G is awesome:)" },
+      { "name": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" },
+      { "name": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" },
       { "name": "IsbelDull", "message": " like samsung the plan is amazing" }
     ]
 
@@ -745,13 +745,13 @@ SQL++ supports SQL's notion of left outer join. The following query is an exampl
 Returns:
 
     [ 
-      { "uname": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" }
-      { "uname": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" }
-      { "uname": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" }
-      { "uname": "MargaritaStoddard", "message": " like verizon the 3G is awesome:)" }
-      { "uname": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" }
-      { "uname": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" }
-      { "uname": "IsbelDull", "message": " like samsung the plan is amazing" }
+      { "uname": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" },
+      { "uname": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" },
+      { "uname": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" },
+      { "uname": "MargaritaStoddard", "message": " like verizon the 3G is awesome:)" },
+      { "uname": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" },
+      { "uname": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" },
+      { "uname": "IsbelDull", "message": " like samsung the plan is amazing" },
       { "uname": "EmoryUnk" }
     ]
    
@@ -791,7 +791,7 @@ This first example query returns:
                              { "msg": { "messageId": 10, "authorId": 1, "inResponseTo": 12, "senderLocation": point("42.5,70.01"), "message": " can't stand motorola the touch-screen is terrible" } }, 
                              { "msg": { "messageId": 11, "authorId": 1, "inResponseTo": 1, "senderLocation": point("38.97,77.49"), "message": " can't stand at&t its plan is terrible" } }, 
                              { "msg": { "messageId": 2, "authorId": 1, "inResponseTo": 4, "senderLocation": point("41.66,80.87"), "message": " dislike iphone its touch-screen is horrible" } }, 
-                             { "msg": { "messageId": 4, "authorId": 1, "inResponseTo": 2, "senderLocation": point("37.73,97.04"), "message": " can't stand at&t the network is horrible:(" } } ] }
+                             { "msg": { "messageId": 4, "authorId": 1, "inResponseTo": 2, "senderLocation": point("37.73,97.04"), "message": " can't stand at&t the network is horrible:(" } } ] },
        { "uid": 2, "msgs": [ { "msg": { "messageId": 6, "authorId": 2, "inResponseTo": 1, "senderLocation": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" } }, 
                              { "msg": { "messageId": 3, "authorId": 2, "inResponseTo": 4, "senderLocation": point("48.09,81.01"), "message": " like samsung the plan is amazing" } } ] }
     ]
@@ -820,7 +820,7 @@ This variant of the example query returns:
                              { "messageId": 10, "authorId": 1, "inResponseTo": 12, "senderLocation": point("42.5,70.01"), "message": " can't stand motorola the touch-screen is terrible" },
                              { "messageId": 11, "authorId": 1, "inResponseTo": 1, "senderLocation": point("38.97,77.49"), "message": " can't stand at&t its plan is terrible" }, 
                              { "messageId": 2, "authorId": 1, "inResponseTo": 4, "senderLocation": point("41.66,80.87"), "message": " dislike iphone its touch-screen is horrible" }, 
-                             { "messageId": 4, "authorId": 1, "inResponseTo": 2, "senderLocation": point("37.73,97.04"), "message": " can't stand at&t the network is horrible:(" } ] }
+                             { "messageId": 4, "authorId": 1, "inResponseTo": 2, "senderLocation": point("37.73,97.04"), "message": " can't stand at&t the network is horrible:(" } ] },
        { "uid": 2, "msgs": [ { "messageId": 6, "authorId": 2, "inResponseTo": 1, "senderLocation": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" }, 
                              { "messageId": 3, "authorId": 2, "inResponseTo": 4, "senderLocation": point("48.09,81.01"), "message": " like samsung the plan is amazing" } ] }
 
@@ -853,7 +853,7 @@ Here the subquery further processes the groups.
 This example query returns:
 
     [
-      { "uid": 1, "msgs": [ { "messageId": 8, "authorId": 1, "inResponseTo": 11, "senderLocation": point("40.33,80.87"), "message": " like verizon the 3G is awesome:)" } ] }
+      { "uid": 1, "msgs": [ { "messageId": 8, "authorId": 1, "inResponseTo": 11, "senderLocation": point("40.33,80.87"), "message": " like verizon the 3G is awesome:)" } ] },
       { "uid": 2, "msgs": [ { "messageId": 3, "authorId": 2, "inResponseTo": 4, "senderLocation": point("48.09,81.01"), "message": " like samsung the plan is amazing" },
                             { "messageId": 6, "authorId": 2, "inResponseTo": 1, "senderLocation": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" } ] }
     ]
@@ -883,7 +883,7 @@ The next example illustrates a query that doesn't provide binding variables for 
 This query returns:
 
     [
-      { "authorId": 1, "msgs": [ { "messageId": 8, "authorId": 1, "inResponseTo": 11, "senderLocation": point("40.33,80.87"), "message": " like verizon the 3G is awesome:)" } ] }
+      { "authorId": 1, "msgs": [ { "messageId": 8, "authorId": 1, "inResponseTo": 11, "senderLocation": point("40.33,80.87"), "message": " like verizon the 3G is awesome:)" } ] },
       { "authorId": 2, "msgs": [ { "messageId": 3, "authorId": 2, "inResponseTo": 4, "senderLocation": point("48.09,81.01"), "message": " like samsung the plan is amazing" },
                                  { "messageId": 6, "authorId": 2, "inResponseTo": 1, "senderLocation": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" } ] }
     ]
@@ -912,7 +912,7 @@ binding variables defined in the `FROM` clause of the current enclosing `SELECT`
 This query returns:
 
     [
-      { "uid": 1, "msgs": [ { "message": " like verizon the 3G is awesome:)" } ] }
+      { "uid": 1, "msgs": [ { "message": " like verizon the 3G is awesome:)" } ] },
       { "uid": 2, "msgs": [ { "message": " like samsung the plan is amazing" },
                             { "message": " like t-mobile its platform is mind-blowing" } ] }
     ]
@@ -980,7 +980,7 @@ This example returns:
 This query returns:
 
     [
-      { "uid": 1, "msgCnt": 5 }
+      { "uid": 1, "msgCnt": 5 },
       { "uid": 2, "msgCnt": 2 }
     ]
 
@@ -1057,7 +1057,7 @@ SQL++ also allows column aliases to be used as `GROUP BY` keys or `ORDER BY` key
 This query returns:
 
     [ 
-      { "aid": 1, "$1": 5 }
+      { "aid": 1, "$1": 5 },
       { "aid": 2, "$1": 2 }
     ]
 
@@ -1081,7 +1081,7 @@ The following example returns all `GleambookUsers` ordered by their friend numbe
 This query returns:
 
     [
-      { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "userSince": datetime("2012-08-20T10:10:00.000Z"), "friendIds": {{ 2, 3, 6, 10 }}, "employment": [ { "organizationName": "Codetechno", "startDate": date("2006-08-06") }, { "organizationName": "geomedia", "startDate": date("2010-06-17"), "endDate": date("2010-01-26") } ], "nickname": "Mags", "gender": "F" }
+      { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "userSince": datetime("2012-08-20T10:10:00.000Z"), "friendIds": {{ 2, 3, 6, 10 }}, "employment": [ { "organizationName": "Codetechno", "startDate": date("2006-08-06") }, { "organizationName": "geomedia", "startDate": date("2010-06-17"), "endDate": date("2010-01-26") } ], "nickname": "Mags", "gender": "F" },
       { "id": 3, "alias": "Emory", "name": "EmoryUnk", "userSince": datetime("2012-07-10T10:10:00.000Z"), "friendIds": {{ 1, 5, 8, 9 }}, "employment": [ { "organizationName": "geomedia", "startDate": date("2010-06-17"), "endDate": date("2010-01-26") } ] }
       { "id": 2, "alias": "Isbel", "name": "IsbelDull", "userSince": datetime("2011-01-22T10:10:00.000Z"), "friendIds": {{ 1, 4 }}, "employment": [ { "organizationName": "Hexviafind", "startDate": date("2010-04-27") } ], "nickname": "Izzy" }
     ]
@@ -1120,7 +1120,7 @@ The next query shows an example.
 This query returns:
 
     [
-      { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "userSince": datetime("2012-08-20T10:10:00.000Z"), "friendIds": {{ 2, 3, 6, 10 }}, "employment": [ { "organizationName": "Codetechno", "startDate": date("2006-08-06") }, { "organizationName": "geomedia", "startDate": date("2010-06-17"), "endDate": date("2010-01-26") } ], "nickname": "Mags", "gender": "F" }
+      { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "userSince": datetime("2012-08-20T10:10:00.000Z"), "friendIds": {{ 2, 3, 6, 10 }}, "employment": [ { "organizationName": "Codetechno", "startDate": date("2006-08-06") }, { "organizationName": "geomedia", "startDate": date("2010-06-17"), "endDate": date("2010-01-26") } ], "nickname": "Mags", "gender": "F" },
       { "id": 3, "alias": "Emory", "name": "EmoryUnk", "userSince": datetime("2012-07-10T10:10:00.000Z"), "friendIds": {{ 1, 5, 8, 9 }}, "employment": [ { "organizationName": "geomedia", "startDate": date("2010-06-17"), "endDate": date("2010-01-26") } ] }
     ]
 
@@ -1162,7 +1162,7 @@ Similar to `WITH` clauses, `Let` clauses can be useful when a (complex) expressi
 This query lists `GleambookUsers` that have posted `GleambookMessages` and shows all authored messages for each listed user. It returns:
 
     [
-      { "messages": [ { "messageId": 8, "authorId": 1, "inResponseTo": 11, "senderLocation": point("40.33,80.87"), "message": " like verizon the 3G is awesome:)" }, { "messageId": 10, "authorId": 1, "inResponseTo": 12, "senderLocation": point("42.5,70.01"), "message": " can't stand motorola the touch-screen is terrible" }, { "messageId": 11, "authorId": 1, "inResponseTo": 1, "senderLocation": point("38.97,77.49"), "message": " can't stand at&t its plan is terrible" }, { "messageId": 2, "authorId": 1, "inResponseTo": 4, "senderLocation": point("41.66,80.87"), "message": " dislike iphone its touch-screen is horrible" }, { "messageId": 4, "authorId": 1, "inResponseTo": 2, "senderLocation": point("37.73,97.04"), "message": " can't stand at&t the network is horrible:(" } ], "uname": "MargaritaStoddard" }
+      { "messages": [ { "messageId": 8, "authorId": 1, "inResponseTo": 11, "senderLocation": point("40.33,80.87"), "message": " like verizon the 3G is awesome:)" }, { "messageId": 10, "authorId": 1, "inResponseTo": 12, "senderLocation": point("42.5,70.01"), "message": " can't stand motorola the touch-screen is terrible" }, { "messageId": 11, "authorId": 1, "inResponseTo": 1, "senderLocation": point("38.97,77.49"), "message": " can't stand at&t its plan is terrible" }, { "messageId": 2, "authorId": 1, "inResponseTo": 4, "senderLocation": point("41.66,80.87"), "message": " dislike iphone its touch-screen is horrible" }, { "messageId": 4, "authorId": 1, "inResponseTo": 2, "senderLocation": point("37.73,97.04"), "message": " can't stand at&t the network is horrible:(" } ], "uname": "MargaritaStoddard" },
       { "messages": [ { "messageId": 6, "authorId": 2, "inResponseTo": 1, "senderLocation": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" }, { "messageId": 3, "authorId": 2, "inResponseTo": 4, "senderLocation": point("48.09,81.01"), "message": " like samsung the plan is amazing" } ], "uname": "IsbelDull" }
     ]
 
@@ -1194,8 +1194,8 @@ UNION ALL can be used to combine two input streams into one. Similar to SQL, the
 This query returns:
 
     [
-      " like t-mobile its platform is mind-blowing"
-      " like samsung the plan is amazing"
+      " like t-mobile its platform is mind-blowing",
+      " like samsung the plan is amazing",
       { "uname": "IsbelDull" }
     ]
 
@@ -1221,7 +1221,7 @@ it retrieves a list of up to two "dislike" messages per user.
 For our sample data set, this query returns:
 
     [
-      { "uid": 1, "msgs": [ { "messageId": 2, "authorId": 1, "inResponseTo": 4, "senderLocation": point("41.66,80.87"), "message": " dislike iphone its touch-screen is horrible" } ] }
+      { "uid": 1, "msgs": [ { "messageId": 2, "authorId": 1, "inResponseTo": 4, "senderLocation": point("41.66,80.87"), "message": " dislike iphone its touch-screen is horrible" } ] },
       { "uid": 2, "msgs": [  ] }
     ]
 
