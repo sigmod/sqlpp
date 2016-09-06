@@ -1236,7 +1236,7 @@ The following matrix is a quick "key differences cheat sheet" for SQL++ and SQL-
 | SELECT * | Returns nested records. | Returns flattened concatenated records. |
 | Subquery | Returns a collection.  | The returned collection of records is cast into a scalar value if the subquery appears in a SELECT list or on one side of a comparison or as input to a function. |
 | Left outer join |  Fills in `MISSING` for non-matches.  |   Fills in `NULL`(s) for non-matches.    |
-| Union All       | Allows heterogenous input and does not enforce schema changes on data. | Different input streams have to have the equivalent structural types and output field names of non-first input streams have to be be changed to be the same as that of the first input stream.
+| Union All       | Allows heterogenous input and does not enforce schema changes on data. | Different input streams have to follow equivalent structural types and output field names for non-first input streams have to be be changed to be the same as that of the first input stream.
 | String literal | Double quotes or single quotes. | Single quotes only. |
 | Delimited identifiers | Backticks. | Double quotes. |
 
