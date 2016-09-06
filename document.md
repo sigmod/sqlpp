@@ -214,6 +214,7 @@ Operators perform a specific operation on the input values or expressions. The s
     OperatorExpression ::= PathExpression
                            | Operator OperatorExpression
                            | OperatorExpression Operator (OperatorExpression)?
+                           | OperatorExpression <BETWEEN> OperatorExpression <AND> OperatorExpression
 
 SQL++ provides a full set of operators that you can use within its statements. Here are the categories of operators:
 
@@ -232,7 +233,7 @@ The following table summarizes the precedence order (from higher to lower) of th
 | +, -                                                                        |  addition, subtraction  |
 | ||                                                                          |  string concatenation |
 | IS NULL, IS NOT NULL, IS MISSING, IS NOT MISSING, <br>IS UNKNOWN, IS NOT UNKNOWN| unknown value comparison |
-| BETWEEN, NOT BETWEEN                                                        | range comparison |
+| BETWEEN, NOT BETWEEN                                                        | range comparison (inclusive on both sides) |
 | =, !=, <, >, <=, >=, LIKE, NOT LIKE, IN, NOT IN                             | comparison  |
 | NOT                                                                         | logical negation |
 | AND                                                                         | conjunction |
