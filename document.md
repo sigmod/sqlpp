@@ -1179,7 +1179,9 @@ This query is equivalent to the following query that does not use the `LET` clau
     );
 
 ## <a id="Union_all">UNION ALL
-UNION ALL can be used to combine two input streams. Similar to SQL, there is no ordering guarantee on the output stream. However, different from SQL, SQL++ does not inspect what the data looks like on each input stream and allows heterogenity on the output stream and does not enforce schema change on any input streams. The following query is an example:
+UNION ALL can be used to combine two input streams into one. Similar to SQL, there is no ordering guarantee on the output stream. However, different from SQL, SQL++ does not inspect what the data looks like on each input stream and allows heterogenity on the output stream and does not enforce schema change on any input streams. The following query is an example:
+
+##### Example
 
     SELECT u.name AS uname
     FROM GleambookUsers u
@@ -1196,8 +1198,6 @@ This query returns:
       " like samsung the plan is amazing"
       { "uname": "IsbelDull" }
     ]
-
-##### Example
 
 ## <a id="Subqueries">Subqueries
 In SQL++, an arbitrary subquery can appear anywhere that an expression can appear.
