@@ -67,19 +67,19 @@
     * [Upserts](#Upserts)
     * [Deletes](#Deletes)
 
-# <a id="Introduction">1. Introduction</a><font size="4">
+# <a id="Introduction">1. Introduction</a><font size="4"/>
 
 This document is intended as a reference guide to the full syntax and semantics of the SQL++ Query Language, a SQL-inspired language for working with semistructured data. SQL++ has much in common with SQL, but there are also differences due to the data model that the language is designed to serve. (SQL was designed in the 1970's for interacting with the flat, schema-ified world of relational databases, while SQL++ is designed for the nested, schema-less/schema-optional world of modern NoSQL systems.) In particular, SQL++ in the context of Apache AsterixDB is intended for working with the Asterix Data Model (ADM), which is a data model aimed at a superset of JSON with an enriched and flexible type system.
 
 New AsterixDB users are encouraged to read and work through the (friendlier) guide "AsterixDB 101: An ADM and SQL++ Primer" before attempting to make use of this document. In addition, readers are advised to read and understand the Asterix Data Model (ADM) reference guide since a basic understanding of ADM concepts is a prerequisite to understanding SQL++. In what follows, we detail the features of the SQL++ language in a grammar-guided manner: we list and briefly explain each of the productions in the SQL++ grammar, offering examples (and results) for clarity.
 
-# <a id="Expressions">2. Expressions
+# <a id="Expressions">2. Expressions</a>
 
     Expression ::= OperatorExpression | CaseExpression | QuantifiedExpression
 
 SQL++ is a highly composable expression language. Each SQL++ expression returns zero or more Asterix Data Model (ADM) instances. There are three major kinds of expressions in SQL++. At the topmost level, a SQL++ expression can be an OperatorExpression (similar to a mathematical expression), an ConditionalExpression (to choose between alternative values), or a QuantifiedExpression (which yields a boolean value). Each will be detailed as we explore the full SQL++ grammar.
 
-## <a id="Primary_expressions">Primary Expressions
+## <a id="Primary_expressions">Primary Expressions</a>
 
     PrimaryExpr ::= Literal
                   | VariableReference
@@ -89,7 +89,7 @@ SQL++ is a highly composable expression language. Each SQL++ expression returns 
 
 The most basic building block for any SQL++ expression is PrimaryExpression. This can be a simple literal (constant) value, a reference to a query variable that is in scope, a parenthesized expression, a function call, or a newly constructed instance of the Asterix Data Model (such as a newly constructed ADM record or list of ADM instances).
 
-### <a id="Literals">Literals
+### <a id="Literals">Literals</a>
 
     Literal        ::= StringLiteral
                        | IntegerLiteral
@@ -111,8 +111,8 @@ The most basic building block for any SQL++ expression is PrimaryExpression. Thi
                      | <DIGITS> ( "." <DIGITS> )?
                      | "." <DIGITS>
 
-> MC: I tentatively deleted the following unused ESCAPE_QUOTE definition: <ESCAPE_QUOT>  ::= "\\\""
-> 		<ESCAPE_QUOT>  ::= "\\\""
+> MC: I tentatively deleted the following unused ESCAPE_QUOTE definition: &lt;ESCAPE_QUOT&gt;  ::= "\\\""
+> 		&lt;ESCAPE_QUOT&gt;  ::= "\\\""
 > Also, I moved the DelimitedIdentifier down further per TW's suggestion.
 
 Literals (constants) in SQL++ can be strings, integers, floating point values, double values, boolean constants, or special constant values like `NULL` and `MISSING`. The `NULL` value is like a `NULL` in SQL; it is used to represent an unknown field value. The specialy value `MISSING` is only meaningful in the context of SQL++ field accesses; it occurs when the accessed field simply does not exist at all in a record being accessed.
@@ -127,7 +127,7 @@ The following are some simple examples of SQL++ literals.
 
 Different from standard SQL, double quotes play the same role as single quotes and may be used for string literals in SQL++.
 
-### <a id="Variable_references">Variable References
+### <a id="Variable_references">Variable References</a>
 
     VariableReference ::= <IDENTIFIER>|<DelimitedIdentifier>
     <IDENTIFIER>  ::= <LETTER> (<LETTER> | <DIGIT> | "_" | "$")*
@@ -143,7 +143,7 @@ A variable in SQL++ can be bound to any legal ADM value. A variable reference re
     `SELECT`
     `my-function`
 
-### <a id="Parenthesized_expressions">Parenthesized expressions
+### <a id="Parenthesized_expressions">Parenthesized expressions</a>
 
     ParenthesizedExpression ::= "(" Expression ")" | Subquery
 
@@ -155,7 +155,7 @@ The following expression evaluates to the value 2.
 
     ( 1 + 1 )
 
-### <a id="Function_call_expressions">Function call expressions
+### <a id="Function_call_expressions">Function call expressions</a>
 
     FunctionCallExpression ::= FunctionName "(" ( Expression ( "," Expression )* )? ")"
 
@@ -167,7 +167,7 @@ The following example is a (built-in) function call expression whose value is 8.
 
     length('a string')
 
-### <a id="Constructors">Constructors
+### <a id="Constructors">Constructors</a>
 
     ListConstructor          ::= OrderedListConstructor | UnorderedListConstructor
     OrderedListConstructor   ::= "[" ( Expression ( "," Expression )* )? "]"
@@ -190,7 +190,7 @@ The following examples illustrate how to construct a new ordered list with 3 ite
 
     {{ 42, "forty-two!", { "rank": "Captain", "name": "America" }, 3.14159 }}
 
-### <a id="Path_expressions">Path expressions
+### <a id="Path_expressions">Path expressions</a>
 
     PathExpression  ::= PrimaryExpression ( Field | Index )*
     Field           ::= "." Identifier
@@ -208,7 +208,7 @@ The following examples illustrate field access for a record, index-based element
 
     ({"name": "MyABCs", "list": [ "a", "b", "c"]}).list[2]
 
-### <a id="Operator_expressions">Operator expressions
+### <a id="Operator_expressions">Operator expressions</a>
     
 Operators perform a specific operation on the input values or expressions. The syntax of an operator expression is as follows:
 
@@ -233,35 +233,35 @@ The following table summarizes the precedence order (from higher to lower) of th
 | *, /                                                                        |  multiplication, division |
 | +, -                                                                        |  addition, subtraction  |
 | ||                                                                          |  string concatenation |
-| IS NULL, IS NOT NULL, IS MISSING, IS NOT MISSING, <br>IS UNKNOWN, IS NOT UNKNOWN| unknown value comparison |
+| IS NULL, IS NOT NULL, IS MISSING, IS NOT MISSING, <br/>IS UNKNOWN, IS NOT UNKNOWN| unknown value comparison |
 | BETWEEN, NOT BETWEEN                                                        | range comparison (inclusive on both sides) |
 | =, !=, <, >, <=, >=, LIKE, NOT LIKE, IN, NOT IN                             | comparison  |
 | NOT                                                                         | logical negation |
 | AND                                                                         | conjunction |
 | OR                                                                          | disjunction |
 
-### <a id="Arithmetic_operators">Arithmetic operators
+### <a id="Arithmetic_operators">Arithmetic operators</a>
 Arithemtic operators are used to exponentiate, add, subtract, multiply, and divide numeric values, or concatenate string values.
  
-| Operator |  Purpose                                                                       | Example    |
-|----------|--------------------------------------------------------------------------------|------------|
-| +, -     |  As unary operators, they denote a <br>positive or negative expression         | SELECT VALUE -1; |
-| +, -     |  As binary operators, they add or subtract                                     | SELECT VALUE 1 + 2; |
-| *, /     |  Multiply, divide                                                              | SELECT VALUE 4 / 2.0; |
-| ^        |  Exponentiation                                                                | SELECT VALUE 2^3;       |
-| ||       |  String concatenation                                                          | SELECT VALUE "ab"||"c"||"d";       |
+| Operator     |  Purpose                                                                | Example    |
+|--------------|-------------------------------------------------------------------------|------------|
+| +, -         |  As unary operators, they denote a <br/>positive or negative expression | SELECT VALUE -1; |
+| +, -         |  As binary operators, they add or subtract                              | SELECT VALUE 1 + 2; |
+| *, /         |  Multiply, divide                                                       | SELECT VALUE 4 / 2.0; |
+| ^            |  Exponentiation                                                         | SELECT VALUE 2^3;       |
+| &#124;&#124; |  String concatenation                                                   | SELECT VALUE "ab"&#124;&#124;"c"&#124;&#124;"d";       |
 
-### <a id="Collection_operators">Collection operators
+### <a id="Collection_operators">Collection operators</a>
 Collection operators are used for membership tests (IN, NOT IN) or empty collection tests (EXISTS, NOT EXISTS).
 
 | Operator   |  Purpose                                     | Example    |
 |------------|----------------------------------------------|------------|
-| IN         |  Membership test                             | SELECT * FROM ChirpMessages cm <br>WHERE cm.user.lang IN ["en", "de"]; |
-| NOT IN     |  Non-membership test                         | SELECT * FROM ChirpMessages cm <br>WHERE cm.user.lang NOT IN ["en"]; |
-| EXISTS     |  Check whether a collection is not empty     | SELECT * FROM ChirpMessages cm <br>WHERE EXISTS cm.referredTopics; |
-| NOT EXISTS |  Check whether a collection is empty         | SELECT * FROM ChirpMessages cm <br>WHERE NOT EXISTS cm.referredTopics; |
+| IN         |  Membership test                             | SELECT * FROM ChirpMessages cm <br/>WHERE cm.user.lang IN ["en", "de"]; |
+| NOT IN     |  Non-membership test                         | SELECT * FROM ChirpMessages cm <br/>WHERE cm.user.lang NOT IN ["en"]; |
+| EXISTS     |  Check whether a collection is not empty     | SELECT * FROM ChirpMessages cm <br/>WHERE EXISTS cm.referredTopics; |
+| NOT EXISTS |  Check whether a collection is empty         | SELECT * FROM ChirpMessages cm <br/>WHERE NOT EXISTS cm.referredTopics; |
 
-### <a id="Comparison_operators">Comparison operators
+### <a id="Comparison_operators">Comparison operators</a>
 Comparison operators are used to compare values. The comparison operators fall into one of two sub-categories: missing value comparisons and regular value comparisons. SQL++ (and JSON) has two ways of representing missing information in a record - the presence of the field with a NULL for its value (as in SQL), and the absence of the field (which JSON permits). For example, the first of the following records represents Jack, whose friend is Jill. In the other examples, Jake is friendless a la SQL, with a friend field that is NULL, while Joe is friendless in a more natural (for JSON) way, i.e., by not having a friend field.
 
 ##### Examples
@@ -275,21 +275,21 @@ The following table enumerates all of SQL++'s comparison operators.
 
 | Operator       |  Purpose                                   | Example    |
 |----------------|--------------------------------------------|------------|
-| IS NULL        |  Test if a value is NULL                       | SELECT * FROM ChirpMessages cm <br>WHERE cm.user.name IS NULL; |
-| IS NOT NULL    |  Test if a value is not NULL                   | SELECT * FROM ChirpMessages cm <br>WHERE cm.user.name IS NOT NULL; | 
-| IS MISSING     |  Test if a value is MISSING                    | SELECT * FROM ChirpMessages cm <br>WHERE cm.user.name IS MISSING; |
-| IS NOT MISSING |  Test if a value is not MISSING                | SELECT * FROM ChirpMessages cm <br>WHERE cm.user.name IS NOT MISSING;|
-| IS UNKNOWN     |  Test if a value is NULL or MISSING            | SELECT * FROM ChirpMessages cm <br>WHERE cm.user.name IS UNKNOWN; | 
-| IS NOT UNKNOWN |  Test if a value is neither NULL nor MISSING   | SELECT * FROM ChirpMessages cm <br>WHERE cm.user.name IS NOT UNKNOWN;| 
-| BETWEEN        |  Test if a value is between a start value and <br>a end value. The comparison is inclusive <br>to both start and end values. |  SELECT * FROM ChirpMessages cm <br>WHERE cm.chirpId BETWEEN 10 AND 20;|
-| =              |  Equality test                                 | SELECT * FROM ChirpMessages cm <br>WHERE cm.chirpId=10; |
-| !=             |  Inequality test                               | SELECT * FROM ChirpMessages cm <br>WHERE cm.chirpId!=10;|
-| <              |  Less than                                     | SELECT * FROM ChirpMessages cm <br>WHERE cm.chirpId<10; |
-| >              |  Greater than                                  | SELECT * FROM ChirpMessages cm <br>WHERE cm.chirpId>10; |
-| <=             |  Less than or equal to                         | SELECT * FROM ChirpMessages cm <br>WHERE cm.chirpId<=10; |
-| >=             |  Greater than or equal to                      | SELECT * FROM ChirpMessages cm <br>WHERE cm.chirpId>=10; |
-| LIKE           |  Test if the left side matches a<br> pattern defined on the right<br> side; in the pattern,  "%" matches  <br>any string while "_" matches <br> any character. | SELECT * FROM ChirpMessages cm <br>WHERE cm.user.name LIKE "%Giesen%";|
-| NOT LIKE       |  Test if the left side does not <br>match a pattern defined on the right<br> side; in the pattern,  "%" matches <br>any string while "_" matches <br> any character. | SELECT * FROM ChirpMessages cm <br>WHERE cm.user.name NOT LIKE "%Giesen%";| 
+| IS NULL        |  Test if a value is NULL                       | SELECT * FROM ChirpMessages cm <br/>WHERE cm.user.name IS NULL; |
+| IS NOT NULL    |  Test if a value is not NULL                   | SELECT * FROM ChirpMessages cm <br/>WHERE cm.user.name IS NOT NULL; |
+| IS MISSING     |  Test if a value is MISSING                    | SELECT * FROM ChirpMessages cm <br/>WHERE cm.user.name IS MISSING; |
+| IS NOT MISSING |  Test if a value is not MISSING                | SELECT * FROM ChirpMessages cm <br/>WHERE cm.user.name IS NOT MISSING;|
+| IS UNKNOWN     |  Test if a value is NULL or MISSING            | SELECT * FROM ChirpMessages cm <br/>WHERE cm.user.name IS UNKNOWN; |
+| IS NOT UNKNOWN |  Test if a value is neither NULL nor MISSING   | SELECT * FROM ChirpMessages cm <br/>WHERE cm.user.name IS NOT UNKNOWN;|
+| BETWEEN        |  Test if a value is between a start value and <br/>a end value. The comparison is inclusive <br/>to both start and end values. |  SELECT * FROM ChirpMessages cm <br/>WHERE cm.chirpId BETWEEN 10 AND 20;|
+| =              |  Equality test                                 | SELECT * FROM ChirpMessages cm <br/>WHERE cm.chirpId=10; |
+| !=             |  Inequality test                               | SELECT * FROM ChirpMessages cm <br/>WHERE cm.chirpId!=10;|
+| <              |  Less than                                     | SELECT * FROM ChirpMessages cm <br/>WHERE cm.chirpId<10; |
+| >              |  Greater than                                  | SELECT * FROM ChirpMessages cm <br/>WHERE cm.chirpId>10; |
+| <=             |  Less than or equal to                         | SELECT * FROM ChirpMessages cm <br/>WHERE cm.chirpId<=10; |
+| >=             |  Greater than or equal to                      | SELECT * FROM ChirpMessages cm <br/>WHERE cm.chirpId>=10; |
+| LIKE           |  Test if the left side matches a<br/> pattern defined on the right<br/> side; in the pattern,  "%" matches  <br/>any string while "&#95;" matches <br/> any character. | SELECT * FROM ChirpMessages cm <br/>WHERE cm.user.name LIKE "%Giesen%";|
+| NOT LIKE       |  Test if the left side does not <br/>match a pattern defined on the right<br/> side; in the pattern,  "%" matches <br/>any string while "&#95;" matches <br/> any character. | SELECT * FROM ChirpMessages cm <br/>WHERE cm.user.name NOT LIKE "%Giesen%";| 
 
 The following table summarizes how the missing value comparison operators work.
 
@@ -302,7 +302,7 @@ The following table summarizes how the missing value comparison operators work.
 | IS UNKNOWN | FALSE | TRUE | TRUE |
 | IS NOT UNKNOWN | TRUE | FALSE | FALSE|
 
-### <a id="Logical_operators">Logical operators
+### <a id="Logical_operators">Logical operators</a>
 Logical operators perform logical `NOT`, `AND`, and `OR` operations over Boolean values (`TRUE` and `FALSE`) plus `NULL` and `MISSING`.
 
 | Operator |  Purpose                                   | Example    |
@@ -335,7 +335,7 @@ The following table demonstrates the results of `NOT` on all possible inputs.
 | NULL | NULL |
 | MISSING | MISSING | 
 
-### <a id="Case_expressions">Case expressions
+### <a id="Case_expressions">Case expressions</a>
 
     CaseExpression ::= SimpleCaseExpression | SearchedCaseExpression
     SimpleCaseExpression ::= <CASE> Expression ( <WHEN> Expression <THEN> Expression )+ ( <ELSE> Expression )? <END>
@@ -350,7 +350,7 @@ The following example illustrates the form of a case expression.
 
     CASE (2 < 3) WHEN true THEN "yes" ELSE "no" END
 
-### <a id="Quantified_expressions">Quantified expressions
+### <a id="Quantified_expressions">Quantified expressions</a>
 
     QuantifiedExpression ::= ( <SOME> | <EVERY> ) Variable <IN> Expression ( "," Variable "in" Expression )*
                              <SATISFIES> Expression
@@ -373,7 +373,7 @@ A SQL++ query can be any legal SQL++ expression or `SELECT` statement. A SQL++ q
 
     Query ::= (Expression | SelectStatement) ";"
 
-##  <a id="SELECT_statements">SELECT statements
+##  <a id="SELECT_statements">SELECT statements</a>
 
 The following shows the (rich) grammar for the `SELECT` statement in SQL++.
 
@@ -442,10 +442,10 @@ In this section, we will make use of two stored collections of records (datasets
     {"messageId":10,"authorId":1,"inResponseTo":12,"senderLocation":point("42.5,70.01"),"message":" can't stand motorola the touch-screen is terrible"}
     {"messageId":11,"authorId":1,"inResponseTo":1,"senderLocation":point("38.97,77.49"),"message":" can't stand at&t its plan is terrible"}
 
-## <a id="Select_clauses">SELECT Clause
+## <a id="Select_clauses">SELECT Clause</a>
 The SQL++ `SELECT` clause always returns a collection value as its result (even if the result is empty or a singleton).
 
-### <a id="Select_element">SELECT VALUE Clause
+### <a id="Select_element">SELECT VALUE Clause</a>
 The `SELECT VALUE` clause in SQL++ returns a collection that contains the results of evaluating the `VALUE` expression, with one evaluation being performed per "binding tuple" (i.e., per `FROM` clause item) satisfying the statement's selection criteria.
 For historical reasons SQL++ also allows the keywords `ELEMENT` or `RAW` to be used in place of `VALUE` (not recommended).
 The following example shows a query that selects one user from the GleambookUsers collection.
@@ -463,7 +463,7 @@ This query returns:
 
     ]
 
-### <a id="SQL_select">SQL-style SELECT
+### <a id="SQL_select">SQL-style SELECT</a>
 In SQL++, the traditional SQL-style `SELECT` syntax is also supported.
 This syntax can also be reformulated in a `SELECT VALUE` based manner in SQL++.
 (E.g., `SELECT expA AS fldA, expB AS fldB` is syntactic sugar for `SELECT VALUE { 'fldA': expA, 'fldB': expB }`.)
@@ -479,7 +479,7 @@ Returns:
       {"user_alias":"Margarita","user_name":"MargaritaStoddard"}
     ]
 
-### <a id="Select_star">SELECT *      
+### <a id="Select_star">SELECT *</a>
 In SQL++, `SELECT *` returns a record with a nested field for each input tuple. Each field has as its field name the name of a binding variable generated by either the `FROM` clause or `GROUP BY` clause in the current enclosing `SELECT` statement, and its field is the value of that binding variable.
 
 ##### Example
@@ -495,7 +495,7 @@ Since `user` is the only binding variable generated in the `FROM` clause, this q
       { "user": { "id": 3, "alias": "Emory", "name": "EmoryUnk", "userSince": datetime("2012-07-10T10:10:00.000Z"), "friendIds": {{ 1, 5, 8, 9 }}, "employment": [ { "organizationName": "geomedia", "startDate": date("2010-06-17"), "endDate": date("2010-01-26") } ] } }
     ]
 
-### <a id="Select_distinct">SELECT DISTINCT
+### <a id="Select_distinct">SELECT DISTINCT</a>
 SQL++'s `DISTINCT` keyword is used to eliminate duplicate items in results. The following example shows how it works.
 
 ##### Example
@@ -518,7 +518,7 @@ This version of the query returns:
 
     [ 1, 2, 3 ]
 
-### <a id="Unnamed_projections">Unnamed projections
+### <a id="Unnamed_projections">Unnamed projections</a>
 Similar to standard SQL, SQL++ supports unnamed projections (a.k.a, unnamed `SELECT` clause items), for which names are generated.
 Name generation has three cases:
 
@@ -540,7 +540,7 @@ This query outputs:
 
 In the result, `$1` is the generated name for `substr(user.name, 1)`, while `alias` is the generated name for `user.alias`.
 
-### <a id="Abbreviatory_field_access_expressions">Abbreviated Field Access Expressions
+### <a id="Abbreviatory_field_access_expressions">Abbreviated Field Access Expressions</a>
 As in standard SQL, SQL++ field access expressions can be abbreviated (not recommended) when there is no ambiguity. In the next example, the variable `user` is the only possible variable reference for fields `id`, `name` and `alias` and thus could be omitted in the query.
 
 ##### Example
@@ -555,10 +555,10 @@ Outputs:
       { "lname": "Stoddard", "alias": "Margarita" }
     ]
 
-## <a id="Unnest_clauses">UNNEST Clause
+## <a id="Unnest_clauses">UNNEST Clause</a>
 For each of its input tuples, the `UNNEST` clause flattens a collection-valued expression into individual items, producing multiple tuples, each of which is one of the expression's original input tuples augmented with a flattened item from its collection.
 
-### <a id="Inner_unnests">Inner UNNEST
+### <a id="Inner_unnests">Inner UNNEST</a>
 The following example is a query that retrieves the names of the organizations that a selected user has worked for. It uses the `UNNEST` clause to unnest the nested collection `employment` in the user's record.
 
 ##### Example
@@ -577,7 +577,7 @@ This query returns:
 
 Note that `UNNEST` has SQL's inner join semantics --- that is, if a user has no employment history, no tuple corresponding to that user will be emitted in the result.
 
-### <a id="Left_outer_unnests">Left outer UNNEST
+### <a id="Left_outer_unnests">Left outer UNNEST</a>
 As an alternative, the `LEFT OUTER UNNEST` clause offers SQL's left outer join semantics. For example, no collection-valued field named `hobbies` exists in the record for the user whose id is 1, but the following query's result still includes user 1.
 
 ##### Example
@@ -595,7 +595,7 @@ Returns:
 
 Note that if `u.hobbies` is an empty collection or leads to a `MISSING` (as above) or `NULL` value for a given input tuple, there is no corresponding binding value for variable `h` for an input tuple. A `MISSING` value will be generated for `h` so that the input tuple can still be propagated.
 
-### <a id="Expressing_joins_using_unnests">Expressing joins using UNNEST
+### <a id="Expressing_joins_using_unnests">Expressing joins using UNNEST</a>
 The SQL++ `UNNEST` clause is similar to SQL's `JOIN` clause except that it allows its right argument to be correlated to its left argument, as in the examples above --- i.e., think "correlated cross-product".
 The next example shows this via a query that joins two data sets, GleambookUsers and GleambookMessages, returning user/message pairs. The results contain one record per pair, with result records containing the user's name and an entire message. The query can be thought of as saying "for each Gleambook user, unnest the `GleambookMessages` collection and filter the output with the condition `message.authorId = user.id`".
 
@@ -630,10 +630,10 @@ Similarly, the above query can also be expressed as the `UNNEST`ing of a correla
         WHERE msg.authorId = u.id
     ) AS m;
 
-## <a id="From_clauses">FROM clauses
+## <a id="From_clauses">FROM clauses</a>
 A `FROM` clause is used for enumerating (i.e., conceptually iterating over) the contents of collections, as in SQL.
 
-### <a id="Binding_expressions">Binding expressions
+### <a id="Binding_expressions">Binding expressions</a>
 In SQL++, in addition to stored collections, a `FROM` clause can iterate over any intermediate collection returned by a valid SQL++ expression.
 
 ##### Example
@@ -648,7 +648,7 @@ Returns:
       3
     ]
 
-### <a id="Multiple_from_terms">Multiple FROM terms
+### <a id="Multiple_from_terms">Multiple FROM terms</a>
 SQL++ permits correlations among `FROM` terms. Specifically, a `FROM` binding expression can refer to variables defined to its left in the given `FROM` clause. Thus, the first unnesting example above could also be expressed as follows:
 
 ##### Example
@@ -658,7 +658,7 @@ SQL++ permits correlations among `FROM` terms. Specifically, a `FROM` binding ex
     WHERE u.id = 1;
 
 
-### <a id="Expressing_joins_using_from_terms">Expressing joins using FROM terms
+### <a id="Expressing_joins_using_from_terms">Expressing joins using FROM terms</a>
 Similarly, the join intentions of the other `UNNEST`-based join examples above could be expressed as:
 
 ##### Example
@@ -679,7 +679,7 @@ Similarly, the join intentions of the other `UNNEST`-based join examples above c
 
 Note that the first alternative is one of the SQL-92 approaches to expressing a join.
 
-### <a id="Implicit_binding_variables">Implicit binding variables
+### <a id="Implicit_binding_variables">Implicit binding variables</a>
 
 Similar to standard SQL, SQL++ supports implicit `FROM` binding variables (i.e., aliases), for which a binding variable is generated. SQL++ variable generation falls into three cases:
 
@@ -725,10 +725,10 @@ Returns:
         where ($GleambookMessages.authorId = $GleambookUsers.id)
     )
 
-## <a id="Join_clauses">JOIN clauses
+## <a id="Join_clauses">JOIN clauses</a>
 The join clause in SQL++ supports both inner joins and left outer joins from standard SQL.
 
-### <a id="Inner_joins">Inner joins
+### <a id="Inner_joins">Inner joins</a>
 Using a `JOIN` clause, the inner join intent from the preceeding examples can also be expressed as follows:
 
 ##### Example
@@ -736,7 +736,7 @@ Using a `JOIN` clause, the inner join intent from the preceeding examples can al
     SELECT u.name AS uname, m.message AS message
     FROM GleambookUsers u JOIN GleambookMessages m ON m.authorId = u.id;
 
-### <a id="Left_outer_joins">Left outer joins
+### <a id="Left_outer_joins">Left outer joins</a>
 SQL++ supports SQL's notion of left outer join. The following query is an example:
 
     SELECT u.name AS uname, m.message AS message
@@ -769,10 +769,10 @@ The left-outer join query can also be expressed using `LEFT OUTER UNNEST`:
 
 In general, in SQL++, SQL-style join queries can also be expressed by `UNNEST` clauses and left outer join queries can be expressed by `LEFT OUTER UNNESTs`.
 
-## <a id="Group_By_clauses">GROUP BY clauses
+## <a id="Group_By_clauses">GROUP BY clauses</a>
 The SQL++ `GROUP BY` clause generalizes standard SQL's grouping and aggregation semantics, but it also retains backward compatibility with the standard (relational) SQL `GROUP BY` and aggregation features.
 
-### <a id="Group_variables">Group variables
+### <a id="Group_variables">Group variables</a>
 In a `GROUP BY` clause, in addition to the binding variable(s) defined for the grouping key(s), SQL++ allows a user to define a *group variable* by using the clause's `GROUP AS` extension to denote the resulting group.
 After grouping, then, the query's in-scope variables include the grouping key's binding variables as well as this group variable which will be bound to one collection value for each group. This per-group collection value will be a set of nested records in which each field of the record is the result of a renamed variable defined in parentheses following the group variable's name. The `GROUP AS` syntax is as follows:
 
@@ -858,7 +858,7 @@ This example query returns:
                             { "messageId": 6, "authorId": 2, "inResponseTo": 1, "senderLocation": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" } ] }
     ]
 
-### <a id="Implicit_group_key_variables">Implicit grouping key variables
+### <a id="Implicit_group_key_variables">Implicit grouping key variables</a>
 In the SQL++ syntax, providing named binding variables for `GROUP BY` key expressions is optional.
 If a grouping key is missing a user-provided binding variable, the underlying compiler will generate one.
 Automatic grouping key variable naming falls into three cases in SQL++, much like the treatment of unnamed projections:
@@ -891,7 +891,7 @@ This query returns:
 Based on the three variable generation rules, the generated variable for the grouping key expression `message.authorId`
 is `authorId` (which is how it is referred to in the example's `SELECT` clause).
 
-### <a id="Implicit_group_variables">Implicit group variables
+### <a id="Implicit_group_variables">Implicit group variables</a>
 The group variable itself is also optional in SQL++'s `GROUP BY` syntax.
 If a user's query does not declare the name and structure of the group variable using `GROUP AS`,
 the query compiler will generate a unique group variable whose fields include all of the
@@ -930,7 +930,7 @@ legal, executable, and returns the same result:
     FROM GleambookMessages message
     GROUP BY message.authorId AS uid GROUP AS `$1` (message AS message);
 
-### <a id="Aggregation_functions">Aggregation functions
+### <a id="Aggregation_functions">Aggregation functions</a>
 In traditional SQL, which doesn't support nested data, grouping always also involves the use of aggregation
 compute properties of the groups (e.g., the average number of messages per user rather than the actual set
 of messages per user).
@@ -989,7 +989,7 @@ Notice how the query forms groups where each group involves a message author and
 The query then uses the collection aggregate function `COLL_COUNT` to get the cardinality of each
 group of messages.
     
-### <a id="SQL-92_aggregation_functions">SQL-92 aggregation functions
+### <a id="SQL-92_aggregation_functions">SQL-92 aggregation functions</a>
 For compatibility with the traditional SQL aggregation functions, SQL++ also offers SQL-92's
 aggregation function symbols (`COUNT`, `SUM`, `MAX`, `MIN`, and `AVG`) as supported syntactic sugar.
 The SQL++ compiler rewrites queries that utilize these function symbols into SQL++ queries that only
@@ -1018,7 +1018,7 @@ The same sort of rewritings apply to the function symbols `SUM`, `MAX`, `MIN`, a
 In contrast to the SQL++ collection aggregate functions, these special SQL-92 function symbols
 can only be used in the same way they are in standard SQL (i.e., with the same restrictions).
 
-### <a id="SQL-92_compliant_gby">SQL-92 compliant GROUP BY aggregations
+### <a id="SQL-92_compliant_gby">SQL-92 compliant GROUP BY aggregations</a>
 SQL++ provides full support for SQL-92 `GROUP BY` aggregation queries.
 The following query is such an example:
 
@@ -1045,7 +1045,7 @@ The following is the equivalent rewritten query that will be generated by the co
     FROM GleambookMessages msg
     GROUP BY msg.authorId AS authorId GROUP AS `$1`(msg AS msg);
 
-### <a id="Column_aliases">Column aliases
+### <a id="Column_aliases">Column aliases</a>
 SQL++ also allows column aliases to be used as `GROUP BY` keys or `ORDER BY` keys.
 
 ##### Example
@@ -1061,12 +1061,12 @@ This query returns:
       { "aid": 2, "$1": 2 }
     ]
 
-## <a id="Where_having_clauses">WHERE clauses and HAVING clauses
+## <a id="Where_having_clauses">WHERE clauses and HAVING clauses</a>
 Both `WHERE` clauses and `HAVING` clauses are used to filter input data based on a condition expression.
 Only tuples for which the condition expression evaluates to `TRUE` are propagated.
 Note that if the condition expression evaluates to `NULL` or `MISSING` the input tuple will be disgarded.
 
-## <a id="Order_By_clauses">ORDER BY clauses
+## <a id="Order_By_clauses">ORDER BY clauses</a>
 The `ORDER BY` clause is used to globally sort data in either ascending order (i.e., `ASC`) or descending order (i.e., `DESC`).
 During ordering, `MISSING` and `NULL` are treated as being smaller than any other value if they are encountered
 in the ordering key(s). `MISSING` is treated as smaller than `NULL` if both occur in the data being sorted.
@@ -1086,7 +1086,7 @@ This query returns:
       { "id": 2, "alias": "Isbel", "name": "IsbelDull", "userSince": datetime("2011-01-22T10:10:00.000Z"), "friendIds": {{ 1, 4 }}, "employment": [ { "organizationName": "Hexviafind", "startDate": date("2010-04-27") } ], "nickname": "Izzy" }
     ]
 
-## <a id="Limit_clauses">LIMIT clauses
+## <a id="Limit_clauses">LIMIT clauses</a>
 The `LIMIT` clause is used to limit the result set to a specified constant size.
 The use of the `LIMIT` clause is illustrated in the next example.
 
@@ -1103,7 +1103,7 @@ This query returns:
       { "id": 1, "alias": "Margarita", "name": "MargaritaStoddard", "userSince": datetime("2012-08-20T10:10:00.000Z"), "friendIds": {{ 2, 3, 6, 10 }}, "employment": [ { "organizationName": "Codetechno", "startDate": date("2006-08-06") }, { "organizationName": "geomedia", "startDate": date("2010-06-17"), "endDate": date("2010-01-26") } ], "nickname": "Mags", "gender": "F" }
     ]
 
-## <a id="With_clauses">WITH clauses
+## <a id="With_clauses">WITH clauses</a>
 As in standard SQL, `WITH` clauses are available to improve the modularity of a query.
 The next query shows an example.
 
@@ -1147,7 +1147,7 @@ not desirable. Thus, in the queries above, the use of "[0]" extracts the first (
 a list-valued query expression's result; this is needed above, even though the result is a list of one
 element, to "de-listify" the list and obtain the desired scalar for the comparison.
 
-## <a id="Let_clauses">LET clauses
+## <a id="Let_clauses">LET clauses</a>
 Similar to `WITH` clauses, `LET` clauses can be useful when a (complex) expression is used several times in a query, such that the query can be more concise. The next query shows an example.
 
 ##### Example
@@ -1178,7 +1178,7 @@ This query is equivalent to the following query that does not use the `LET` clau
                    WHERE m.authorId = u.id
     );
 
-## <a id="Union_all">UNION ALL
+## <a id="Union_all">UNION ALL</a>
 UNION ALL can be used to combine two input streams into one. Similar to SQL, there is no ordering guarantee on the output stream. However, different from SQL, SQL++ does not inspect what the data looks like on each input stream and allows heterogenity on the output stream and does not enforce schema change on any input streams. The following query is an example:
 
 ##### Example
@@ -1199,7 +1199,7 @@ This query returns:
       { "uname": "IsbelDull" }
     ]
 
-## <a id="Subqueries">Subqueries
+## <a id="Subqueries">Subqueries</a>
 In SQL++, an arbitrary subquery can appear anywhere that an expression can appear.
 Unlike SQL-92, as was just alluded to, the subqueries in a SELECT list or a boolean predicate need
 not return singleton, single-column relations.
@@ -1228,7 +1228,7 @@ For our sample data set, this query returns:
 Note that a subquery, like a top-level `SELECT` statment, always returns a collection -- regardless of where
 within a query the subquery occurs -- and again, its result is never automatically cast into a scalar.
 
-## <a id="Vs_SQL-92">SQL++ vs. SQL-92
+## <a id="Vs_SQL-92">SQL++ vs. SQL-92</a>
 The following matrix is a quick "key differences cheat sheet" for SQL++ and SQL-92.
 
 | Feature |  SQL++ | SQL-92 |
@@ -1269,7 +1269,7 @@ This section details the DDL and DML statements supported in the SQL++ language 
 > TW: AsterixDB?
 > MC: Good question here - I eradicated the preceding references except in the Intro, which needs a rewrite, but here it is really still about AsterixDB, I think?  (Since most of these statements will be hidden in the Couchbase case?)
 
-## <a id="Declarations">Declarations
+## <a id="Declarations">Declarations</a>
 
     DatabaseDeclaration ::= "USE" Identifier
 
@@ -1309,7 +1309,7 @@ For our sample data set, this returns:
 
     ]
 
-## <a id="Lifecycle_management_statements">Lifecycle management statements
+## <a id="Lifecycle_management_statements">Lifecycle management statements</a>
 
     CreateStatement ::= "CREATE" ( DatabaseSpecification
                                  | TypeSpecification
@@ -1323,7 +1323,7 @@ For our sample data set, this returns:
 The CREATE statement in SQL++ is used for creating dataverses as well as other persistent artifacts in a dataverse.
 It can be used to create new dataverses, datatypes, datasets, indexes, and user-defined SQL++ functions.
 
-### <a id="Dataverses"> Dataverses
+### <a id="Dataverses"> Dataverses</a>
 
     DatabaseSpecification ::= "DATAVERSE" Identifier IfNotExists ( "WITH" "FORMAT" StringLiteral )?
 
@@ -1343,7 +1343,7 @@ The following example creates a new dataverse named TinySocial if one does not a
 
     CREATE DATAVERSE TinySocial IF NOT EXISTS;
 
-### <a id="Types"> Types
+### <a id="Types"> Types</a>
 
     TypeSpecification    ::= "TYPE" FunctionOrTypeName IfNotExists "AS" TypeExpr
     FunctionOrTypeName   ::= QualifiedName
@@ -1403,7 +1403,7 @@ This field type can be used if you want to have this field be an autogenerated-P
       name:       string
     };
 
-### <a id="Datasets"> Datasets
+### <a id="Datasets"> Datasets</a>
 
     DatasetSpecification ::= ( <INTERNAL> )? <DATASET> QualifiedName "(" QualifiedName ")" IfNotExists 
                                PrimaryKey ( <ON> Identifier )? ( <HINTS> Properties )? 
@@ -1566,7 +1566,7 @@ The following example creates a keyword index called fbMessageIdx on the message
 
     CREATE INDEX fbMessageIdx ON GleambookMessages(message) TYPE KEYWORD;
 
-### <a id="Functions"> Functions
+### <a id="Functions"> Functions</a>
 
 The create function statement creates a **named** function that can then be used and reused in SQL++ queries.
 The body of a function can be any SQL++ expression involving the function's parameters.
@@ -1634,9 +1634,9 @@ The following example shows how to bulk load the GleambookUsers dataset from an 
      LOAD DATASET GleambookUsers USING localfs
         (("path"="127.0.0.1:///Users/bignosqlfan/tinysocialnew/gbu.adm"),("format"="adm"));
 
-## <a id="Modification_statements">Modification statements
+## <a id="Modification_statements">Modification statements</a>
 
-### <a id="Inserts">INSERTs
+### <a id="Inserts">INSERTs</a>
 
     InsertStatement ::= <INSERT> <INTO> QualifiedName Query
 
@@ -1662,7 +1662,7 @@ The following example illustrates a query-based insertion.
 
     INSERT INTO UsersCopy (SELECT VALUE user FROM GleambookUsers user)
 
-### <a id="Upserts">UPSERTs
+### <a id="Upserts">UPSERTs</a>
 
     UpsertStatement ::= <UPSERT> <INTO> QualifiedName Query
 
@@ -1679,7 +1679,7 @@ The following example illustrates a query-based upsert operation.
 *Editor's note: Upserts currently work in AQL but are apparently disabled at the moment in SQL++.
 (@Yingyi, is that indeed the case?)*
 
-### <a id="Deletes">DELETEs
+### <a id="Deletes">DELETEs</a>
 
     DeleteStatement ::= <DELETE> <FROM> QualifiedName ( (<AS>)? Variable )? ( <WHERE> Expression )?
 
