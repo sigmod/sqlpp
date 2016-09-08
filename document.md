@@ -3,7 +3,7 @@
 ## <a id="toc">Table of Contents</a> ##
 
 * [1. Introduction](#Introduction)
-* [2. Expressions](#Expressions)  
+* [2. Expressions](#Expressions)
   * [Primary expressions](#Primary_expressions)
     * [Literals](#Literals)
     * [Variable references](#Variable_references)
@@ -209,7 +209,7 @@ The following examples illustrate field access for a record, index-based element
     ({"name": "MyABCs", "list": [ "a", "b", "c"]}).list[2]
 
 ### <a id="Operator_expressions">Operator expressions</a>
-    
+
 Operators perform a specific operation on the input values or expressions. The syntax of an operator expression is as follows:
 
     OperatorExpression ::= PathExpression
@@ -242,7 +242,7 @@ The following table summarizes the precedence order (from higher to lower) of th
 
 ### <a id="Arithmetic_operators">Arithmetic operators</a>
 Arithemtic operators are used to exponentiate, add, subtract, multiply, and divide numeric values, or concatenate string values.
- 
+
 | Operator     |  Purpose                                                                | Example    |
 |--------------|-------------------------------------------------------------------------|------------|
 | +, -         |  As unary operators, they denote a <br/>positive or negative expression | SELECT VALUE -1; |
@@ -271,7 +271,7 @@ Comparison operators are used to compare values. The comparison operators fall i
 
 {"name": "Joe"}
 
-The following table enumerates all of SQL++'s comparison operators. 
+The following table enumerates all of SQL++'s comparison operators.
 
 | Operator       |  Purpose                                   | Example    |
 |----------------|--------------------------------------------|------------|
@@ -308,7 +308,7 @@ Logical operators perform logical `NOT`, `AND`, and `OR` operations over Boolean
 | Operator |  Purpose                                   | Example    |
 |----------|-----------------------------------------------------------------------------|------------|
 | NOT      |  Returns true if the following condition is false, otherwise returns false  | SELECT VALUE NOT TRUE;  |
-| AND      |  Returns true if both branches are true, otherwise returns false            | SELECT VALUE TRUE AND FALSE; | 
+| AND      |  Returns true if both branches are true, otherwise returns false            | SELECT VALUE TRUE AND FALSE; |
 | OR       |  Returns true if one branch is true, otherwise returns false                | SELECT VALUE FALSE OR FALSE; |
 
 The following table is the truth table for `AND` and `OR`.
@@ -333,7 +333,7 @@ The following table demonstrates the results of `NOT` on all possible inputs.
 | TRUE | FALSE |
 | FALSE | TRUE |
 | NULL | NULL |
-| MISSING | MISSING | 
+| MISSING | MISSING |
 
 ### <a id="Case_expressions">Case expressions</a>
 
@@ -383,7 +383,7 @@ The following shows the (rich) grammar for the `SELECT` statement in SQL++.
                            SelectSetOperation (OrderbyClause )? ( LimitClause )?
     SelectSetOperation ::= SelectBlock (<UNION> <ALL> ( SelectBlock | Subquery ) )*
     Subquery           ::= "(" SelectStatement ")"
-    
+
     SelectBlock        ::= SelectClause
                            ( FromClause ( WithClause )?)?
                            ( WhereClause )?
@@ -398,7 +398,7 @@ The following shows the (rich) grammar for the `SELECT` statement in SQL++.
     SelectRegular      ::= Projection ( "," Projection )*
     SelectValue      ::= ( <VALUE> | <ELEMENT> | <RAW> ) Expression
     Projection         ::= ( Expression ( <AS> )? Identifier | "*" )
-  
+
     FromClause         ::= <FROM> FromTerm ( "," FromTerm )*
     FromTerm           ::= Expression (( <AS> )? Variable)? ( <AT> Variable )?
                            ( ( JoinType )? ( JoinClause | UnnestClause ) )*
@@ -412,15 +412,15 @@ The following shows the (rich) grammar for the `SELECT` statement in SQL++.
     LetClause          ::= (<LET> | <LETTING>) LetElement ( "," LetElement )*
     LetElement         ::= Variable "=" Expression
     WithElement        ::= Variable <AS> Expression
-  
+
     WhereClause        ::= <WHERE> Expression
-    
+
     GroupbyClause      ::= <GROUP> <BY> ( Expression ( (<AS>)? Variable )? ( "," Expression ( (<AS>)? Variable )? )*
                            ( <GROUP> <AS> Variable
                              ("(" Variable <AS> VariableReference ("," Variable <AS> VariableReference )* ")")?
                            )?
     HavingClause       ::= <HAVING> Expression
-    
+
     OrderbyClause      ::= <ORDER> <BY> Expression ( <ASC> | <DESC> )? ( "," Expression ( <ASC> | <DESC> )? )*
     LimitClause        ::= <LIMIT> Expression ( <OFFSET> Expression )?
 
@@ -472,7 +472,7 @@ This syntax can also be reformulated in a `SELECT VALUE` based manner in SQL++.
     SELECT user.alias user_alias, user.name user_name
     FROM GleambookUsers user
     WHERE user.id = 1;
-    
+
 Returns:
 
     [
@@ -504,7 +504,7 @@ SQL++'s `DISTINCT` keyword is used to eliminate duplicate items in results. The 
 
 This query returns:
 
-    [ 
+    [
       { "foo": 1 },
       { "foo": 2 },
       { "foo": 3 }
@@ -531,10 +531,10 @@ Name generation has three cases:
     SELECT substr(user.name, 10), user.alias
     FROM GleambookUsers user
     WHERE user.id = 1;
-    
+
 This query outputs:
 
-    [ 
+    [
       { "$1": "Stoddard", "alias": "Margarita" }
     ]
 
@@ -551,7 +551,7 @@ As in standard SQL, SQL++ field access expressions can be abbreviated (not recom
 
 Outputs:
 
-    [ 
+    [
       { "lname": "Stoddard", "alias": "Margarita" }
     ]
 
@@ -616,7 +616,7 @@ This returns:
       { "uname": "MargaritaStoddard", "message": " can't stand motorola the touch-screen is terrible" },
       { "uname": "IsbelDull", "message": " like t-mobile its platform is mind-blowing" },
       { "uname": "IsbelDull", "message": " like samsung the plan is amazing" }
-    ]  
+    ]
 
 Similarly, the above query can also be expressed as the `UNNEST`ing of a correlated SQL++ subquery:
 
@@ -710,7 +710,7 @@ Returns:
 ##### Example
 
     SELECT GleambookUsers.name, GleambookMessages.message
-    FROM GleambookUsers, 
+    FROM GleambookUsers,
       (
         SELECT VALUE GleambookMessages
         FROM GleambookMessages
@@ -744,7 +744,7 @@ SQL++ supports SQL's notion of left outer join. The following query is an exampl
 
 Returns:
 
-    [ 
+    [
       { "uname": "MargaritaStoddard", "message": " can't stand at&t its plan is terrible" },
       { "uname": "MargaritaStoddard", "message": " dislike iphone its touch-screen is horrible" },
       { "uname": "MargaritaStoddard", "message": " can't stand at&t the network is horrible:(" },
@@ -754,7 +754,7 @@ Returns:
       { "uname": "IsbelDull", "message": " like samsung the plan is amazing" },
       { "uname": "EmoryUnk" }
     ]
-   
+
 For non-matching left-side tuples, SQL++ produces `MISSING` values for the right-side binding variables; that is why the last record in the above result doesn't have a `message` field. Note that this is slightly different from standard SQL, which instead would fill in `NULL` values for the right-side fields. The reason for this difference is that, for non-matches in its join results, SQL++ views fields from the right-side as being "not there" (a.k.a. `MISSING`) instead of as being "there but unknown" (i.e., `NULL`).
 
 The left-outer join query can also be expressed using `LEFT OUTER UNNEST`:
@@ -787,12 +787,12 @@ After grouping, then, the query's in-scope variables include the grouping key's 
 This first example query returns:
 
     [
-       { "uid": 1, "msgs": [ { "msg": { "messageId": 8, "authorId": 1, "inResponseTo": 11, "senderLocation": point("40.33,80.87"), "message": " like verizon the 3G is awesome:)" } }, 
-                             { "msg": { "messageId": 10, "authorId": 1, "inResponseTo": 12, "senderLocation": point("42.5,70.01"), "message": " can't stand motorola the touch-screen is terrible" } }, 
-                             { "msg": { "messageId": 11, "authorId": 1, "inResponseTo": 1, "senderLocation": point("38.97,77.49"), "message": " can't stand at&t its plan is terrible" } }, 
-                             { "msg": { "messageId": 2, "authorId": 1, "inResponseTo": 4, "senderLocation": point("41.66,80.87"), "message": " dislike iphone its touch-screen is horrible" } }, 
+       { "uid": 1, "msgs": [ { "msg": { "messageId": 8, "authorId": 1, "inResponseTo": 11, "senderLocation": point("40.33,80.87"), "message": " like verizon the 3G is awesome:)" } },
+                             { "msg": { "messageId": 10, "authorId": 1, "inResponseTo": 12, "senderLocation": point("42.5,70.01"), "message": " can't stand motorola the touch-screen is terrible" } },
+                             { "msg": { "messageId": 11, "authorId": 1, "inResponseTo": 1, "senderLocation": point("38.97,77.49"), "message": " can't stand at&t its plan is terrible" } },
+                             { "msg": { "messageId": 2, "authorId": 1, "inResponseTo": 4, "senderLocation": point("41.66,80.87"), "message": " dislike iphone its touch-screen is horrible" } },
                              { "msg": { "messageId": 4, "authorId": 1, "inResponseTo": 2, "senderLocation": point("37.73,97.04"), "message": " can't stand at&t the network is horrible:(" } } ] },
-       { "uid": 2, "msgs": [ { "msg": { "messageId": 6, "authorId": 2, "inResponseTo": 1, "senderLocation": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" } }, 
+       { "uid": 2, "msgs": [ { "msg": { "messageId": 6, "authorId": 2, "inResponseTo": 1, "senderLocation": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" } },
                              { "msg": { "messageId": 3, "authorId": 2, "inResponseTo": 4, "senderLocation": point("48.09,81.01"), "message": " like samsung the plan is amazing" } } ] }
     ]
 
@@ -818,10 +818,10 @@ This variant of the example query returns:
 
        { "uid": 1, "msgs": [ { "messageId": 8, "authorId": 1, "inResponseTo": 11, "senderLocation": point("40.33,80.87"), "message": " like verizon the 3G is awesome:)" },
                              { "messageId": 10, "authorId": 1, "inResponseTo": 12, "senderLocation": point("42.5,70.01"), "message": " can't stand motorola the touch-screen is terrible" },
-                             { "messageId": 11, "authorId": 1, "inResponseTo": 1, "senderLocation": point("38.97,77.49"), "message": " can't stand at&t its plan is terrible" }, 
-                             { "messageId": 2, "authorId": 1, "inResponseTo": 4, "senderLocation": point("41.66,80.87"), "message": " dislike iphone its touch-screen is horrible" }, 
+                             { "messageId": 11, "authorId": 1, "inResponseTo": 1, "senderLocation": point("38.97,77.49"), "message": " can't stand at&t its plan is terrible" },
+                             { "messageId": 2, "authorId": 1, "inResponseTo": 4, "senderLocation": point("41.66,80.87"), "message": " dislike iphone its touch-screen is horrible" },
                              { "messageId": 4, "authorId": 1, "inResponseTo": 2, "senderLocation": point("37.73,97.04"), "message": " can't stand at&t the network is horrible:(" } ] },
-       { "uid": 2, "msgs": [ { "messageId": 6, "authorId": 2, "inResponseTo": 1, "senderLocation": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" }, 
+       { "uid": 2, "msgs": [ { "messageId": 6, "authorId": 2, "inResponseTo": 1, "senderLocation": point("31.5,75.56"), "message": " like t-mobile its platform is mind-blowing" },
                              { "messageId": 3, "authorId": 2, "inResponseTo": 4, "senderLocation": point("48.09,81.01"), "message": " like samsung the plan is amazing" } ] }
 
 Because this is a fairly common case, a third variant with output identical to the second variant is also possible:
@@ -976,7 +976,7 @@ This example returns:
     SELECT uid AS uid, COLL_COUNT(grp) AS msgCnt
     FROM GleambookMessages message
     GROUP BY message.authorId AS uid GROUP AS grp(message AS msg);
-    
+
 This query returns:
 
     [
@@ -988,7 +988,7 @@ Notice how the query forms groups where each group involves a message author and
 (SQL cannot do this because the grouped intermediate result is non-1NF in nature.)
 The query then uses the collection aggregate function `COLL_COUNT` to get the cardinality of each
 group of messages.
-    
+
 ### <a id="SQL-92_aggregation_functions">SQL-92 aggregation functions</a>
 For compatibility with the traditional SQL aggregation functions, SQL++ also offers SQL-92's
 aggregation function symbols (`COUNT`, `SUM`, `MAX`, `MIN`, and `AVG`) as supported syntactic sugar.
@@ -1027,10 +1027,10 @@ The following query is such an example:
     SELECT msg.authorId, COUNT(msg)
     FROM GleambookMessages msg
     GROUP BY msg.authorId;
-    
+
 This query outputs:
 
-    [ 
+    [
       { "authorId": 1, "$1": 5 },
       { "authorId": 2, "$1": 2 }
     ]
@@ -1056,7 +1056,7 @@ SQL++ also allows column aliases to be used as `GROUP BY` keys or `ORDER BY` key
 
 This query returns:
 
-    [ 
+    [
       { "aid": 1, "$1": 5 },
       { "aid": 2, "$1": 2 }
     ]
@@ -1109,7 +1109,7 @@ The next query shows an example.
 
 ##### Example
 
-    WITH avgFriendCount AS ( 
+    WITH avgFriendCount AS (
       SELECT VALUE AVG(LEN(user.friendIds))
       FROM GleambookUsers AS user
     )[0]
@@ -1187,7 +1187,7 @@ UNION ALL can be used to combine two input streams into one. Similar to SQL, the
     FROM GleambookUsers u
     WHERE u.id = 2
     UNION ALL
-    SELECT VALUE m.message 
+    SELECT VALUE m.message
     FROM GleambookMessages m
     WHERE authorId=2;
 
@@ -1405,8 +1405,8 @@ This field type can be used if you want to have this field be an autogenerated-P
 
 ### <a id="Datasets"> Datasets</a>
 
-    DatasetSpecification ::= ( <INTERNAL> )? <DATASET> QualifiedName "(" QualifiedName ")" IfNotExists 
-                               PrimaryKey ( <ON> Identifier )? ( <HINTS> Properties )? 
+    DatasetSpecification ::= ( <INTERNAL> )? <DATASET> QualifiedName "(" QualifiedName ")" IfNotExists
+                               PrimaryKey ( <ON> Identifier )? ( <HINTS> Properties )?
                                ( "USING" "COMPACTION" "POLICY" CompactionPolicy ( Configuration )? )?
                                ( <WITH> <FILTER> <ON> Identifier )?
                               |
